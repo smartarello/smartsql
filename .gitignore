@@ -1,3 +1,9 @@
+# Moc object
+moc_*.cpp
+
+#Qt files
+*.pro
+
 # Compiled Object files
 *.slo
 *.lo
@@ -26,3 +32,4 @@
 *.exe
 *.out
 *.app
+mysqlclient
