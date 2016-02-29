@@ -1,35 +1,6 @@
-# Moc object
-moc_*.cpp
-
-#Qt files
-*.pro
-
-# Compiled Object files
-*.slo
-*.lo
+/Debug/
 *.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+.project
+.cproject
+moc_*.cpp
 mysqlclient

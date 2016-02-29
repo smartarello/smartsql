@@ -49,16 +49,16 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = main.cpp \
-		UI/Session/NewSessionWindow.cpp \
+		UI/Session/EditSessionWindow.cpp \
 		UI/Session/SessionWindow.cpp \
-		UI/MainWindow.cpp moc_NewSessionWindow.cpp \
+		UI/MainWindow.cpp moc_EditSessionWindow.cpp \
 		moc_SessionWindow.cpp \
 		moc_MainWindow.cpp
 OBJECTS       = main.o \
-		NewSessionWindow.o \
+		EditSessionWindow.o \
 		SessionWindow.o \
 		MainWindow.o \
-		moc_NewSessionWindow.o \
+		moc_EditSessionWindow.o \
 		moc_SessionWindow.o \
 		moc_MainWindow.o
 DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
@@ -195,10 +195,10 @@ DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/exceptions.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/yacc.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/lex.prf \
-		mysqlclient.pro UI/Session/NewSessionWindow.h \
+		mysqlclient.pro UI/Session/EditSessionWindow.h \
 		UI/Session/SessionWindow.h \
 		UI/MainWindow.h main.cpp \
-		UI/Session/NewSessionWindow.cpp \
+		UI/Session/EditSessionWindow.cpp \
 		UI/Session/SessionWindow.cpp \
 		UI/MainWindow.cpp
 QMAKE_TARGET  = mysqlclient
@@ -522,8 +522,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents UI/Session/NewSessionWindow.h UI/Session/SessionWindow.h UI/MainWindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp UI/Session/NewSessionWindow.cpp UI/Session/SessionWindow.cpp UI/MainWindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents UI/Session/EditSessionWindow.h UI/Session/SessionWindow.h UI/MainWindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp UI/Session/EditSessionWindow.cpp UI/Session/SessionWindow.cpp UI/MainWindow.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -546,10 +546,10 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_NewSessionWindow.cpp moc_SessionWindow.cpp moc_MainWindow.cpp
+compiler_moc_header_make_all: moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_MainWindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_NewSessionWindow.cpp moc_SessionWindow.cpp moc_MainWindow.cpp
-moc_NewSessionWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
+	-$(DEL_FILE) moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_MainWindow.cpp
+moc_EditSessionWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
@@ -651,8 +651,15 @@ moc_NewSessionWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
-		UI/Session/NewSessionWindow.h
-	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Session/NewSessionWindow.h -o moc_NewSessionWindow.cpp
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		UI/Session/EditSessionWindow.h
+	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Session/EditSessionWindow.h -o moc_EditSessionWindow.cpp
 
 moc_SessionWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
@@ -759,8 +766,8 @@ moc_SessionWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		UI/Session/SessionWindow.h
 	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Session/SessionWindow.h -o moc_SessionWindow.cpp
 
-moc_MainWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
+moc_MainWindow.cpp: UI/Session/EditSessionWindow.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
@@ -862,8 +869,18 @@ moc_MainWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
 		UI/MainWindow.h
 	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/MainWindow.h -o moc_MainWindow.cpp
 
@@ -990,13 +1007,23 @@ main.o: main.cpp ../../Qt/5.5/gcc_64/include/QtWidgets/QApplication \
 		../../Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
 		UI/MainWindow.h \
+		UI/Session/EditSessionWindow.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
-		../../Qt/5.5/gcc_64/include/QtGui/qicon.h
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
-NewSessionWindow.o: UI/Session/NewSessionWindow.cpp UI/Session/NewSessionWindow.h \
+EditSessionWindow.o: UI/Session/EditSessionWindow.cpp UI/Session/EditSessionWindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
@@ -1099,13 +1126,6 @@ NewSessionWindow.o: UI/Session/NewSessionWindow.cpp UI/Session/NewSessionWindow.
 		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QFormLayout \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qformlayout.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QLayout \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
@@ -1113,13 +1133,21 @@ NewSessionWindow.o: UI/Session/NewSessionWindow.cpp UI/Session/NewSessionWindow.
 		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QFormLayout \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qformlayout.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLayout \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o NewSessionWindow.o UI/Session/NewSessionWindow.cpp
+		../../Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
+		../../Qt/5.5/gcc_64/include/QtCore/QString
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EditSessionWindow.o UI/Session/EditSessionWindow.cpp
 
 SessionWindow.o: UI/Session/SessionWindow.cpp ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
@@ -1236,12 +1264,17 @@ SessionWindow.o: UI/Session/SessionWindow.cpp ../../Qt/5.5/gcc_64/include/QtWidg
 		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QSettings \
+		../../Qt/5.5/gcc_64/include/QtCore/qsettings.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLabel \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
 		UI/Session/SessionWindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SessionWindow.o UI/Session/SessionWindow.cpp
 
 MainWindow.o: UI/MainWindow.cpp UI/MainWindow.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
+		UI/Session/EditSessionWindow.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
@@ -1343,12 +1376,25 @@ MainWindow.o: UI/MainWindow.cpp UI/MainWindow.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
-		../../Qt/5.5/gcc_64/include/QtGui/qicon.h
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
+		../../Qt/5.5/gcc_64/include/QtCore/QSettings \
+		../../Qt/5.5/gcc_64/include/QtCore/qsettings.h \
+		UI/Session/SessionWindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o UI/MainWindow.cpp
 
-moc_NewSessionWindow.o: moc_NewSessionWindow.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_NewSessionWindow.o moc_NewSessionWindow.cpp
+moc_EditSessionWindow.o: moc_EditSessionWindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_EditSessionWindow.o moc_EditSessionWindow.cpp
 
 moc_SessionWindow.o: moc_SessionWindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_SessionWindow.o moc_SessionWindow.cpp

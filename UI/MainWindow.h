@@ -8,9 +8,9 @@
 #ifndef UI_MAINWINDOW_H_
 #define UI_MAINWINDOW_H_
 
+#include <UI/Session/EditSessionWindow.h>
 #include <QMainWindow>
 #include <QDebug>
-#include "Session/NewSessionWindow.h"
 
 namespace UI {
 
@@ -23,13 +23,8 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-public slots:
-	void handleNewConnection();
-	void handleCancelNewConnection();
-	void handleSaveConnection();
-
 private:
-	Session::NewSessionWindow *editSession;
+	Session::EditSessionWindow *editSession;
 
 };
 };

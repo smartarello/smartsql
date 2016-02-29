@@ -6,6 +6,7 @@
  */
 
 #include <UI/MainWindow.h>
+#include <QSettings>
 #include "Session/SessionWindow.h"
 
 namespace UI {
@@ -22,22 +23,4 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 MainWindow::~MainWindow() {
 	// TODO Auto-generated destructor stub
 }
-
-void MainWindow::handleNewConnection()
-{
-	this->editSession = new Session::NewSessionWindow(this);
-	this->setCentralWidget(this->editSession);
-}
-
-void MainWindow::handleCancelNewConnection()
-{
-	Session::SessionWindow *sessionList = new Session::SessionWindow(this);
-	this->setCentralWidget(sessionList);
-}
-
-void MainWindow::handleSaveConnection()
-{
-	qDebug() << this->editSession->getHost();
-}
-
 } /* namespace UI */
