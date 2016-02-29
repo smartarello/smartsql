@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QListView>
 #include <QItemSelection>
+#include <QJsonArray>
 #include "EditSessionWindow.h"
 
 namespace UI {
@@ -27,12 +28,17 @@ public:
 private:
 	QListView *sessionList;
 	EditSessionWindow * editSession;
+	int currentItem;
+	QJsonArray sessionStore;
+	void updateSelected();
+	void persistSessionStore();
 
 public slots:
 		void handleNewConnection();
 		void handleSaveConnection();
 		void handleSelectionChanged(const QItemSelection& selection);
 		void handleExit();
+		void handleDelete();
 
 };
 };

@@ -10,7 +10,9 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QIntValidator>
 #include <QString>
+#include <QDebug>
 namespace UI {
 namespace Session {
 
@@ -22,7 +24,10 @@ EditSessionWindow::EditSessionWindow(QWidget *parent) : QWidget(parent){
 	this->hostLineEdit = new QLineEdit();
 	this->userLineEdit = new QLineEdit();
 	this->passwordLineEdit = new QLineEdit();
-	this->portLineEdit = new QLineEdit();
+	this->portLineEdit = new QSpinBox();
+	this->portLineEdit->setMinimum(0);
+	this->portLineEdit->setMaximum(1000000);
+	this->portLineEdit->setFixedWidth(100);
 	// Asterisks will be shown when values are entered
 	this->passwordLineEdit->setEchoMode(QLineEdit::Password);
 
@@ -67,9 +72,30 @@ QString EditSessionWindow::getPassword()
 	return this->passwordLineEdit->text();
 }
 
-QString EditSessionWindow::getPort()
+int EditSessionWindow::getPort()
 {
-	return this->portLineEdit->text();
+	return this->portLineEdit->value();
+}
+
+void EditSessionWindow::setName(QString name)
+{
+	this->nameLineEdit->setText(name);
+}
+void EditSessionWindow::setHostName(QString hostname)
+{
+	this->hostLineEdit->setText(hostname);
+}
+void EditSessionWindow::setUser(QString user)
+{
+	this->userLineEdit->setText(user);
+}
+void EditSessionWindow::setPassword(QString password)
+{
+	this->passwordLineEdit->setText(password);
+}
+void EditSessionWindow::setPort(int port)
+{
+	this->portLineEdit->setValue(port);
 }
 
 } /* namespace Session */

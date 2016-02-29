@@ -16,13 +16,17 @@
 #include <QStringListModel>
 #include <QStringList>
 #include <QCoreApplication>
+#include <QMessageBox>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonDocument>
 #include "SessionWindow.h"
 
 namespace UI {
 
 namespace Session {
 
-SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
+SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent), currentItem(0){
 
 	 QVBoxLayout *vlayout = new QVBoxLayout;
 	 this->setLayout(vlayout);
@@ -34,7 +38,7 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 header->setLayout(hlayout);
 
 	 this->sessionList = new QListView;
-	 this->sessionList->setFixedWidth(200);
+	 this->sessionList->setFixedWidth(250);
 
 	 // Create model
 	 QStringListModel *model = new QStringListModel(this);
@@ -44,13 +48,16 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 hlayout->addWidget(this->sessionList);
 
 	 QSettings settings("smartarello", "mysqlclient");
-	 int size = settings.beginReadArray("sessions");
-
-	 for (int i = 0; i < size; ++i) {
-	     settings.setArrayIndex(i);
-	     sessionNames << settings.value("name").toString();
+	 QString sessions = settings.value("sessions").toString();
+	 if (!sessions.isNull() && !sessions.isEmpty()){
+		 QJsonDocument doc = QJsonDocument::fromJson(sessions.toUtf8());
+		 this->sessionStore = doc.array();
 	 }
-	 settings.endArray();
+
+	 for (int i = 0; i < this->sessionStore.count(); i++){
+		 QJsonObject session = this->sessionStore.at(i).toObject();
+		 sessionNames << session.value("name").toString();
+	 }
 
 	 // Populate our model
 	 model->setStringList(sessionNames);
@@ -88,6 +95,7 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 connect(newConnection, SIGNAL (released()), this, SLOT (handleNewConnection()));
 	 connect(exitButton, SIGNAL (released()), this, SLOT (handleExit()));
 	 connect(saveButton, SIGNAL (released()), this, SLOT (handleSaveConnection()));
+	 connect(deleteButton, SIGNAL (released()), this, SLOT (handleDelete()));
 
 	 connect(this->sessionList->selectionModel(),
 	       SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
@@ -97,8 +105,34 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 
 void SessionWindow::handleNewConnection()
 {
-//	this->editSession = new Session::EditSessionWindow(this);
-//	this->setCentralWidget(this->editSession);
+	QJsonObject newSession;
+	newSession.insert("name", "Unamed");
+	newSession.insert("user", "");
+	newSession.insert("password", "");
+	newSession.insert("port", 3306);
+	newSession.insert("hostname", "localhost");
+
+	this->sessionStore.append(newSession);
+
+	this->persistSessionStore();
+
+	this->currentItem = this->sessionStore.count() - 1;
+	this->updateSelected();
+}
+
+void SessionWindow::handleDelete()
+{
+	QMessageBox *confirm = new QMessageBox();
+	confirm->setText("Delete session");
+	confirm->setIcon(QMessageBox::Question);
+	confirm->setWindowTitle("Confirm");
+	confirm->setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes);
+	int ret = confirm->exec();
+
+	if (ret == QMessageBox::Yes){
+		this->sessionStore.removeAt(this->currentItem);
+		this->persistSessionStore();
+	}
 }
 
 void SessionWindow::handleSelectionChanged(const QItemSelection& selection)
@@ -108,11 +142,23 @@ void SessionWindow::handleSelectionChanged(const QItemSelection& selection)
 	}
 
 	QModelIndex m = selection.indexes().first();
-	int r = m.row();
+	this->currentItem = m.row();
 
-	qDebug() << r;
-//	this->editSession = new Session::EditSessionWindow(this);
-//	this->setCentralWidget(this->editSession);
+	this->updateSelected();
+
+}
+
+void SessionWindow::updateSelected()
+{
+	if (this->currentItem < this->sessionStore.count()){
+		QJsonObject session = this->sessionStore.at(this->currentItem).toObject();
+
+		this->editSession->setName(session.value("name").toString());
+		this->editSession->setHostName(session.value("hostname").toString());
+		this->editSession->setUser(session.value("user").toString());
+		this->editSession->setPassword(session.value("password").toString());
+		this->editSession->setPort(session.value("port").toInt());
+	}
 }
 
 void SessionWindow::handleExit()
@@ -124,19 +170,28 @@ void SessionWindow::handleSaveConnection()
 {
 	QSettings settings("smartarello", "mysqlclient");
 
-	int size = settings.beginReadArray("sessions");
-	settings.endArray();
 
-	settings.beginWriteArray("sessions");
-	settings.setArrayIndex(size);
-	settings.setValue("name", this->editSession->getName());
-	settings.setValue("hostname", this->editSession->getHostName());
-	settings.setValue("user", this->editSession->getUser());
-	settings.setValue("password", this->editSession->getPassword());
-	settings.setValue("port", this->editSession->getPort());
-	settings.endArray();
+	QJsonObject session = this->sessionStore.at(this->currentItem).toObject();
 
-	qDebug() << this->editSession->getName();
+	session.insert("name", this->editSession->getName());
+	session.insert("hostname", this->editSession->getHostName());
+	session.insert("user", this->editSession->getUser());
+	session.insert("password", this->editSession->getPassword());
+	session.insert("port", this->editSession->getPort());
+
+	this->sessionStore.replace(this->currentItem, session);
+
+	this->persistSessionStore();
+}
+
+void SessionWindow::persistSessionStore()
+{
+	QSettings settings("smartarello", "mysqlclient");
+
+	QJsonDocument doc;
+	doc.setArray(this->sessionStore);
+	QString strJson(doc.toJson(QJsonDocument::Compact));
+	settings.setValue("sessions", strJson);
 }
 
 SessionWindow::~SessionWindow(){

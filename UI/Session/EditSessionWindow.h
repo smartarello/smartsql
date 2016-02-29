@@ -10,6 +10,7 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <QSpinBox>
 
 namespace UI {
 namespace Session {
@@ -26,14 +27,19 @@ public:
 	QString getHostName();
 	QString getUser();
 	QString getPassword();
-	QString getPort();
+	int getPort();
+	void setName(QString name);
+	void setHostName(QString hostname);
+	void setUser(QString user);
+	void setPassword(QString password);
+	void setPort(int port);
 
 private:
 	QLineEdit *nameLineEdit ;
 	QLineEdit *hostLineEdit;
 	QLineEdit *userLineEdit ;
 	QLineEdit *passwordLineEdit ;
-	QLineEdit *portLineEdit ;
+	QSpinBox *portLineEdit ;
 };
 
 }; /* namespace Session */
