@@ -26,7 +26,7 @@ namespace UI {
 
 namespace Session {
 
-SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent), currentItem(0){
+SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 
 	 QVBoxLayout *vlayout = new QVBoxLayout;
 	 this->setLayout(vlayout);
@@ -39,9 +39,10 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent), currentItem(0){
 
 	 this->sessionList = new QListView;
 	 this->sessionList->setFixedWidth(250);
+	 this->sessionList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	 // Create model
-	 QStringListModel *model = new QStringListModel(this);
+	 this->model = new QStringListModel(this);
 
 	 // Make data
 	 QStringList sessionNames;
@@ -72,42 +73,62 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent), currentItem(0){
 	 // Footer part
 	 QWidget *buttonContainer = new QWidget;
 	 QBoxLayout *buttonLayout = new QBoxLayout(QBoxLayout::LeftToRight);
-
 	 buttonContainer->setLayout(buttonLayout);
 
-	 QPushButton *newConnection = new QPushButton("New connection");
-	 newConnection->setFixedWidth(150);
-	 buttonLayout->addWidget(newConnection);
+	 QWidget *leftPartWidget = new QWidget;
+	 QHBoxLayout *leftPartLayout = new QHBoxLayout;
+	 leftPartWidget->setLayout(leftPartLayout);
+	 leftPartLayout->setAlignment(Qt::AlignLeft);
 
-	 QPushButton *saveButton = new QPushButton("Save");
-	 QPushButton *exitButton = new QPushButton("Exit");
+	 QPushButton *newConnection = new QPushButton("New connection");
 	 QPushButton *deleteButton = new QPushButton("Delete");
-	 saveButton->setFixedWidth(150);
-	 exitButton->setFixedWidth(150);
+	 newConnection->setFixedWidth(150);
 	 deleteButton->setFixedWidth(150);
-	 buttonLayout->addWidget(saveButton);
-	 buttonLayout->addWidget(deleteButton);
-	 buttonLayout->addWidget(exitButton);
+	 leftPartLayout->addWidget(newConnection);
+	 leftPartLayout->addWidget(deleteButton);
+	 buttonLayout->addWidget(leftPartWidget);
+
+	 QWidget *rightPartWidget = new QWidget;
+	 QHBoxLayout *rightPartLayout = new QHBoxLayout;
+	 rightPartLayout->setAlignment(Qt::AlignRight);
+	 rightPartWidget->setLayout(rightPartLayout);
+	 QPushButton *exitButton = new QPushButton("Exit");
+	 exitButton->setFixedWidth(100);
+	 rightPartLayout->addWidget(exitButton);
+	 buttonLayout->addWidget(rightPartWidget);
 
 	 vlayout->addWidget(buttonContainer);
 
 	 // Connect button signal to appropriate slot
 	 connect(newConnection, SIGNAL (released()), this, SLOT (handleNewConnection()));
 	 connect(exitButton, SIGNAL (released()), this, SLOT (handleExit()));
-	 connect(saveButton, SIGNAL (released()), this, SLOT (handleSaveConnection()));
 	 connect(deleteButton, SIGNAL (released()), this, SLOT (handleDelete()));
 
 	 connect(this->sessionList->selectionModel(),
 	       SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
 	       this, SLOT(handleSelectionChanged(QItemSelection)));
+
+	 connect(this->sessionList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT( handleOpenConnection() ) );
+
+	 if ( this->sessionStore.count() == 0){
+		 	this->handleNewConnection();
+	 }
+	 else{
+		 this->sessionList->setCurrentIndex(this->model->index(0, 0));
+		 this->updateSelected();
+	 }
 }
 
+void SessionWindow::handleOpenConnection()
+{
+	qDebug() << "double click";
+}
 
 void SessionWindow::handleNewConnection()
 {
 	QJsonObject newSession;
 	newSession.insert("name", "Unamed");
-	newSession.insert("user", "");
+	newSession.insert("user", "root");
 	newSession.insert("password", "");
 	newSession.insert("port", 3306);
 	newSession.insert("hostname", "localhost");
@@ -116,7 +137,11 @@ void SessionWindow::handleNewConnection()
 
 	this->persistSessionStore();
 
-	this->currentItem = this->sessionStore.count() - 1;
+	QStringList list = this->model->stringList();
+	list.append("Unamed");
+	this->model->setStringList(list);
+	this->sessionList->setCurrentIndex(this->model->index(this->sessionStore.count() - 1, 0));
+
 	this->updateSelected();
 }
 
@@ -130,28 +155,35 @@ void SessionWindow::handleDelete()
 	int ret = confirm->exec();
 
 	if (ret == QMessageBox::Yes){
-		this->sessionStore.removeAt(this->currentItem);
-		this->persistSessionStore();
+		QModelIndex index = this->sessionList->currentIndex();
+		if (index.row() < this->sessionStore.count()){
+
+			QStringList list = this->model->stringList();
+			list.removeAt(index.row());
+			this->model->setStringList(list);
+			this->sessionStore.removeAt(index.row());
+			this->persistSessionStore();
+
+			if (this->sessionStore.count() > 0){
+				this->sessionList->setCurrentIndex(this->model->index(0, 0));
+			}
+			else{
+
+			}
+		}
 	}
 }
 
 void SessionWindow::handleSelectionChanged(const QItemSelection& selection)
 {
-	if (selection.indexes().isEmpty()){
-		return ;
-	}
-
-	QModelIndex m = selection.indexes().first();
-	this->currentItem = m.row();
-
 	this->updateSelected();
-
 }
 
 void SessionWindow::updateSelected()
 {
-	if (this->currentItem < this->sessionStore.count()){
-		QJsonObject session = this->sessionStore.at(this->currentItem).toObject();
+	QModelIndex index = this->sessionList->currentIndex();
+	if (index.row() < this->sessionStore.count()){
+		QJsonObject session = this->sessionStore.at(index.row()).toObject();
 
 		this->editSession->setName(session.value("name").toString());
 		this->editSession->setHostName(session.value("hostname").toString());
@@ -168,20 +200,24 @@ void SessionWindow::handleExit()
 
 void SessionWindow::handleSaveConnection()
 {
-	QSettings settings("smartarello", "mysqlclient");
+	QModelIndex index = this->sessionList->currentIndex();
+	if (index.row() < this->sessionStore.count()){
+		QJsonObject session = this->sessionStore.at(index.row()).toObject();
 
+		session.insert("name", this->editSession->getName());
+		session.insert("hostname", this->editSession->getHostName());
+		session.insert("user", this->editSession->getUser());
+		session.insert("password", this->editSession->getPassword());
+		session.insert("port", this->editSession->getPort());
 
-	QJsonObject session = this->sessionStore.at(this->currentItem).toObject();
+		this->sessionStore.replace(index.row(), session);
 
-	session.insert("name", this->editSession->getName());
-	session.insert("hostname", this->editSession->getHostName());
-	session.insert("user", this->editSession->getUser());
-	session.insert("password", this->editSession->getPassword());
-	session.insert("port", this->editSession->getPort());
+		this->persistSessionStore();
 
-	this->sessionStore.replace(this->currentItem, session);
-
-	this->persistSessionStore();
+		QStringList list = this->model->stringList();
+		list.replace(index.row(), this->editSession->getName());
+		this->model->setStringList(list);
+	}
 }
 
 void SessionWindow::persistSessionStore()

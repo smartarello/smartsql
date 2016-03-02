@@ -31,21 +31,34 @@ EditSessionWindow::EditSessionWindow(QWidget *parent) : QWidget(parent){
 	// Asterisks will be shown when values are entered
 	this->passwordLineEdit->setEchoMode(QLineEdit::Password);
 
-
 	QFormLayout *formLayout = new QFormLayout;
 	formLayout->addRow(tr("&Connection name:"), this->nameLineEdit);
 	formLayout->addRow(tr("&Hostname / IP:"), this->hostLineEdit);
 	formLayout->addRow(tr("&User:"), this->userLineEdit);
 	formLayout->addRow(tr("&Password:"), this->passwordLineEdit);
 	formLayout->addRow(tr("&Port:"), this->portLineEdit);
+
+	formWidget->setFixedHeight(200);
 	formWidget->setLayout(formLayout);
 
-
-
 	QVBoxLayout *layout = new QVBoxLayout;
+	layout->setAlignment(Qt::AlignTop);
 	layout->addWidget(formWidget);
 
+	QWidget *buttonWidget = new QWidget;
+	QHBoxLayout *hboxlayout = new QHBoxLayout;
+	hboxlayout->setAlignment(Qt::AlignRight);
+	buttonWidget->setLayout(hboxlayout);
+
+	QPushButton *saveButton = new QPushButton("Save");
+	saveButton->setFixedWidth(100);
+	hboxlayout->addWidget(saveButton);
+
+	layout->addWidget(buttonWidget);
+
 	this->setLayout(layout);
+
+	connect(saveButton, SIGNAL (released()), this->parent(), SLOT (handleSaveConnection()));
 }
 
 EditSessionWindow::~EditSessionWindow() {

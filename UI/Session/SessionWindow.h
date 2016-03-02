@@ -11,6 +11,7 @@
 #include <QListView>
 #include <QItemSelection>
 #include <QJsonArray>
+#include <QStringListModel>
 #include "EditSessionWindow.h"
 
 namespace UI {
@@ -28,10 +29,10 @@ public:
 private:
 	QListView *sessionList;
 	EditSessionWindow * editSession;
-	int currentItem;
 	QJsonArray sessionStore;
 	void updateSelected();
 	void persistSessionStore();
+	QStringListModel *model;
 
 public slots:
 		void handleNewConnection();
@@ -39,6 +40,7 @@ public slots:
 		void handleSelectionChanged(const QItemSelection& selection);
 		void handleExit();
 		void handleDelete();
+		void handleOpenConnection();
 
 };
 };
