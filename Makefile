@@ -12,10 +12,10 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I. -I../../Qt/5.5/gcc_64/include -I../../Qt/5.5/gcc_64/include/QtWidgets -I../../Qt/5.5/gcc_64/include/QtGui -I../../Qt/5.5/gcc_64/include/QtCore -I. -I../../Qt/5.5/gcc_64/mkspecs/linux-g++
+INCPATH       = -I. -I. -I../../Qt/5.5/gcc_64/include -I../../Qt/5.5/gcc_64/include/QtWidgets -I../../Qt/5.5/gcc_64/include/QtGui -I../../Qt/5.5/gcc_64/include/QtSql -I../../Qt/5.5/gcc_64/include/QtCore -I. -I../../Qt/5.5/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/stephane/Qt/5.5/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -36,7 +36,7 @@ DISTNAME      = mysqlclient1.0.0
 DISTDIR = /home/stephane/workspace_cpp/mysqlclient/.tmp/mysqlclient1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64 -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/home/stephane/Qt/5.5/gcc_64/lib -lQt5Widgets -L/usr/lib64 -lQt5Gui -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -L/home/stephane/Qt/5.5/gcc_64/lib -lQt5Widgets -L/usr/lib64 -lQt5Gui -lQt5Sql -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -368,6 +368,7 @@ Makefile: mysqlclient.pro ../../Qt/5.5/gcc_64/mkspecs/linux-g++/qmake.conf ../..
 		mysqlclient.pro \
 		/home/stephane/Qt/5.5/gcc_64/lib/libQt5Widgets.prl \
 		/home/stephane/Qt/5.5/gcc_64/lib/libQt5Gui.prl \
+		/home/stephane/Qt/5.5/gcc_64/lib/libQt5Sql.prl \
 		/home/stephane/Qt/5.5/gcc_64/lib/libQt5Core.prl
 	$(QMAKE) -o Makefile mysqlclient.pro
 ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf:
@@ -507,6 +508,7 @@ Makefile: mysqlclient.pro ../../Qt/5.5/gcc_64/mkspecs/linux-g++/qmake.conf ../..
 mysqlclient.pro:
 /home/stephane/Qt/5.5/gcc_64/lib/libQt5Widgets.prl:
 /home/stephane/Qt/5.5/gcc_64/lib/libQt5Gui.prl:
+/home/stephane/Qt/5.5/gcc_64/lib/libQt5Sql.prl:
 /home/stephane/Qt/5.5/gcc_64/lib/libQt5Core.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile mysqlclient.pro
@@ -658,8 +660,17 @@ moc_EditSessionWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QSpinBox \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
 		UI/Session/EditSessionWindow.h
-	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Session/EditSessionWindow.h -o moc_EditSessionWindow.cpp
+	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Session/EditSessionWindow.h -o moc_EditSessionWindow.cpp
 
 moc_SessionWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
@@ -763,8 +774,45 @@ moc_SessionWindow.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QListView \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QItemSelection \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonArray \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonarray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QStringListModel \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlistmodel.h \
+		UI/Session/EditSessionWindow.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QSpinBox \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
 		UI/Session/SessionWindow.h
-	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Session/SessionWindow.h -o moc_SessionWindow.cpp
+	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Session/SessionWindow.h -o moc_SessionWindow.cpp
 
 moc_MainWindow.cpp: UI/Session/EditSessionWindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
@@ -876,13 +924,21 @@ moc_MainWindow.cpp: UI/Session/EditSessionWindow.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QSpinBox \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
-		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
 		UI/MainWindow.h
-	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/MainWindow.h -o moc_MainWindow.cpp
+	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/MainWindow.h -o moc_MainWindow.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -1016,10 +1072,18 @@ main.o: main.cpp ../../Qt/5.5/gcc_64/include/QtWidgets/QApplication \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QSpinBox \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
-		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
@@ -1133,6 +1197,15 @@ EditSessionWindow.o: UI/Session/EditSessionWindow.cpp UI/Session/EditSessionWind
 		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QSpinBox \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QFormLayout \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qformlayout.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QLayout \
@@ -1140,13 +1213,14 @@ EditSessionWindow.o: UI/Session/EditSessionWindow.cpp UI/Session/EditSessionWind
 		../../Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
-		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
-		../../Qt/5.5/gcc_64/include/QtCore/QString
+		../../Qt/5.5/gcc_64/include/QtGui/QIntValidator \
+		../../Qt/5.5/gcc_64/include/QtCore/QString \
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
+		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
+		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt/5.5/gcc_64/include/QtSql/qsql.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EditSessionWindow.o UI/Session/EditSessionWindow.cpp
 
 SessionWindow.o: UI/Session/SessionWindow.cpp ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
@@ -1269,7 +1343,53 @@ SessionWindow.o: UI/Session/SessionWindow.cpp ../../Qt/5.5/gcc_64/include/QtWidg
 		../../Qt/5.5/gcc_64/include/QtWidgets/QLabel \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
-		UI/Session/SessionWindow.h
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QListView \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QStringListModel \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlistmodel.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QStringList \
+		../../Qt/5.5/gcc_64/include/QtCore/QCoreApplication \
+		../../Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QMessageBox \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qmessagebox.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qdialog.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonValue \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonDocument \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsondocument.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QShortcut \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qshortcut.h \
+		UI/Session/SessionWindow.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QItemSelection \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonArray \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonarray.h \
+		UI/Session/EditSessionWindow.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QSpinBox \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SessionWindow.o UI/Session/SessionWindow.cpp
 
 MainWindow.o: UI/MainWindow.cpp UI/MainWindow.h \
@@ -1383,14 +1503,41 @@ MainWindow.o: UI/MainWindow.cpp UI/MainWindow.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QSpinBox \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
-		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
 		../../Qt/5.5/gcc_64/include/QtCore/QSettings \
 		../../Qt/5.5/gcc_64/include/QtCore/qsettings.h \
-		UI/Session/SessionWindow.h
+		UI/Session/SessionWindow.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QListView \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QItemSelection \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonArray \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonarray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QStringListModel \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlistmodel.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o UI/MainWindow.cpp
 
 moc_EditSessionWindow.o: moc_EditSessionWindow.cpp 

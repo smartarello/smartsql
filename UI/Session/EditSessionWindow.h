@@ -10,6 +10,7 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QSpinBox>
 
 namespace UI {
@@ -33,6 +34,7 @@ public:
 	void setUser(QString user);
 	void setPassword(QString password);
 	void setPort(int port);
+	QPushButton *saveButton;
 
 private:
 	QLineEdit *nameLineEdit ;
@@ -40,6 +42,11 @@ private:
 	QLineEdit *userLineEdit ;
 	QLineEdit *passwordLineEdit ;
 	QSpinBox *portLineEdit ;
+
+
+public slots:
+	void edited();
+	void testConnection();
 };
 
 }; /* namespace Session */

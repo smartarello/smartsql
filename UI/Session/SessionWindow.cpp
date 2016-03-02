@@ -20,6 +20,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonDocument>
+#include <QShortcut>
 #include "SessionWindow.h"
 
 namespace UI {
@@ -110,6 +111,9 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 
 	 connect(this->sessionList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT( handleOpenConnection() ) );
 
+	 QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this->sessionList);
+	 connect(shortcut, SIGNAL(activated()), this, SLOT(handleDelete()));
+
 	 if ( this->sessionStore.count() == 0){
 		 	this->handleNewConnection();
 	 }
@@ -147,18 +151,21 @@ void SessionWindow::handleNewConnection()
 
 void SessionWindow::handleDelete()
 {
-	QMessageBox *confirm = new QMessageBox();
-	confirm->setText("Delete session");
-	confirm->setIcon(QMessageBox::Question);
-	confirm->setWindowTitle("Confirm");
-	confirm->setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes);
-	int ret = confirm->exec();
+	QModelIndex index = this->sessionList->currentIndex();
+	if (index.row() < this->sessionStore.count()){
 
-	if (ret == QMessageBox::Yes){
-		QModelIndex index = this->sessionList->currentIndex();
-		if (index.row() < this->sessionStore.count()){
+		QStringList list = this->model->stringList();
 
-			QStringList list = this->model->stringList();
+		QMessageBox *confirm = new QMessageBox();
+		confirm->setText("Delete session \""+list.at(index.row())+"\" ?");
+		confirm->setIcon(QMessageBox::Question);
+		confirm->setWindowTitle("Confirm");
+		confirm->setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes);
+		int ret = confirm->exec();
+
+		if (ret == QMessageBox::Yes){
+			QModelIndex index = this->sessionList->currentIndex();
+
 			list.removeAt(index.row());
 			this->model->setStringList(list);
 			this->sessionStore.removeAt(index.row());
@@ -168,7 +175,7 @@ void SessionWindow::handleDelete()
 				this->sessionList->setCurrentIndex(this->model->index(0, 0));
 			}
 			else{
-
+				this->handleNewConnection();
 			}
 		}
 	}
@@ -190,6 +197,7 @@ void SessionWindow::updateSelected()
 		this->editSession->setUser(session.value("user").toString());
 		this->editSession->setPassword(session.value("password").toString());
 		this->editSession->setPort(session.value("port").toInt());
+		this->editSession->saveButton->setDisabled(true);
 	}
 }
 
@@ -200,6 +208,8 @@ void SessionWindow::handleExit()
 
 void SessionWindow::handleSaveConnection()
 {
+	QPushButton *button = (QPushButton *)sender();
+	button->setDisabled(true);
 	QModelIndex index = this->sessionList->currentIndex();
 	if (index.row() < this->sessionStore.count()){
 		QJsonObject session = this->sessionStore.at(index.row()).toObject();
@@ -217,6 +227,8 @@ void SessionWindow::handleSaveConnection()
 		QStringList list = this->model->stringList();
 		list.replace(index.row(), this->editSession->getName());
 		this->model->setStringList(list);
+
+		this->sessionList->setCurrentIndex(index);
 	}
 }
 

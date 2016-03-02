@@ -7,12 +7,14 @@
 
 #include <UI/Session/EditSessionWindow.h>
 #include <QFormLayout>
-#include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QIntValidator>
 #include <QString>
 #include <QDebug>
+#include <QSqlError>
+#include <QSqlDatabase>
+#include <QMessageBox>
 namespace UI {
 namespace Session {
 
@@ -48,21 +50,73 @@ EditSessionWindow::EditSessionWindow(QWidget *parent) : QWidget(parent){
 	QWidget *buttonWidget = new QWidget;
 	QHBoxLayout *hboxlayout = new QHBoxLayout;
 	hboxlayout->setAlignment(Qt::AlignRight);
+
+	this->saveButton = new QPushButton("Save");
+	this->saveButton->setFixedWidth(100);
+	this->saveButton->setDisabled(true);
+
+	QPushButton *testButton = new QPushButton("Test connection");
+	testButton->setFixedWidth(150);
+
+	hboxlayout->addWidget(testButton);
+	hboxlayout->addWidget(this->saveButton);
+
 	buttonWidget->setLayout(hboxlayout);
-
-	QPushButton *saveButton = new QPushButton("Save");
-	saveButton->setFixedWidth(100);
-	hboxlayout->addWidget(saveButton);
-
 	layout->addWidget(buttonWidget);
 
 	this->setLayout(layout);
 
-	connect(saveButton, SIGNAL (released()), this->parent(), SLOT (handleSaveConnection()));
+	connect(testButton, SIGNAL (released()), this, SLOT (testConnection()));
+	connect(this->saveButton, SIGNAL (released()), this->parent(), SLOT (handleSaveConnection()));
+	connect(this->nameLineEdit, SIGNAL (textEdited(QString)), this, SLOT (edited()));
+	connect(this->hostLineEdit, SIGNAL (textEdited(QString)), this, SLOT (edited()));
+	connect(this->userLineEdit, SIGNAL (textEdited(QString)), this, SLOT (edited()));
+	connect(this->passwordLineEdit, SIGNAL (textEdited(QString)), this, SLOT (edited()));
+	connect(this->portLineEdit, SIGNAL (valueChanged(int)), this, SLOT (edited()));
 }
 
+
+
 EditSessionWindow::~EditSessionWindow() {
-	// TODO Auto-generated destructor stub
+
+}
+
+void EditSessionWindow::testConnection()
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "test");
+	db.setHostName(this->getHostName());
+	db.setUserName(this->getUser());
+	db.setPassword(this->getPassword());
+	db.setPort(this->getPort());
+
+	QMessageBox *message = new QMessageBox();
+	message->setWindowTitle("Connection test");
+
+	if (db.open()){
+
+		db.close();
+		db = QSqlDatabase();
+		db.removeDatabase("test");
+		message->setText("Connected successfully");
+		message->setIcon(QMessageBox::Information);
+	}
+	else{
+		QSqlError err = db.lastError();
+		message->setText("Connection error");
+		message->setDetailedText(err.text());
+		message->setIcon(QMessageBox::Warning);
+
+		db = QSqlDatabase();
+		db.removeDatabase("test");
+	}
+
+	message->exec();
+
+}
+
+void EditSessionWindow::edited()
+{
+	this->saveButton->setDisabled(false);
 }
 
 QString EditSessionWindow::getHostName()
