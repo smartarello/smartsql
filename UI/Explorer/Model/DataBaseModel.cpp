@@ -7,6 +7,7 @@
 
 #include <UI/Explorer/Model/DataBaseModel.h>
 #include <QSqlQuery>
+#include <QHash>
 #include <QDebug>
 
 namespace UI {
@@ -15,21 +16,30 @@ namespace Model {
 
 DataBaseModel::DataBaseModel() {
 
-
+	this->setColumnCount(2);
 	QStandardItem *rootItem = this->invisibleRootItem();
+	rootItem->setColumnCount(2);
 
 	rootItem->setWhatsThis("root");
-	qDebug() << rootItem->whatsThis();
 
 	QSqlDatabase db = QSqlDatabase::database();
 	QString name = db.hostName();
 
 	QStandardItem *defaultHost = new QStandardItem(name);
+
+
 	defaultHost->setWhatsThis("host");
 	QList<QStandardItem *> dbList = this->getDataBaseList(db);
-	defaultHost->appendRows(dbList);
 
-	rootItem->appendRow(defaultHost);
+	int row = 0;
+	foreach (QStandardItem * db, dbList){
+		defaultHost->setChild(row, 0, db);
+		defaultHost->setChild(row++, 1, new QStandardItem("B"));
+	}
+
+	rootItem->setChild(0, 0, defaultHost);
+	rootItem->setChild(0, 1, new QStandardItem("A"));
+
 
 }
 
@@ -64,7 +74,8 @@ bool DataBaseModel::canFetchMore(const QModelIndex & parent) const
 			QStandardItem *dataBaseItem = connectionItem->child(parent.row());
 
 			if (dataBaseItem != 0){
-				return !dataBaseItem->hasChildren();
+
+				return (dataBaseItem->rowCount() == 0);
 			}
 		}
 	}
@@ -103,8 +114,18 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 				db.setDatabaseName(dataBaseItem->text());
 				if (db.open()){
 					QStringList tables = db.tables();
+					QHash<QString, QString> tableSize = this->getTableSize(db);
+
 					for(int i = 0; i < tables.count(); i++){
-						dataBaseItem->appendRow(new QStandardItem(tables.at(i)));
+
+						QString tableName = tables.at(i);
+
+						QList<QStandardItem *> cols;
+						cols << new QStandardItem(tableName);
+						QStandardItem *size = new QStandardItem(tableSize.value(tableName));
+						size->setTextAlignment(Qt::AlignRight);
+						cols << size;
+						dataBaseItem->appendRow(cols);
 					}
 
 					db.close();
@@ -112,6 +133,38 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 			}
 		}
 	}
+}
+
+QHash<QString, QString> DataBaseModel::getTableSize(QSqlDatabase db)
+{
+	QHash<QString, QString> size;
+	QSqlQuery query;
+	query.exec("show table status");
+
+	while (query.next()){
+		double dataLength = query.value("Data_length").toDouble();
+		double indexLength = query.value("Index_length").toDouble();
+
+		double totalSize = (dataLength + indexLength) / 1024;
+
+		if (totalSize < 1000){
+			size.insert(query.value("Name").toString(), QString("%1 Kb").arg(QString::number(totalSize, 'f', 0)));
+		}
+		else{
+			totalSize = totalSize / 1024;
+			if (totalSize < 1000){
+				size.insert(query.value("Name").toString(), QString("%1 Mb").arg(QString::number(totalSize, 'f', 0)));
+			}
+			else{
+				totalSize = totalSize / 1024;
+				size.insert(query.value("Name").toString(), QString("%1 Gb").arg(QString::number(totalSize, 'f', 0)));
+			}
+		}
+
+
+	}
+
+	return size;
 }
 
 DataBaseModel::~DataBaseModel() {

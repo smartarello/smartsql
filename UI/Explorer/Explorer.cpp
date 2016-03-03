@@ -20,7 +20,7 @@ Explorer::Explorer(QWidget *parent) : QWidget(parent) {
 	this->setLayout(hboxlayout);
 
 	QWidget *leftPartWidget = new QWidget;
-	leftPartWidget->setFixedWidth(350);
+	leftPartWidget->setFixedWidth(500);
 	QVBoxLayout *leftPartlayout = new QVBoxLayout;
 	leftPartWidget->setLayout(leftPartlayout);
 

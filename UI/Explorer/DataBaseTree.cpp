@@ -8,6 +8,7 @@
 #include <UI/Explorer/DataBaseTree.h>
 #include <QSortFilterProxyModel>
 #include <QDebug>
+#include <QHeaderView>
 #include <QModelIndexList>
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
 
@@ -24,6 +25,10 @@ DataBaseTree::DataBaseTree(QWidget *parent) : QTreeView(parent) {
 	this->setModel(filter);
 	this->setHeaderHidden(true);
 	this->expandToDepth(0);
+
+	// The first column with the table name takes all the space.
+	this->header()->setStretchLastSection(false);
+	this->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 }
 
 void DataBaseTree::filterTable(QString text)
