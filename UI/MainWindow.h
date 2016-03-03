@@ -23,8 +23,8 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-private:
-	Session::EditSessionWindow *editSession;
+public slots:
+	void handleOpenConnection();
 
 };
 };

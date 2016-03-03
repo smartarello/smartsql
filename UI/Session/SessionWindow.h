@@ -25,6 +25,7 @@ class SessionWindow : public QWidget
 public:
 	explicit SessionWindow(QWidget *parent);
 	~SessionWindow();
+	QJsonObject getSelectedSession();
 
 private:
 	QListView *sessionList;
@@ -40,7 +41,6 @@ public slots:
 		void handleSelectionChanged(const QItemSelection& selection);
 		void handleExit();
 		void handleDelete();
-		void handleOpenConnection();
 
 };
 };

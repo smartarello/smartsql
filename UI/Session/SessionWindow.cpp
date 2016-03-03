@@ -109,7 +109,7 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	       SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
 	       this, SLOT(handleSelectionChanged(QItemSelection)));
 
-	 connect(this->sessionList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT( handleOpenConnection() ) );
+	 connect(this->sessionList, SIGNAL(doubleClicked(QModelIndex)), this->parent(), SLOT( handleOpenConnection() ) );
 
 	 QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this->sessionList);
 	 connect(shortcut, SIGNAL(activated()), this, SLOT(handleDelete()));
@@ -121,11 +121,6 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 		 this->sessionList->setCurrentIndex(this->model->index(0, 0));
 		 this->updateSelected();
 	 }
-}
-
-void SessionWindow::handleOpenConnection()
-{
-	qDebug() << "double click";
 }
 
 void SessionWindow::handleNewConnection()
@@ -240,6 +235,13 @@ void SessionWindow::persistSessionStore()
 	doc.setArray(this->sessionStore);
 	QString strJson(doc.toJson(QJsonDocument::Compact));
 	settings.setValue("sessions", strJson);
+}
+
+QJsonObject SessionWindow::getSelectedSession()
+{
+	QModelIndex index = this->sessionList->currentIndex();
+	QJsonObject session = this->sessionStore.at(index.row()).toObject();
+	return session;
 }
 
 SessionWindow::~SessionWindow(){
