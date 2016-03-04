@@ -18,7 +18,6 @@ DataBaseModel::DataBaseModel() {
 
 	this->setColumnCount(2);
 	QStandardItem *rootItem = this->invisibleRootItem();
-	rootItem->setColumnCount(2);
 
 	QSqlDatabase db = QSqlDatabase::database();
 	QString name = db.hostName();
@@ -123,6 +122,10 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 						dataBaseItem->appendRow(cols);
 					}
 
+					QStandardItem *size = new QStandardItem(tableSize.value("DATABASE_SIZE"));
+					size->setTextAlignment(Qt::AlignRight);
+					connectionItem->setChild(parent.row(), 1, size);
+
 					db.close();
 				}
 			}
@@ -136,30 +139,38 @@ QHash<QString, QString> DataBaseModel::getTableSize(QSqlDatabase db)
 	QSqlQuery query;
 	query.exec("show table status");
 
+	double dataBaseTotalSize = 0;
+
 	while (query.next()){
 		double dataLength = query.value("Data_length").toDouble();
 		double indexLength = query.value("Index_length").toDouble();
 
 		double totalSize = (dataLength + indexLength) / 1024;
 
-		if (totalSize < 1000){
-			size.insert(query.value("Name").toString(), QString("%1 Kb").arg(QString::number(totalSize, 'f', 0)));
-		}
-		else{
-			totalSize = totalSize / 1024;
-			if (totalSize < 1000){
-				size.insert(query.value("Name").toString(), QString("%1 Mb").arg(QString::number(totalSize, 'f', 0)));
-			}
-			else{
-				totalSize = totalSize / 1024;
-				size.insert(query.value("Name").toString(), QString("%1 Gb").arg(QString::number(totalSize, 'f', 0)));
-			}
-		}
+		dataBaseTotalSize += totalSize;
 
-
+		size.insert(query.value("Name").toString(), this->getSizeString(totalSize));
 	}
 
+	size.insert("DATABASE_SIZE", this->getSizeString(dataBaseTotalSize));
+
 	return size;
+}
+
+QString DataBaseModel::getSizeString(double size) {
+	if (size < 1000){
+		return QString("%1 Kb").arg(QString::number(size, 'f', 0));
+	}
+	else{
+		size = size / 1024;
+		if (size < 1000){
+			return QString("%1 Mb").arg(QString::number(size, 'f', 0));
+		}
+		else{
+			size = size / 1024;
+			return QString("%1 Gb").arg(QString::number(size, 'f', 2));
+		}
+	}
 }
 
 DataBaseModel::~DataBaseModel() {

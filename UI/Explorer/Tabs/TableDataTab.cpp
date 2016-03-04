@@ -7,9 +7,10 @@
 
 #include <UI/Explorer/Tabs/TableDataTab.h>
 #include <QDebug>
-#include <QSqlQueryModel>
+#include <QSqlTableModel>
 #include <QSqlQuery>
 #include <QHeaderView>
+#include "Model/TableDataTabModel.h"
 
 namespace UI {
 namespace Explorer {
@@ -33,8 +34,9 @@ TableDataTab::TableDataTab(QWidget *parent) : QSplitter(parent) {
 void TableDataTab::setTable(QString tableName, QSqlDatabase db) {
 
 	if (db.open()){
-		QSqlQueryModel *queryModel = new QSqlQueryModel();
-		queryModel->setQuery(QString("SELECT * FROM %1 LIMIT 1000").arg(tableName));
+		Model::TableDataTabModel *queryModel = new Model::TableDataTabModel(0, db);
+		queryModel->setTable(tableName);
+		queryModel->select();
 		this->tableData->setModel(queryModel);
 
 		db.close();

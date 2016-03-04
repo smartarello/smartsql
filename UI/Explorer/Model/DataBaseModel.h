@@ -32,6 +32,7 @@ public:
 private:
 	QList<QStandardItem *> getDataBaseList(QSqlDatabase db);
 	QHash<QString, QString> getTableSize(QSqlDatabase db);
+	QString getSizeString(double size);
 };
 
 } /* namespace Model */
