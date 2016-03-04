@@ -20,25 +20,21 @@ DataBaseModel::DataBaseModel() {
 	QStandardItem *rootItem = this->invisibleRootItem();
 	rootItem->setColumnCount(2);
 
-	rootItem->setWhatsThis("root");
-
 	QSqlDatabase db = QSqlDatabase::database();
 	QString name = db.hostName();
 
 	QStandardItem *defaultHost = new QStandardItem(name);
 
-
-	defaultHost->setWhatsThis("host");
 	QList<QStandardItem *> dbList = this->getDataBaseList(db);
 
 	int row = 0;
 	foreach (QStandardItem * db, dbList){
 		defaultHost->setChild(row, 0, db);
-		defaultHost->setChild(row++, 1, new QStandardItem("B"));
+		defaultHost->setChild(row++, 1, new QStandardItem(""));
 	}
 
 	rootItem->setChild(0, 0, defaultHost);
-	rootItem->setChild(0, 1, new QStandardItem("A"));
+	rootItem->setChild(0, 1, new QStandardItem(""));
 
 
 }
@@ -54,7 +50,6 @@ QList<QStandardItem *> DataBaseModel::getDataBaseList(QSqlDatabase db)
 	while (query.next()) {
 		QString dbname = query.value(0).toString();
 		QStandardItem *currentDB = new QStandardItem(dbname);
-		currentDB->setWhatsThis("database");
 		dbList.append(currentDB);
 	}
 

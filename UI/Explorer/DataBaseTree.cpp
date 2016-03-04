@@ -25,10 +25,16 @@ DataBaseTree::DataBaseTree(QWidget *parent) : QTreeView(parent) {
 	this->setModel(filter);
 	this->setHeaderHidden(true);
 	this->expandToDepth(0);
+	this->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	// The first column with the table name takes all the space.
 	this->header()->setStretchLastSection(false);
 	this->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+}
+
+Model::DataBaseModel * DataBaseTree::getDataBaseModel()
+{
+	return this->dataBaseModel;
 }
 
 void DataBaseTree::filterTable(QString text)

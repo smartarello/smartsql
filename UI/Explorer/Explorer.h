@@ -10,7 +10,11 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <QModelIndex>
+#include <QTabWidget>
 #include "DataBaseTree.h"
+#include "Tabs/DataBaseTab.h"
+#include "Tabs/TableDataTab.h"
 
 namespace UI {
 namespace Explorer {
@@ -23,9 +27,16 @@ public:
 	Explorer(QWidget *parent = 0);
 	virtual ~Explorer();
 
+public slots:
+	void dataBaseTreeClicked(QModelIndex index);
+
+
 private:
 	DataBaseTree *dataBaseTree;
 	QLineEdit *tableFilterLineEdit;
+	QTabWidget *explorerTabs;
+	Tabs::DataBaseTab *databaseTab;
+	Tabs::TableDataTab *tableTab;
 };
 
 } /* namespace Explorer */

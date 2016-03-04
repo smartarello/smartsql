@@ -18,8 +18,8 @@ namespace UI {
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	setWindowTitle("MySQL explorer");
-		 // Set size of the window
-	setFixedSize(800, 600);
+
+	//setFixedSize(800, 600);
 
 	Session::SessionWindow *sessionList = new Session::SessionWindow(this);
 	this->setCentralWidget(sessionList);
@@ -38,7 +38,7 @@ void MainWindow::handleOpenConnection()
 
 	if (db.open()){
 		db.close();
-		this->setFixedSize(1024, 768);
+		this->showMaximized();
 		Explorer::Explorer *explorer = new Explorer::Explorer(this);
 		this->setCentralWidget(explorer);
 	}

@@ -23,6 +23,7 @@ public:
 	virtual ~DataBaseTree();
 public slots:
 	void filterTable(QString text);
+	Model::DataBaseModel * getDataBaseModel();
 
 private:
 	Model::DataBaseModel *dataBaseModel;
