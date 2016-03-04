@@ -12,10 +12,12 @@
 #include <QSettings>
 #include <QLabel>
 #include <QDebug>
+#include <QIcon>
 #include <QListView>
-#include <QStringListModel>
+#include <QStandardItemModel>
 #include <QStringList>
 #include <QCoreApplication>
+#include <QStandardItem>
 #include <QMessageBox>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -43,7 +45,7 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 this->sessionList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	 // Create model
-	 this->model = new QStringListModel(this);
+	 this->model = new QStandardItemModel(this);
 
 	 // Make data
 	 QStringList sessionNames;
@@ -56,17 +58,16 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 		 this->sessionStore = doc.array();
 	 }
 
+	 QStandardItem *rootItem = this->model->invisibleRootItem();
 	 for (int i = 0; i < this->sessionStore.count(); i++){
 		 QJsonObject session = this->sessionStore.at(i).toObject();
-		 sessionNames << session.value("name").toString();
+		 QStandardItem *item = new QStandardItem(session.value("name").toString());
+		 item->setData(QIcon("resources/icons/mysql_logo.png"),Qt::DecorationRole);
+		 rootItem->appendRow(item);
 	 }
-
-	 // Populate our model
-	 model->setStringList(sessionNames);
 
 	 // Glue model and view together
 	 this->sessionList->setModel(model);
-
 
 	 this->editSession = new EditSessionWindow(this);
 	 hlayout->addWidget(this->editSession);
@@ -136,9 +137,10 @@ void SessionWindow::handleNewConnection()
 
 	this->persistSessionStore();
 
-	QStringList list = this->model->stringList();
-	list.append("Unamed");
-	this->model->setStringList(list);
+	QStandardItem *rootItem = this->model->invisibleRootItem();
+	QStandardItem *item = new QStandardItem("Unamed");
+	item->setData(QIcon("resources/icons/mysql_logo.png"),Qt::DecorationRole);
+	rootItem->appendRow(item);
 	this->sessionList->setCurrentIndex(this->model->index(this->sessionStore.count() - 1, 0));
 
 	this->updateSelected();
@@ -149,10 +151,9 @@ void SessionWindow::handleDelete()
 	QModelIndex index = this->sessionList->currentIndex();
 	if (index.row() < this->sessionStore.count()){
 
-		QStringList list = this->model->stringList();
-
+		QStandardItem *rootItem = this->model->invisibleRootItem();
 		QMessageBox *confirm = new QMessageBox();
-		confirm->setText("Delete session \""+list.at(index.row())+"\" ?");
+		confirm->setText("Delete session \""+ rootItem->child(index.row())->text() +"\" ?");
 		confirm->setIcon(QMessageBox::Question);
 		confirm->setWindowTitle("Confirm");
 		confirm->setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes);
@@ -161,8 +162,7 @@ void SessionWindow::handleDelete()
 		if (ret == QMessageBox::Yes){
 			QModelIndex index = this->sessionList->currentIndex();
 
-			list.removeAt(index.row());
-			this->model->setStringList(list);
+			rootItem->removeRow(index.row());
 			this->sessionStore.removeAt(index.row());
 			this->persistSessionStore();
 
@@ -219,9 +219,8 @@ void SessionWindow::handleSaveConnection()
 
 		this->persistSessionStore();
 
-		QStringList list = this->model->stringList();
-		list.replace(index.row(), this->editSession->getName());
-		this->model->setStringList(list);
+		QStandardItem *rootItem = this->model->invisibleRootItem();
+		rootItem->setChild(index.row(), new QStandardItem( this->editSession->getName()));
 
 		this->sessionList->setCurrentIndex(index);
 	}
