@@ -9,6 +9,8 @@
 #define UI_EXPLORER_MODEL_TABLEFILTERPROXYMODEL_H_
 
 #include <qsortfilterproxymodel.h>
+#include <QObject>
+#include <QModelIndex>
 
 namespace UI {
 namespace Explorer {
@@ -19,7 +21,7 @@ class TableFilterProxyModel: public QSortFilterProxyModel {
 	Q_OBJECT
 
 public:
-	TableFilterProxyModel();
+	TableFilterProxyModel(QObject * parent = 0);
 	virtual ~TableFilterProxyModel();
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };

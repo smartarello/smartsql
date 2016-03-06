@@ -24,7 +24,7 @@ class Explorer: public QWidget {
 	Q_OBJECT
 
 public:
-	Explorer(QWidget *parent = 0);
+	Explorer(QWidget *parent, QJsonObject sessionConf);
 	virtual ~Explorer();
 
 public slots:

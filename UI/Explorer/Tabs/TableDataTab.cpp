@@ -31,16 +31,13 @@ TableDataTab::TableDataTab(QWidget *parent) : QSplitter(parent) {
 	this->setStretchFactor(1, 1);
 }
 
-void TableDataTab::setTable(QString tableName, QSqlDatabase db) {
+void TableDataTab::setTable(QString tableName) {
 
-	if (db.open()){
-		Model::TableDataTabModel *queryModel = new Model::TableDataTabModel(0, db);
-		queryModel->setTable(tableName);
-		queryModel->select();
-		this->tableData->setModel(queryModel);
+	Model::TableDataTabModel *queryModel = new Model::TableDataTabModel();
+	queryModel->setTable(tableName);
+	queryModel->select();
+	this->tableData->setModel(queryModel);
 
-		db.close();
-	}
 }
 
 TableDataTab::~TableDataTab() {

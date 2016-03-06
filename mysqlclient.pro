@@ -6,6 +6,8 @@ QT += widgets sql
 TEMPLATE = app
 TARGET = mysqlclient
 INCLUDEPATH += .
+QMAKE_CXXFLAGS = -g 
+CONFIG += qt debug
 
 # Input
 HEADERS += UI/MainWindow.h \

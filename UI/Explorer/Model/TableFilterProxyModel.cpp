@@ -6,12 +6,13 @@
  */
 
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
+#include <QDebug>
 
 namespace UI {
 namespace Explorer {
 namespace Model {
 
-TableFilterProxyModel::TableFilterProxyModel() {
+TableFilterProxyModel::TableFilterProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {
 	// TODO Auto-generated constructor stub
 
 }

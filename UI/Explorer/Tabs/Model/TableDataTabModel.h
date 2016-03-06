@@ -22,9 +22,9 @@ class TableDataTabModel: public QSqlTableModel {
 	Q_OBJECT
 
 public:
-	TableDataTabModel(QObject * parent = 0, QSqlDatabase db = QSqlDatabase());
+	TableDataTabModel(QObject * parent = 0);
 	virtual ~TableDataTabModel();
-	void sort(int column, Qt::SortOrder order);
+//	void sort(int column, Qt::SortOrder order);
 };
 
 } /* namespace Model */

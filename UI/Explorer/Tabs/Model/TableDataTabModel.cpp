@@ -6,22 +6,22 @@
  */
 
 #include <UI/Explorer/Tabs/Model/TableDataTabModel.h>
-
+#include <QSqlQuery>
 namespace UI {
 namespace Explorer {
 namespace Tabs {
 namespace Model {
 
-TableDataTabModel::TableDataTabModel(QObject * parent, QSqlDatabase db) : QSqlTableModel(parent, db) {
-	// TODO Auto-generated constructor stub
+TableDataTabModel::TableDataTabModel(QObject * parent) : QSqlTableModel(parent) {
+
 
 }
 
-void TableDataTabModel::sort(int column, Qt::SortOrder order){
-	this->database().open();
-	QSqlTableModel::sort(column, order);
-	this->database().close();
-}
+//void TableDataTabModel::sort(int column, Qt::SortOrder order){
+//	this->database().open();
+//	QSqlTableModel::sort(column, order);
+//	this->database().close();
+//}
 
 TableDataTabModel::~TableDataTabModel() {
 	// TODO Auto-generated destructor stub

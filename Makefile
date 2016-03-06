@@ -12,9 +12,9 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB
-CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
+DEFINES       = -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB
+CFLAGS        = -pipe -g -D_REENTRANT -Wall -W -fPIC $(DEFINES)
+CXXFLAGS      = -g -g -D_REENTRANT -Wall -W -fPIC $(DEFINES)
 INCPATH       = -I. -I. -I../../Qt/5.5/gcc_64/include -I../../Qt/5.5/gcc_64/include/QtWidgets -I../../Qt/5.5/gcc_64/include/QtGui -I../../Qt/5.5/gcc_64/include/QtSql -I../../Qt/5.5/gcc_64/include/QtCore -I. -I../../Qt/5.5/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/stephane/Qt/5.5/gcc_64/bin/qmake
 DEL_FILE      = rm -f
@@ -35,7 +35,7 @@ COMPRESS      = gzip -9f
 DISTNAME      = mysqlclient1.0.0
 DISTDIR = /home/stephane/workspace_cpp/mysqlclient/.tmp/mysqlclient1.0.0
 LINK          = g++
-LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64 -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64/lib
+LFLAGS        = -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64 -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64/lib
 LIBS          = $(SUBLIBS) -L/home/stephane/Qt/5.5/gcc_64/lib -lQt5Widgets -L/usr/lib64 -lQt5Gui -lQt5Sql -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
@@ -212,13 +212,13 @@ DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/default_pre.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/resolve_config.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/default_post.prf \
-		../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/qt.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/resources.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/moc.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/unix/opengl.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/uic.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/unix/thread.prf \
+		../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/testcase_targets.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/exceptions.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/yacc.prf \
@@ -396,13 +396,13 @@ Makefile: mysqlclient.pro ../../Qt/5.5/gcc_64/mkspecs/linux-g++/qmake.conf ../..
 		../../Qt/5.5/gcc_64/mkspecs/features/default_pre.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/resolve_config.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/default_post.prf \
-		../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/qt.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/resources.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/moc.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/unix/opengl.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/uic.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/unix/thread.prf \
+		../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/testcase_targets.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/exceptions.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/yacc.prf \
@@ -536,13 +536,13 @@ Makefile: mysqlclient.pro ../../Qt/5.5/gcc_64/mkspecs/linux-g++/qmake.conf ../..
 ../../Qt/5.5/gcc_64/mkspecs/features/default_pre.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/resolve_config.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/default_post.prf:
-../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/qt.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/resources.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/moc.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/unix/opengl.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/uic.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/unix/thread.prf:
+../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/testcase_targets.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/exceptions.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/yacc.prf:
@@ -839,6 +839,9 @@ moc_DataBaseTree.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QTreeView \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
 		UI/Explorer/Model/DataBaseModel.h \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qstandarditemmodel.h \
@@ -981,6 +984,9 @@ moc_Explorer.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
 		UI/Explorer/Model/DataBaseModel.h \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qstandarditemmodel.h \
@@ -1356,6 +1362,9 @@ moc_DataBaseModel.cpp: ../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItem \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
@@ -1894,6 +1903,13 @@ main.o: main.cpp ../../Qt/5.5/gcc_64/include/QtWidgets/QApplication \
 		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QTranslator \
+		../../Qt/5.5/gcc_64/include/QtCore/qtranslator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QLibraryInfo \
+		../../Qt/5.5/gcc_64/include/QtCore/qlibraryinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdatetime.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QLocale \
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
 		UI/MainWindow.h \
 		UI/Session/EditSessionWindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
@@ -1915,8 +1931,7 @@ main.o: main.cpp ../../Qt/5.5/gcc_64/include/QtWidgets/QApplication \
 		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
-		../../Qt/5.5/gcc_64/include/QtCore/QDebug
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 MainWindow.o: UI/MainWindow.cpp UI/MainWindow.h \
@@ -2216,6 +2231,9 @@ DataBaseTree.o: UI/Explorer/DataBaseTree.cpp UI/Explorer/DataBaseTree.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
 		UI/Explorer/Model/DataBaseModel.h \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qstandarditemmodel.h \
@@ -2366,6 +2384,9 @@ Explorer.o: UI/Explorer/Explorer.cpp UI/Explorer/Explorer.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
 		UI/Explorer/Model/DataBaseModel.h \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qstandarditemmodel.h \
@@ -2692,6 +2713,8 @@ SessionWindow.o: UI/Session/SessionWindow.cpp ../../Qt/5.5/gcc_64/include/QtWidg
 		../../Qt/5.5/gcc_64/include/QtCore/QJsonValue \
 		../../Qt/5.5/gcc_64/include/QtCore/QJsonDocument \
 		../../Qt/5.5/gcc_64/include/QtCore/qjsondocument.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QUuid \
+		../../Qt/5.5/gcc_64/include/QtCore/quuid.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QShortcut \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qshortcut.h \
 		UI/Session/SessionWindow.h \
@@ -2802,6 +2825,9 @@ DataBaseModel.o: UI/Explorer/Model/DataBaseModel.cpp UI/Explorer/Model/DataBaseM
 		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItem \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
@@ -2810,7 +2836,9 @@ DataBaseModel.o: UI/Explorer/Model/DataBaseModel.cpp UI/Explorer/Model/DataBaseM
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqlquery.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QHash \
-		../../Qt/5.5/gcc_64/include/QtCore/QDebug
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
+		../../Qt/5.5/gcc_64/include/QtSql/QSqlError \
+		../../Qt/5.5/gcc_64/include/QtSql/qsqlerror.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DataBaseModel.o UI/Explorer/Model/DataBaseModel.cpp
 
 TableFilterProxyModel.o: UI/Explorer/Model/TableFilterProxyModel.cpp UI/Explorer/Model/TableFilterProxyModel.h \
@@ -3234,7 +3262,9 @@ TableDataTabModel.o: UI/Explorer/Tabs/Model/TableDataTabModel.cpp UI/Explorer/Ta
 		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
-		../../Qt/5.5/gcc_64/include/QtCore/QObject
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
+		../../Qt/5.5/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt/5.5/gcc_64/include/QtSql/qsqlquery.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TableDataTabModel.o UI/Explorer/Tabs/Model/TableDataTabModel.cpp
 
 moc_MainWindow.o: moc_MainWindow.cpp 

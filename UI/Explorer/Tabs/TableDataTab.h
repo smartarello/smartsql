@@ -24,7 +24,7 @@ class TableDataTab: public QSplitter {
 public:
 	TableDataTab(QWidget *parent = 0);
 	virtual ~TableDataTab();
-	void setTable(QString tableName, QSqlDatabase db);
+	void setTable(QString tableName);
 
 private:
 	QTableView *tableData;

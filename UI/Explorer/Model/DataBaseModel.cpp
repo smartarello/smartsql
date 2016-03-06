@@ -9,12 +9,13 @@
 #include <QSqlQuery>
 #include <QHash>
 #include <QDebug>
+#include <QSqlError>
 
 namespace UI {
 namespace Explorer {
 namespace Model {
 
-DataBaseModel::DataBaseModel() {
+DataBaseModel::DataBaseModel(QJsonObject sessionConf, QObject *parent) : QStandardItemModel(parent) {
 
 	this->setColumnCount(2);
 	QStandardItem *rootItem = this->invisibleRootItem();
@@ -23,24 +24,20 @@ DataBaseModel::DataBaseModel() {
 	QString name = db.hostName();
 
 	QStandardItem *defaultHost = new QStandardItem(name);
+	defaultHost->setData(QVariant(sessionConf));
 
-	QList<QStandardItem *> dbList = this->getDataBaseList(db);
+	rootItem->appendRow(defaultHost);
 
-	int row = 0;
+	QList<QStandardItem *> dbList = this->getDataBaseList();
+
 	foreach (QStandardItem * db, dbList){
-		defaultHost->setChild(row, 0, db);
-		defaultHost->setChild(row++, 1, new QStandardItem(""));
+		defaultHost->appendRow(db);
 	}
-
-	rootItem->setChild(0, 0, defaultHost);
-	rootItem->setChild(0, 1, new QStandardItem(""));
-
-
 }
 
-QList<QStandardItem *> DataBaseModel::getDataBaseList(QSqlDatabase db)
+QList<QStandardItem *> DataBaseModel::getDataBaseList()
 {
-	db.open();
+
 	QSqlQuery query;
 	query.exec("SHOW DATABASES");
 
@@ -52,7 +49,7 @@ QList<QStandardItem *> DataBaseModel::getDataBaseList(QSqlDatabase db)
 		dbList.append(currentDB);
 	}
 
-	db.close();
+
 	return dbList;
 }
 
@@ -105,35 +102,58 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 			if (dataBaseItem != 0){
 
 				QSqlDatabase db = QSqlDatabase::database();
-				db.setDatabaseName(dataBaseItem->text());
-				if (db.open()){
-					QStringList tables = db.tables();
-					QHash<QString, QString> tableSize = this->getTableSize(db);
-
-					for(int i = 0; i < tables.count(); i++){
-
-						QString tableName = tables.at(i);
-
-						QList<QStandardItem *> cols;
-						cols << new QStandardItem(tableName);
-						QStandardItem *size = new QStandardItem(tableSize.value(tableName));
-						size->setTextAlignment(Qt::AlignRight);
-						cols << size;
-						dataBaseItem->appendRow(cols);
-					}
-
-					QStandardItem *size = new QStandardItem(tableSize.value("DATABASE_SIZE"));
-					size->setTextAlignment(Qt::AlignRight);
-					connectionItem->setChild(parent.row(), 1, size);
-
+				QJsonObject sessionConf = connectionItem->data().toJsonObject();
+				if(db.isOpen()){
 					db.close();
 				}
+
+				qDebug() << "Closing current connection";
+				qInfo() << "Connection to the new database";
+				qDebug() << sessionConf;
+
+				db.setHostName(sessionConf.value("hostname").toString());
+				db.setUserName(sessionConf.value("user").toString());
+				db.setPassword(sessionConf.value("password").toString());
+				db.setPort(sessionConf.value("port").toInt());
+				db.setDatabaseName(dataBaseItem->text());
+
+				qDebug() << "Loading table list for: " + db.databaseName();
+
+				if (!db.open()){
+					qDebug() << db.lastError().text();
+					return ;
+				}
+
+				QStringList tables = db.tables();
+				QHash<QString, QString> tableSize = this->getTableSize();
+
+				qDebug() << "Table count: " + QString::number(tables.count());
+				for(int i = 0; i < tables.count(); i++){
+
+					QString tableName = tables.at(i);
+
+					QList<QStandardItem *> cols;
+					cols << new QStandardItem(tableName);
+					QStandardItem *size = new QStandardItem(tableSize.value(tableName));
+					size->setTextAlignment(Qt::AlignRight);
+					cols << size;
+
+
+					dataBaseItem->appendRow(cols);
+				}
+
+				QStandardItem *size = new QStandardItem(tableSize.value("DATABASE_SIZE"));
+				size->setTextAlignment(Qt::AlignRight);
+				//connectionItem->setChild(dataBaseItem->index().row(), 1, size);
+
+				qDebug() << "Table list retrieves successfully";
+
 			}
 		}
 	}
 }
 
-QHash<QString, QString> DataBaseModel::getTableSize(QSqlDatabase db)
+QHash<QString, QString> DataBaseModel::getTableSize()
 {
 	QHash<QString, QString> size;
 	QSqlQuery query;

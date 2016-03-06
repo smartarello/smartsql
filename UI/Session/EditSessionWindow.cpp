@@ -34,11 +34,11 @@ EditSessionWindow::EditSessionWindow(QWidget *parent) : QWidget(parent){
 	this->passwordLineEdit->setEchoMode(QLineEdit::Password);
 
 	QFormLayout *formLayout = new QFormLayout;
-	formLayout->addRow(tr("&Connection name:"), this->nameLineEdit);
-	formLayout->addRow(tr("&Hostname / IP:"), this->hostLineEdit);
-	formLayout->addRow(tr("&User:"), this->userLineEdit);
-	formLayout->addRow(tr("&Password:"), this->passwordLineEdit);
-	formLayout->addRow(tr("&Port:"), this->portLineEdit);
+	formLayout->addRow(tr("Connection name:"), this->nameLineEdit);
+	formLayout->addRow(tr("Hostname / IP:"), this->hostLineEdit);
+	formLayout->addRow(tr("User:"), this->userLineEdit);
+	formLayout->addRow(tr("Password:"), this->passwordLineEdit);
+	formLayout->addRow(tr("Port:"), this->portLineEdit);
 
 	formWidget->setFixedHeight(200);
 	formWidget->setLayout(formLayout);
@@ -51,11 +51,11 @@ EditSessionWindow::EditSessionWindow(QWidget *parent) : QWidget(parent){
 	QHBoxLayout *hboxlayout = new QHBoxLayout;
 	hboxlayout->setAlignment(Qt::AlignRight);
 
-	this->saveButton = new QPushButton("Save");
+	this->saveButton = new QPushButton(tr("Save"));
 	this->saveButton->setFixedWidth(100);
 	this->saveButton->setDisabled(true);
 
-	QPushButton *testButton = new QPushButton("Test connection");
+	QPushButton *testButton = new QPushButton(tr("Test connection"));
 	testButton->setFixedWidth(150);
 
 	hboxlayout->addWidget(testButton);
@@ -90,19 +90,19 @@ void EditSessionWindow::testConnection()
 	db.setPort(this->getPort());
 
 	QMessageBox *message = new QMessageBox();
-	message->setWindowTitle("Connection test");
+	message->setWindowTitle(tr("Connection test"));
 
 	if (db.open()){
 
 		db.close();
 		db = QSqlDatabase();
 		db.removeDatabase("test");
-		message->setText("Connected successfully");
+		message->setText(tr("Connected successfully"));
 		message->setIcon(QMessageBox::Information);
 	}
 	else{
 		QSqlError err = db.lastError();
-		message->setText("Connection error");
+		message->setText(tr("Connection error"));
 		message->setDetailedText(err.text());
 		message->setIcon(QMessageBox::Warning);
 

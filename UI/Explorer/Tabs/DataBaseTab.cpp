@@ -16,27 +16,20 @@ namespace Tabs {
 
 DataBaseTab::DataBaseTab(QSqlDatabase db, QWidget * parent) : QTableView(parent) {
 
-	if (db.open()){
-		QSqlQueryModel *model = new QSqlQueryModel();
-		model->setQuery("SHOW TABLE STATUS", db);
+	QSqlQueryModel *model = new QSqlQueryModel();
+	model->setQuery("SHOW TABLE STATUS", db);
 
-		this->setModel(model);
-		db.close();
-	}
-
+	this->setModel(model);
 	this->resizeColumnsToContents();
 	this->verticalHeader()->hide();
 }
 
-void DataBaseTab::setSqlDatabase(QSqlDatabase db)
+void DataBaseTab::refresh()
 {
-	if (db.open()){
-		QSqlQueryModel *model = new QSqlQueryModel();
-		model->setQuery("SHOW TABLE STATUS", db);
+	QSqlQueryModel *model = new QSqlQueryModel();
+	model->setQuery("SHOW TABLE STATUS");
 
-		this->setModel(model);
-		db.close();
-	}
+	this->setModel(model);
 }
 
 DataBaseTab::~DataBaseTab() {

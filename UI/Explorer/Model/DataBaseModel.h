@@ -10,6 +10,8 @@
 
 #include <QStandardItemModel>
 #include <QList>
+#include <QObject>
+#include <QJsonObject>
 #include <QStandardItem>
 #include <QSqlDatabase>
 #include <QModelIndex>
@@ -23,15 +25,17 @@ class DataBaseModel : public QStandardItemModel {
 	Q_OBJECT
 
 public:
-	DataBaseModel();
+	DataBaseModel(QJsonObject sessionConf, QObject * parent = 0);
 	virtual ~DataBaseModel();
-	bool canFetchMore(const QModelIndex & parent) const;
-	bool hasChildren(const QModelIndex & parent = QModelIndex()) const;
-	void fetchMore(const QModelIndex & parent);
+
+protected:
+	bool canFetchMore(const QModelIndex & parent) const Q_DECL_OVERRIDE;
+	bool hasChildren(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
+	void fetchMore(const QModelIndex & parent) Q_DECL_OVERRIDE;
 
 private:
-	QList<QStandardItem *> getDataBaseList(QSqlDatabase db);
-	QHash<QString, QString> getTableSize(QSqlDatabase db);
+	QList<QStandardItem *> getDataBaseList();
+	QHash<QString, QString> getTableSize();
 	QString getSizeString(double size);
 };
 

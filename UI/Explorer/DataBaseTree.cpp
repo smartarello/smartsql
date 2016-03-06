@@ -15,9 +15,9 @@
 namespace UI {
 namespace Explorer {
 
-DataBaseTree::DataBaseTree(QWidget *parent) : QTreeView(parent) {
+DataBaseTree::DataBaseTree(QWidget *parent, QJsonObject sessionConf) : QTreeView(parent) {
 
-	this->dataBaseModel = new Model::DataBaseModel();
+	this->dataBaseModel = new Model::DataBaseModel(sessionConf);
 
 	Model::TableFilterProxyModel *filter = new Model::TableFilterProxyModel();
 	filter->setSourceModel(this->dataBaseModel);
@@ -40,6 +40,8 @@ Model::DataBaseModel * DataBaseTree::getDataBaseModel()
 void DataBaseTree::filterTable(QString text)
 {
 	((Model::TableFilterProxyModel *)this->model())->setFilterRegExp(text);
+
+	this->expandToDepth(1);
 }
 
 

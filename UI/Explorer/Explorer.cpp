@@ -19,9 +19,9 @@
 namespace UI {
 namespace Explorer {
 
-Explorer::Explorer(QWidget *parent) : QWidget(parent) {
+Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 
-	this->dataBaseTree = new DataBaseTree(this);
+	this->dataBaseTree = new DataBaseTree(this, sessionConf);
 
 	QSplitter *splitter = new QSplitter(Qt::Horizontal);
 
@@ -49,6 +49,7 @@ Explorer::Explorer(QWidget *parent) : QWidget(parent) {
 
 	QSqlDatabase db = QSqlDatabase::database();
 	db.setDatabaseName(firstDataBase->text());
+	db.open();
 
 	this->databaseTab = new Tabs::DataBaseTab(db);
 	this->explorerTabs->addTab(this->databaseTab, "Database");
@@ -63,11 +64,15 @@ Explorer::Explorer(QWidget *parent) : QWidget(parent) {
 	connect(this->dataBaseTree, SIGNAL (clicked(QModelIndex)), this, SLOT (dataBaseTreeClicked(QModelIndex)));
 }
 
+
 void Explorer::dataBaseTreeClicked(QModelIndex index)
 {
+	int tableTabIndex = this->explorerTabs->indexOf(this->tableTab) ;
 	if (!index.parent().isValid()){
 		// click on the server host
-		// nothing todo
+		if (tableTabIndex != -1){
+			this->explorerTabs->removeTab(tableTabIndex);
+		}
 		return ;
 	}
 
@@ -75,30 +80,54 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 	index = model->mapToSource(index);
 	QStandardItem *root = this->dataBaseTree->getDataBaseModel()->invisibleRootItem();
 
+
+	QString dataBaseName;
+	QString tableName;
+	QStandardItem *dbItem ;
+
 	QModelIndex dbIndex = index;
 	if (index.parent().parent().isValid()){
 		// click on a table
 		dbIndex = index.parent();
 
 		// Show table details
-		QStandardItem *dbItem = root->child(0)->child(dbIndex.row());
+		dbItem = root->child(0)->child(dbIndex.row());
 		QStandardItem *tableItem = dbItem->child(index.row());
 
-		QSqlDatabase db = QSqlDatabase::database();
-		db.setDatabaseName(dbItem->text());
-
-		this->tableTab->setTable(tableItem->text(), db);
-		this->explorerTabs->insertTab(1, this->tableTab, tableItem->text());
-		this->explorerTabs->setCurrentIndex(1);
-		this->databaseTab->setSqlDatabase(db);
+		dataBaseName = dbItem->text();
+		tableName = tableItem->text();
 	}
 	else{
-		QStandardItem *item = root->child(0)->child(dbIndex.row());
-
-		QSqlDatabase db = QSqlDatabase::database();
-		db.setDatabaseName(item->text());
-		this->databaseTab->setSqlDatabase(db);
+		dbItem = root->child(0)->child(dbIndex.row());
+		dataBaseName = dbItem->text();
 	}
+
+	QSqlDatabase db = QSqlDatabase::database();
+	QJsonObject sessionConf = dbItem->parent()->data().toJsonObject();
+	db.close();
+	qDebug() << "Closing current connection";
+	qInfo() << "Connection to the new database";
+	qDebug() << sessionConf;
+
+	db.setHostName(sessionConf.value("hostname").toString());
+	db.setUserName(sessionConf.value("user").toString());
+	db.setPassword(sessionConf.value("password").toString());
+	db.setPort(sessionConf.value("port").toInt());
+	db.setDatabaseName(dataBaseName);
+
+	db.open();
+
+	if (!tableName.isNull()){
+		this->tableTab->setTable(tableName);
+		if (this->explorerTabs->indexOf(this->tableTab) == -1){
+			this->explorerTabs->insertTab(1, this->tableTab, tr("Data"));
+		}
+	}
+	else if (tableTabIndex != -1){
+		this->explorerTabs->removeTab(tableTabIndex);
+	}
+
+	this->databaseTab->refresh();
 }
 
 Explorer::~Explorer() {

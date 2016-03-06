@@ -22,6 +22,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonDocument>
+#include <QUuid>
 #include <QShortcut>
 #include "SessionWindow.h"
 
@@ -82,8 +83,8 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 leftPartWidget->setLayout(leftPartLayout);
 	 leftPartLayout->setAlignment(Qt::AlignLeft);
 
-	 QPushButton *newConnection = new QPushButton("New connection");
-	 QPushButton *deleteButton = new QPushButton("Delete");
+	 QPushButton *newConnection = new QPushButton(tr("New"));
+	 QPushButton *deleteButton = new QPushButton(tr("Delete"));
 	 newConnection->setFixedWidth(150);
 	 deleteButton->setFixedWidth(150);
 	 leftPartLayout->addWidget(newConnection);
@@ -94,7 +95,7 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 QHBoxLayout *rightPartLayout = new QHBoxLayout;
 	 rightPartLayout->setAlignment(Qt::AlignRight);
 	 rightPartWidget->setLayout(rightPartLayout);
-	 QPushButton *exitButton = new QPushButton("Exit");
+	 QPushButton *exitButton = new QPushButton(tr("Exit"));
 	 exitButton->setFixedWidth(100);
 	 rightPartLayout->addWidget(exitButton);
 	 buttonLayout->addWidget(rightPartWidget);
@@ -126,12 +127,16 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 
 void SessionWindow::handleNewConnection()
 {
+	qInfo() << "Creating the new session configuration";
 	QJsonObject newSession;
 	newSession.insert("name", "Unamed");
 	newSession.insert("user", "root");
 	newSession.insert("password", "");
 	newSession.insert("port", 3306);
 	newSession.insert("hostname", "localhost");
+	newSession.insert("uuid", QUuid::createUuid().toString());
+
+	qDebug() << newSession;
 
 	this->sessionStore.append(newSession);
 
@@ -228,11 +233,14 @@ void SessionWindow::handleSaveConnection()
 
 void SessionWindow::persistSessionStore()
 {
+	qInfo() << "Saving the session configuration";
 	QSettings settings("smartarello", "mysqlclient");
 
 	QJsonDocument doc;
 	doc.setArray(this->sessionStore);
 	QString strJson(doc.toJson(QJsonDocument::Compact));
+
+	qDebug() << strJson;
 	settings.setValue("sessions", strJson);
 }
 

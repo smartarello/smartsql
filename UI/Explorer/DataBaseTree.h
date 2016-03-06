@@ -9,6 +9,7 @@
 #define UI_EXPLORER_DATABASETREE_H_
 
 #include <QTreeView>
+#include <QJsonObject>
 #include "Model/DataBaseModel.h"
 
 namespace UI {
@@ -19,7 +20,7 @@ class DataBaseTree: public QTreeView {
 	Q_OBJECT
 
 public:
-	DataBaseTree(QWidget *parent = 0);
+	DataBaseTree(QWidget *parent, QJsonObject sessionUuid);
 	virtual ~DataBaseTree();
 public slots:
 	void filterTable(QString text);
