@@ -7,21 +7,44 @@
 
 #include <UI/Explorer/Tabs/Model/TableDataTabModel.h>
 #include <QSqlQuery>
+#include <QDebug>
 namespace UI {
 namespace Explorer {
 namespace Tabs {
 namespace Model {
 
-TableDataTabModel::TableDataTabModel(QObject * parent) : QSqlTableModel(parent) {
+TableDataTabModel::TableDataTabModel(QObject * parent) : QSqlQueryModel(parent) {
 
 
 }
 
-//void TableDataTabModel::sort(int column, Qt::SortOrder order){
-//	this->database().open();
-//	QSqlTableModel::sort(column, order);
-//	this->database().close();
-//}
+void TableDataTabModel::setTable(QString table){
+	this->table = table;
+	this->setQuery(QString("SELECT * FROM %1 LIMIT 1000").arg(this->table));
+
+	QSqlQuery query;
+	query.exec(QString("SHOW COLUMNS FROM %1").arg(this->table));
+	this->columns = QList<QString>();
+	while(query.next()){
+		this->columns.append(query.value("Field").toString());
+	}
+}
+
+void TableDataTabModel::sort(int column, Qt::SortOrder order){
+	if (column >= this->columns.count()){
+		return ;
+	}
+
+	QString sortOrder = QString("ASC");
+	if (order == Qt::DescendingOrder){
+		sortOrder = QString("DESC");
+	}
+
+	QString col = this->columns.at(column);
+	QString query = QString("SELECT * FROM %1 ORDER BY %2 %3 LIMIT 1000").arg(this->table).arg(col).arg(sortOrder);
+	qDebug() << query;
+	this->setQuery(query);
+}
 
 TableDataTabModel::~TableDataTabModel() {
 	// TODO Auto-generated destructor stub

@@ -22,6 +22,7 @@ TableDataTab::TableDataTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData = new QTableView();
 	this->tableData->setSortingEnabled(true);
 	this->tableData->verticalHeader()->hide();
+
 	this->whereConditionText = new QTextEdit();
 
 	this->addWidget(this->tableData);
@@ -35,7 +36,6 @@ void TableDataTab::setTable(QString tableName) {
 
 	Model::TableDataTabModel *queryModel = new Model::TableDataTabModel();
 	queryModel->setTable(tableName);
-	queryModel->select();
 	this->tableData->setModel(queryModel);
 
 }

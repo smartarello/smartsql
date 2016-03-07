@@ -9,6 +9,7 @@
 #define UI_EXPLORER_TABS_MODEL_TABLEDATATABMODEL_H_
 
 #include <QSqlTableModel>
+#include <QSqlQueryModel>
 #include <QSqlDatabase>
 #include <QObject>
 
@@ -17,14 +18,19 @@ namespace Explorer {
 namespace Tabs {
 namespace Model {
 
-class TableDataTabModel: public QSqlTableModel {
+class TableDataTabModel: public QSqlQueryModel {
 
 	Q_OBJECT
 
 public:
 	TableDataTabModel(QObject * parent = 0);
 	virtual ~TableDataTabModel();
-//	void sort(int column, Qt::SortOrder order);
+	void setTable(QString table);
+
+private:
+	QString table;
+	QList<QString> columns;
+	void sort(int column, Qt::SortOrder order);
 };
 
 } /* namespace Model */
