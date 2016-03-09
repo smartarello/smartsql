@@ -30,6 +30,10 @@ void TableDataTabModel::setTable(QString table){
 	}
 }
 
+QList<QString> TableDataTabModel::getColumns(){
+	return this->columns;
+}
+
 void TableDataTabModel::sort(int column, Qt::SortOrder order){
 	if (column >= this->columns.count()){
 		return ;

@@ -20,7 +20,7 @@ class DataBaseTab: public QTableView {
 	Q_OBJECT
 
 public:
-	DataBaseTab(QSqlDatabase db, QWidget * parent = 0);
+	DataBaseTab(QWidget * parent = 0);
 	virtual ~DataBaseTab();
 	void refresh();
 };

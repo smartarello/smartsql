@@ -40,13 +40,11 @@ Model::DataBaseModel * DataBaseTree::getDataBaseModel()
 void DataBaseTree::filterTable(QString text)
 {
 	((Model::TableFilterProxyModel *)this->model())->setFilterRegExp(text);
-
-	this->expandToDepth(1);
 }
 
 
 DataBaseTree::~DataBaseTree() {
-	// TODO Auto-generated destructor stub
+
 }
 
 } /* namespace Explorer */

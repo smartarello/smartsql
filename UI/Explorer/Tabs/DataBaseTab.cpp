@@ -14,10 +14,10 @@ namespace UI {
 namespace Explorer {
 namespace Tabs {
 
-DataBaseTab::DataBaseTab(QSqlDatabase db, QWidget * parent) : QTableView(parent) {
+DataBaseTab::DataBaseTab(QWidget * parent) : QTableView(parent) {
 
 	QSqlQueryModel *model = new QSqlQueryModel();
-	model->setQuery("SHOW TABLE STATUS", db);
+	model->setQuery("SHOW TABLE STATUS");
 
 	this->setModel(model);
 	this->resizeColumnsToContents();

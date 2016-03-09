@@ -51,7 +51,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	db.setDatabaseName(firstDataBase->text());
 	db.open();
 
-	this->databaseTab = new Tabs::DataBaseTab(db);
+	this->databaseTab = new Tabs::DataBaseTab();
 	this->explorerTabs->addTab(this->databaseTab, "Database");
 
 	splitter->setStretchFactor(0, 1);

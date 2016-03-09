@@ -26,6 +26,7 @@ public:
 	TableDataTabModel(QObject * parent = 0);
 	virtual ~TableDataTabModel();
 	void setTable(QString table);
+	QList<QString> getColumns();
 
 private:
 	QString table;

@@ -12,9 +12,9 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB
-CFLAGS        = -pipe -g -D_REENTRANT -Wall -W -fPIC $(DEFINES)
-CXXFLAGS      = -g -g -D_REENTRANT -Wall -W -fPIC $(DEFINES)
+DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB
+CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -I. -I../../Qt/5.5/gcc_64/include -I../../Qt/5.5/gcc_64/include/QtWidgets -I../../Qt/5.5/gcc_64/include/QtGui -I../../Qt/5.5/gcc_64/include/QtSql -I../../Qt/5.5/gcc_64/include/QtCore -I. -I../../Qt/5.5/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/stephane/Qt/5.5/gcc_64/bin/qmake
 DEL_FILE      = rm -f
@@ -35,7 +35,7 @@ COMPRESS      = gzip -9f
 DISTNAME      = mysqlclient1.0.0
 DISTDIR = /home/stephane/workspace_cpp/mysqlclient/.tmp/mysqlclient1.0.0
 LINK          = g++
-LFLAGS        = -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64 -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64/lib
+LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64 -Wl,-rpath,/home/stephane/Qt/5.5/gcc_64/lib
 LIBS          = $(SUBLIBS) -L/home/stephane/Qt/5.5/gcc_64/lib -lQt5Widgets -L/usr/lib64 -lQt5Gui -lQt5Sql -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
@@ -58,6 +58,7 @@ SOURCES       = main.cpp \
 		UI/Explorer/Model/TableFilterProxyModel.cpp \
 		UI/Explorer/Tabs/DataBaseTab.cpp \
 		UI/Explorer/Tabs/TableDataTab.cpp \
+		UI/Explorer/Tabs/TableFilterTextEdit.cpp \
 		UI/Explorer/Tabs/Model/TableDataTabModel.cpp moc_MainWindow.cpp \
 		moc_DataBaseTree.cpp \
 		moc_Explorer.cpp \
@@ -67,6 +68,7 @@ SOURCES       = main.cpp \
 		moc_TableFilterProxyModel.cpp \
 		moc_DataBaseTab.cpp \
 		moc_TableDataTab.cpp \
+		moc_TableFilterTextEdit.cpp \
 		moc_TableDataTabModel.cpp
 OBJECTS       = main.o \
 		MainWindow.o \
@@ -78,6 +80,7 @@ OBJECTS       = main.o \
 		TableFilterProxyModel.o \
 		DataBaseTab.o \
 		TableDataTab.o \
+		TableFilterTextEdit.o \
 		TableDataTabModel.o \
 		moc_MainWindow.o \
 		moc_DataBaseTree.o \
@@ -88,6 +91,7 @@ OBJECTS       = main.o \
 		moc_TableFilterProxyModel.o \
 		moc_DataBaseTab.o \
 		moc_TableDataTab.o \
+		moc_TableFilterTextEdit.o \
 		moc_TableDataTabModel.o
 DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		../../Qt/5.5/gcc_64/mkspecs/common/unix.conf \
@@ -212,13 +216,13 @@ DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/default_pre.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/resolve_config.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/default_post.prf \
+		../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/qt.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/resources.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/moc.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/unix/opengl.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/uic.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/unix/thread.prf \
-		../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/testcase_targets.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/exceptions.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/yacc.prf \
@@ -232,6 +236,7 @@ DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		UI/Explorer/Model/TableFilterProxyModel.h \
 		UI/Explorer/Tabs/DataBaseTab.h \
 		UI/Explorer/Tabs/TableDataTab.h \
+		UI/Explorer/Tabs/TableFilterTextEdit.h \
 		UI/Explorer/Tabs/Model/TableDataTabModel.h main.cpp \
 		UI/MainWindow.cpp \
 		UI/Explorer/DataBaseTree.cpp \
@@ -242,6 +247,7 @@ DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		UI/Explorer/Model/TableFilterProxyModel.cpp \
 		UI/Explorer/Tabs/DataBaseTab.cpp \
 		UI/Explorer/Tabs/TableDataTab.cpp \
+		UI/Explorer/Tabs/TableFilterTextEdit.cpp \
 		UI/Explorer/Tabs/Model/TableDataTabModel.cpp
 QMAKE_TARGET  = mysqlclient
 DESTDIR       = #avoid trailing-slash linebreak
@@ -396,13 +402,13 @@ Makefile: mysqlclient.pro ../../Qt/5.5/gcc_64/mkspecs/linux-g++/qmake.conf ../..
 		../../Qt/5.5/gcc_64/mkspecs/features/default_pre.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/resolve_config.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/default_post.prf \
+		../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/qt.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/resources.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/moc.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/unix/opengl.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/uic.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/unix/thread.prf \
-		../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/testcase_targets.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/exceptions.prf \
 		../../Qt/5.5/gcc_64/mkspecs/features/yacc.prf \
@@ -536,13 +542,13 @@ Makefile: mysqlclient.pro ../../Qt/5.5/gcc_64/mkspecs/linux-g++/qmake.conf ../..
 ../../Qt/5.5/gcc_64/mkspecs/features/default_pre.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/resolve_config.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/default_post.prf:
+../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/qt.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/resources.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/moc.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/unix/opengl.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/uic.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/unix/thread.prf:
-../../Qt/5.5/gcc_64/mkspecs/features/warn_on.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/testcase_targets.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/exceptions.prf:
 ../../Qt/5.5/gcc_64/mkspecs/features/yacc.prf:
@@ -566,8 +572,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents UI/MainWindow.h UI/Explorer/DataBaseTree.h UI/Explorer/Explorer.h UI/Session/EditSessionWindow.h UI/Session/SessionWindow.h UI/Explorer/Model/DataBaseModel.h UI/Explorer/Model/TableFilterProxyModel.h UI/Explorer/Tabs/DataBaseTab.h UI/Explorer/Tabs/TableDataTab.h UI/Explorer/Tabs/Model/TableDataTabModel.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp UI/MainWindow.cpp UI/Explorer/DataBaseTree.cpp UI/Explorer/Explorer.cpp UI/Session/EditSessionWindow.cpp UI/Session/SessionWindow.cpp UI/Explorer/Model/DataBaseModel.cpp UI/Explorer/Model/TableFilterProxyModel.cpp UI/Explorer/Tabs/DataBaseTab.cpp UI/Explorer/Tabs/TableDataTab.cpp UI/Explorer/Tabs/Model/TableDataTabModel.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents UI/MainWindow.h UI/Explorer/DataBaseTree.h UI/Explorer/Explorer.h UI/Session/EditSessionWindow.h UI/Session/SessionWindow.h UI/Explorer/Model/DataBaseModel.h UI/Explorer/Model/TableFilterProxyModel.h UI/Explorer/Tabs/DataBaseTab.h UI/Explorer/Tabs/TableDataTab.h UI/Explorer/Tabs/TableFilterTextEdit.h UI/Explorer/Tabs/Model/TableDataTabModel.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp UI/MainWindow.cpp UI/Explorer/DataBaseTree.cpp UI/Explorer/Explorer.cpp UI/Session/EditSessionWindow.cpp UI/Session/SessionWindow.cpp UI/Explorer/Model/DataBaseModel.cpp UI/Explorer/Model/TableFilterProxyModel.cpp UI/Explorer/Tabs/DataBaseTab.cpp UI/Explorer/Tabs/TableDataTab.cpp UI/Explorer/Tabs/TableFilterTextEdit.cpp UI/Explorer/Tabs/Model/TableDataTabModel.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents mysqlclient_en.ts $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -590,9 +597,9 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_MainWindow.cpp moc_DataBaseTree.cpp moc_Explorer.cpp moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_DataBaseModel.cpp moc_TableFilterProxyModel.cpp moc_DataBaseTab.cpp moc_TableDataTab.cpp moc_TableDataTabModel.cpp
+compiler_moc_header_make_all: moc_MainWindow.cpp moc_DataBaseTree.cpp moc_Explorer.cpp moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_DataBaseModel.cpp moc_TableFilterProxyModel.cpp moc_DataBaseTab.cpp moc_TableDataTab.cpp moc_TableFilterTextEdit.cpp moc_TableDataTabModel.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_MainWindow.cpp moc_DataBaseTree.cpp moc_Explorer.cpp moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_DataBaseModel.cpp moc_TableFilterProxyModel.cpp moc_DataBaseTab.cpp moc_TableDataTab.cpp moc_TableDataTabModel.cpp
+	-$(DEL_FILE) moc_MainWindow.cpp moc_DataBaseTree.cpp moc_Explorer.cpp moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_DataBaseModel.cpp moc_TableFilterProxyModel.cpp moc_DataBaseTab.cpp moc_TableDataTab.cpp moc_TableFilterTextEdit.cpp moc_TableDataTabModel.cpp
 moc_MainWindow.cpp: UI/Session/EditSessionWindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
@@ -846,6 +853,7 @@ moc_DataBaseTree.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QTreeView \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qstandarditemmodel.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItem \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
@@ -991,6 +999,7 @@ moc_Explorer.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qstandarditemmodel.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItem \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
@@ -1001,7 +1010,7 @@ moc_Explorer.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		UI/Explorer/Tabs/TableDataTab.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QSplitter \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qsplitter.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QTextEdit \
+		UI/Explorer/Tabs/TableFilterTextEdit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
 		UI/Explorer/Explorer.h
@@ -1362,6 +1371,7 @@ moc_DataBaseModel.cpp: ../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
 		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
@@ -1441,6 +1451,8 @@ moc_TableFilterProxyModel.cpp: ../../Qt/5.5/gcc_64/include/QtCore/qsortfilterpro
 		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
+		../../Qt/5.5/gcc_64/include/QtCore/QModelIndex \
 		UI/Explorer/Model/TableFilterProxyModel.h
 	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Explorer/Model/TableFilterProxyModel.h -o moc_TableFilterProxyModel.cpp
 
@@ -1692,18 +1704,132 @@ moc_TableDataTab.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QSplitter \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QTextEdit \
+		UI/Explorer/Tabs/TableFilterTextEdit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
 		../../Qt/5.5/gcc_64/include/QtSql/qsql.h \
 		UI/Explorer/Tabs/TableDataTab.h
 	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Explorer/Tabs/TableDataTab.h -o moc_TableDataTab.cpp
+
+moc_TableFilterTextEdit.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qline.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
+		UI/Explorer/Tabs/TableFilterTextEdit.h
+	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Explorer/Tabs/TableFilterTextEdit.h -o moc_TableFilterTextEdit.cpp
 
 moc_TableDataTabModel.cpp: ../../Qt/5.5/gcc_64/include/QtSql/QSqlTableModel \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqltablemodel.h \
@@ -1776,6 +1902,7 @@ moc_TableDataTabModel.cpp: ../../Qt/5.5/gcc_64/include/QtSql/QSqlTableModel \
 		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtSql/QSqlQueryModel \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		UI/Explorer/Tabs/Model/TableDataTabModel.h
@@ -2098,6 +2225,7 @@ MainWindow.o: UI/MainWindow.cpp UI/MainWindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtreeview.h \
 		UI/Explorer/Model/DataBaseModel.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItem \
 		UI/Explorer/Tabs/DataBaseTab.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QTableView \
@@ -2105,7 +2233,7 @@ MainWindow.o: UI/MainWindow.cpp UI/MainWindow.h \
 		UI/Explorer/Tabs/TableDataTab.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QSplitter \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qsplitter.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QTextEdit \
+		UI/Explorer/Tabs/TableFilterTextEdit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o UI/MainWindow.cpp
@@ -2238,6 +2366,7 @@ DataBaseTree.o: UI/Explorer/DataBaseTree.cpp UI/Explorer/DataBaseTree.h \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qstandarditemmodel.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItem \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
@@ -2391,6 +2520,7 @@ Explorer.o: UI/Explorer/Explorer.cpp UI/Explorer/Explorer.h \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItemModel \
 		../../Qt/5.5/gcc_64/include/QtGui/qstandarditemmodel.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		../../Qt/5.5/gcc_64/include/QtGui/QStandardItem \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
@@ -2401,7 +2531,7 @@ Explorer.o: UI/Explorer/Explorer.cpp UI/Explorer/Explorer.h \
 		UI/Explorer/Tabs/TableDataTab.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QSplitter \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qsplitter.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QTextEdit \
+		UI/Explorer/Tabs/TableFilterTextEdit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
@@ -2825,6 +2955,7 @@ DataBaseModel.o: UI/Explorer/Model/DataBaseModel.cpp UI/Explorer/Model/DataBaseM
 		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QList \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		../../Qt/5.5/gcc_64/include/QtCore/QJsonObject \
 		../../Qt/5.5/gcc_64/include/QtCore/qjsonobject.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qjsonvalue.h \
@@ -2909,7 +3040,10 @@ TableFilterProxyModel.o: UI/Explorer/Model/TableFilterProxyModel.cpp UI/Explorer
 		../../Qt/5.5/gcc_64/include/QtCore/qvector.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
-		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h
+		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject \
+		../../Qt/5.5/gcc_64/include/QtCore/QModelIndex \
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TableFilterProxyModel.o UI/Explorer/Model/TableFilterProxyModel.cpp
 
 DataBaseTab.o: UI/Explorer/Tabs/DataBaseTab.cpp UI/Explorer/Tabs/DataBaseTab.h \
@@ -3167,13 +3301,14 @@ TableDataTab.o: UI/Explorer/Tabs/TableDataTab.cpp UI/Explorer/Tabs/TableDataTab.
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
-		../../Qt/5.5/gcc_64/include/QtWidgets/QTextEdit \
+		UI/Explorer/Tabs/TableFilterTextEdit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqldatabase.h \
 		../../Qt/5.5/gcc_64/include/QtSql/qsql.h \
@@ -3183,11 +3318,132 @@ TableDataTab.o: UI/Explorer/Tabs/TableDataTab.cpp UI/Explorer/Tabs/TableDataTab.
 		../../Qt/5.5/gcc_64/include/QtSql/qsqlquerymodel.h \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt/5.5/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QLabel \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
 		UI/Explorer/Tabs/Model/TableDataTabModel.h \
+		../../Qt/5.5/gcc_64/include/QtSql/QSqlQueryModel \
 		../../Qt/5.5/gcc_64/include/QtCore/QObject
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TableDataTab.o UI/Explorer/Tabs/TableDataTab.cpp
+
+TableFilterTextEdit.o: UI/Explorer/Tabs/TableFilterTextEdit.cpp UI/Explorer/Tabs/TableFilterTextEdit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qline.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TableFilterTextEdit.o UI/Explorer/Tabs/TableFilterTextEdit.cpp
 
 TableDataTabModel.o: UI/Explorer/Tabs/Model/TableDataTabModel.cpp UI/Explorer/Tabs/Model/TableDataTabModel.h \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlTableModel \
@@ -3261,10 +3517,12 @@ TableDataTabModel.o: UI/Explorer/Tabs/Model/TableDataTabModel.cpp UI/Explorer/Ta
 		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
 		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtSql/QSqlQueryModel \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt/5.5/gcc_64/include/QtCore/QObject \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlQuery \
-		../../Qt/5.5/gcc_64/include/QtSql/qsqlquery.h
+		../../Qt/5.5/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt/5.5/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TableDataTabModel.o UI/Explorer/Tabs/Model/TableDataTabModel.cpp
 
 moc_MainWindow.o: moc_MainWindow.cpp 
@@ -3293,6 +3551,9 @@ moc_DataBaseTab.o: moc_DataBaseTab.cpp
 
 moc_TableDataTab.o: moc_TableDataTab.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TableDataTab.o moc_TableDataTab.cpp
+
+moc_TableFilterTextEdit.o: moc_TableFilterTextEdit.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TableFilterTextEdit.o moc_TableFilterTextEdit.cpp
 
 moc_TableDataTabModel.o: moc_TableDataTabModel.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TableDataTabModel.o moc_TableDataTabModel.cpp

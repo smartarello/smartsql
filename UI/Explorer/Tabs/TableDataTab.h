@@ -10,7 +10,7 @@
 
 #include <QSplitter>
 #include <QTableView>
-#include <QTextEdit>
+#include "TableFilterTextEdit.h"
 #include <QSqlDatabase>
 
 namespace UI {
@@ -28,7 +28,7 @@ public:
 
 private:
 	QTableView *tableData;
-	QTextEdit *whereConditionText;
+	TableFilterTextEdit *whereConditionText;
 };
 
 } /* namespace Tabs */
