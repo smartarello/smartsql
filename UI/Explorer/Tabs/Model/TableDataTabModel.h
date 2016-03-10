@@ -28,10 +28,16 @@ public:
 	void setTable(QString table);
 	QList<QString> getColumns();
 
+public slots:
+	void refreshWithFilter(QString filter);
+
 private:
 	QString table;
+	QString filter;
+	QString sortOrder;
 	QList<QString> columns;
 	void sort(int column, Qt::SortOrder order);
+	QString buildQuery();
 };
 
 } /* namespace Model */

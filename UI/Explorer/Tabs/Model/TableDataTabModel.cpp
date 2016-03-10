@@ -20,7 +20,10 @@ TableDataTabModel::TableDataTabModel(QObject * parent) : QSqlQueryModel(parent) 
 
 void TableDataTabModel::setTable(QString table){
 	this->table = table;
-	this->setQuery(QString("SELECT * FROM %1 LIMIT 1000").arg(this->table));
+	this->sortOrder = "";
+	this->filter = "";
+
+	this->setQuery(this->buildQuery());
 
 	QSqlQuery query;
 	query.exec(QString("SHOW COLUMNS FROM %1").arg(this->table));
@@ -40,14 +43,39 @@ void TableDataTabModel::sort(int column, Qt::SortOrder order){
 	}
 
 	QString sortOrder = QString("ASC");
-	if (order == Qt::DescendingOrder){
+	if (order == Qt::AscendingOrder){
 		sortOrder = QString("DESC");
 	}
 
 	QString col = this->columns.at(column);
-	QString query = QString("SELECT * FROM %1 ORDER BY %2 %3 LIMIT 1000").arg(this->table).arg(col).arg(sortOrder);
+
+	this->sortOrder = col + " " + sortOrder;
+
+	this->setQuery(this->buildQuery());
+}
+
+void TableDataTabModel::refreshWithFilter(QString filter)
+{
+	this->filter = filter;
+	this->setQuery(this->buildQuery());
+}
+
+QString TableDataTabModel::buildQuery()
+{
+	QString query = QString("SELECT * FROM %1 ").arg(this->table);
+	if (!this->filter.isEmpty()){
+		query += QString(" WHERE %1").arg(this->filter);
+	}
+
+	if (!this->sortOrder.isEmpty()){
+		query += QString(" ORDER BY %1").arg(this->sortOrder);
+	}
+
+	query += " LIMIT 1000";
+
 	qDebug() << query;
-	this->setQuery(query);
+
+	return query;
 }
 
 TableDataTabModel::~TableDataTabModel() {

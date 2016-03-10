@@ -11,12 +11,21 @@
 #include <qabstractitemview.h>
 #include <QScrollBar>
 #include <QDebug>
+#include <QFont>
+#include <QTextDocument>
+#include "SQLSyntaxHighlighter.h"
 
 namespace UI {
 namespace Explorer {
 namespace Tabs {
 
 TableFilterTextEdit::TableFilterTextEdit(QWidget *parent) : QTextEdit(parent) {
+
+	QFont font = QFont("Monospace");
+	font.setPointSize(12);
+	this->setFont(font);
+
+	SQLSyntaxHighlighter *highlighter  = new SQLSyntaxHighlighter(this->document());
 
 	this->autocomplete = new QCompleter(this);
 	this->autocomplete->setCaseSensitivity(Qt::CaseInsensitive);
@@ -45,6 +54,11 @@ void TableFilterTextEdit::insertCompletion(const QString& completion)
 
 void TableFilterTextEdit::keyPressEvent(QKeyEvent *e)
 {
+	if (e->key() == Qt::Key_F5){
+		emit filterChanged(this->toPlainText());
+		return;
+	}
+
 	if (this->autocomplete->popup()->isVisible()) {
 		// The following keys are forwarded by the completer to the widget
 		switch (e->key()) {

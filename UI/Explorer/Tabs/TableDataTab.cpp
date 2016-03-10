@@ -46,13 +46,18 @@ TableDataTab::TableDataTab(QWidget *parent) : QSplitter(parent) {
 
 	this->setStretchFactor(0, 4);
 	this->setStretchFactor(1, 1);
+
+	Model::TableDataTabModel *queryModel = new Model::TableDataTabModel();
+	this->tableData->setModel(queryModel);
+
+	connect(this->whereConditionText, SIGNAL(filterChanged(QString)), queryModel, SLOT(refreshWithFilter(QString)));
 }
 
 void TableDataTab::setTable(QString tableName) {
 
-	Model::TableDataTabModel *queryModel = new Model::TableDataTabModel();
+	Model::TableDataTabModel *queryModel = (Model::TableDataTabModel *)this->tableData->model();
 	queryModel->setTable(tableName);
-	this->tableData->setModel(queryModel);
+
 	QCompleter *completer = this->whereConditionText->getAutocomplete();
 
 	QStringListModel *model =  new QStringListModel(QStringList(queryModel->getColumns()), completer);

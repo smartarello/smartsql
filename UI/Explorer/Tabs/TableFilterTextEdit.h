@@ -27,6 +27,9 @@ public:
 	virtual ~TableFilterTextEdit();
 	QCompleter *getAutocomplete();
 
+signals:
+	    void filterChanged(QString filter);
+
 protected:
     void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
 
