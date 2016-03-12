@@ -12,6 +12,7 @@
 #include <QTreeView>
 #include <QSqlDatabase>
 #include <QSplitter>
+#include <QItemSelectionModel>
 #include <QDebug>
 #include <QSqlError>
 #include "Model/DataBaseModel.h"
@@ -46,6 +47,11 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	Model::DataBaseModel *model = this->dataBaseTree->getDataBaseModel();
 	QStandardItem *rootItem = model->invisibleRootItem();
 	QStandardItem *firstDataBase = rootItem->child(0)->child(0);
+
+	// Select the first DataBase
+	QSortFilterProxyModel *filterModel = (QSortFilterProxyModel *)this->dataBaseTree->model();
+	QModelIndex	index = filterModel->mapFromSource(firstDataBase->index());
+	this->dataBaseTree->selectionModel()->setCurrentIndex(index, (QItemSelectionModel::Select | QItemSelectionModel::Rows));
 
 	QSqlDatabase db = QSqlDatabase::database();
 	db.setDatabaseName(firstDataBase->text());
@@ -106,7 +112,7 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 	QJsonObject sessionConf = dbItem->parent()->data().toJsonObject();
 	db.close();
 	qDebug() << "Closing current connection";
-	qInfo() << "Connection to the new database";
+	qInfo() << "Connection to the new database: " + dataBaseName;
 	qDebug() << sessionConf;
 
 	db.setHostName(sessionConf.value("hostname").toString());

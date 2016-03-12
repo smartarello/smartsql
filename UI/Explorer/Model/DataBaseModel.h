@@ -15,6 +15,7 @@
 #include <QStandardItem>
 #include <QSqlDatabase>
 #include <QModelIndex>
+#include <QMap>
 
 namespace UI {
 namespace Explorer {
@@ -35,7 +36,7 @@ protected:
 
 private:
 	QList<QStandardItem *> getDataBaseList();
-	QHash<QString, QString> getTableSize();
+	QMap<QString, QString> getTableSize();
 	QString getSizeString(double size);
 };
 

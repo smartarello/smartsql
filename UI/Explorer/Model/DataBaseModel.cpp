@@ -131,22 +131,25 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 					return ;
 				}
 
-				QStringList tables = db.tables();
-				QHash<QString, QString> tableSize = this->getTableSize();
+				QMap<QString, QString> tableSize = this->getTableSize();
 
-				qDebug() << "Table count: " + QString::number(tables.count());
-				for(int i = 0; i < tables.count(); i++){
+				qDebug() << "Table count: " + QString::number(tableSize.count());
 
-					QString tableName = tables.at(i);
+				QMapIterator<QString, QString> iterator(tableSize);
+				while(iterator.hasNext()){
+					iterator.next();
 
-					QList<QStandardItem *> cols;
-					cols << new QStandardItem(tableName);
-					QStandardItem *size = new QStandardItem(tableSize.value(tableName));
-					size->setTextAlignment(Qt::AlignRight);
-					cols << size;
+					if (iterator.key() != "DATABASE_SIZE"){
+						QList<QStandardItem *> cols;
+						cols << new QStandardItem(iterator.key());
+						QStandardItem *size = new QStandardItem(iterator.value());
+						size->setTextAlignment(Qt::AlignRight);
+						cols << size;
 
 
-					dataBaseItem->appendRow(cols);
+						dataBaseItem->appendRow(cols);
+					}
+
 				}
 
 				QStandardItem *size = connectionItem->child(dataBaseItem->index().row(), 1);
@@ -159,9 +162,9 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 	}
 }
 
-QHash<QString, QString> DataBaseModel::getTableSize()
+QMap<QString, QString> DataBaseModel::getTableSize()
 {
-	QHash<QString, QString> size;
+	QMap<QString, QString> size;
 	QSqlQuery query;
 	query.exec("show table status");
 
