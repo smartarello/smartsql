@@ -58,6 +58,8 @@ SOURCES       = main.cpp \
 		UI/Explorer/Model/TableFilterProxyModel.cpp \
 		UI/Explorer/Tabs/SQLSyntaxHighlighter.cpp \
 		UI/Explorer/Tabs/Database/DataBaseTab.cpp \
+		UI/Explorer/Tabs/Query/QueryTab.cpp \
+		UI/Explorer/Tabs/Query/QueryTextEdit.cpp \
 		UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp \
 		UI/Explorer/Tabs/Table/TableModel.cpp \
 		UI/Explorer/Tabs/Table/TableTab.cpp moc_MainWindow.cpp \
@@ -69,6 +71,8 @@ SOURCES       = main.cpp \
 		moc_TableFilterProxyModel.cpp \
 		moc_SQLSyntaxHighlighter.cpp \
 		moc_DataBaseTab.cpp \
+		moc_QueryTab.cpp \
+		moc_QueryTextEdit.cpp \
 		moc_TableFilterTextEdit.cpp \
 		moc_TableModel.cpp \
 		moc_TableTab.cpp
@@ -82,6 +86,8 @@ OBJECTS       = main.o \
 		TableFilterProxyModel.o \
 		SQLSyntaxHighlighter.o \
 		DataBaseTab.o \
+		QueryTab.o \
+		QueryTextEdit.o \
 		TableFilterTextEdit.o \
 		TableModel.o \
 		TableTab.o \
@@ -94,6 +100,8 @@ OBJECTS       = main.o \
 		moc_TableFilterProxyModel.o \
 		moc_SQLSyntaxHighlighter.o \
 		moc_DataBaseTab.o \
+		moc_QueryTab.o \
+		moc_QueryTextEdit.o \
 		moc_TableFilterTextEdit.o \
 		moc_TableModel.o \
 		moc_TableTab.o
@@ -240,6 +248,8 @@ DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		UI/Explorer/Model/TableFilterProxyModel.h \
 		UI/Explorer/Tabs/SQLSyntaxHighlighter.h \
 		UI/Explorer/Tabs/Database/DataBaseTab.h \
+		UI/Explorer/Tabs/Query/QueryTab.h \
+		UI/Explorer/Tabs/Query/QueryTextEdit.h \
 		UI/Explorer/Tabs/Table/TableFilterTextEdit.h \
 		UI/Explorer/Tabs/Table/TableModel.h \
 		UI/Explorer/Tabs/Table/TableTab.h main.cpp \
@@ -252,6 +262,8 @@ DIST          = ../../Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		UI/Explorer/Model/TableFilterProxyModel.cpp \
 		UI/Explorer/Tabs/SQLSyntaxHighlighter.cpp \
 		UI/Explorer/Tabs/Database/DataBaseTab.cpp \
+		UI/Explorer/Tabs/Query/QueryTab.cpp \
+		UI/Explorer/Tabs/Query/QueryTextEdit.cpp \
 		UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp \
 		UI/Explorer/Tabs/Table/TableModel.cpp \
 		UI/Explorer/Tabs/Table/TableTab.cpp
@@ -578,8 +590,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents UI/MainWindow.h UI/Explorer/DataBaseTree.h UI/Explorer/Explorer.h UI/Session/EditSessionWindow.h UI/Session/SessionWindow.h UI/Explorer/Model/DataBaseModel.h UI/Explorer/Model/TableFilterProxyModel.h UI/Explorer/Tabs/SQLSyntaxHighlighter.h UI/Explorer/Tabs/Database/DataBaseTab.h UI/Explorer/Tabs/Table/TableFilterTextEdit.h UI/Explorer/Tabs/Table/TableModel.h UI/Explorer/Tabs/Table/TableTab.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp UI/MainWindow.cpp UI/Explorer/DataBaseTree.cpp UI/Explorer/Explorer.cpp UI/Session/EditSessionWindow.cpp UI/Session/SessionWindow.cpp UI/Explorer/Model/DataBaseModel.cpp UI/Explorer/Model/TableFilterProxyModel.cpp UI/Explorer/Tabs/SQLSyntaxHighlighter.cpp UI/Explorer/Tabs/Database/DataBaseTab.cpp UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp UI/Explorer/Tabs/Table/TableModel.cpp UI/Explorer/Tabs/Table/TableTab.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents UI/MainWindow.h UI/Explorer/DataBaseTree.h UI/Explorer/Explorer.h UI/Session/EditSessionWindow.h UI/Session/SessionWindow.h UI/Explorer/Model/DataBaseModel.h UI/Explorer/Model/TableFilterProxyModel.h UI/Explorer/Tabs/SQLSyntaxHighlighter.h UI/Explorer/Tabs/Database/DataBaseTab.h UI/Explorer/Tabs/Query/QueryTab.h UI/Explorer/Tabs/Query/QueryTextEdit.h UI/Explorer/Tabs/Table/TableFilterTextEdit.h UI/Explorer/Tabs/Table/TableModel.h UI/Explorer/Tabs/Table/TableTab.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp UI/MainWindow.cpp UI/Explorer/DataBaseTree.cpp UI/Explorer/Explorer.cpp UI/Session/EditSessionWindow.cpp UI/Session/SessionWindow.cpp UI/Explorer/Model/DataBaseModel.cpp UI/Explorer/Model/TableFilterProxyModel.cpp UI/Explorer/Tabs/SQLSyntaxHighlighter.cpp UI/Explorer/Tabs/Database/DataBaseTab.cpp UI/Explorer/Tabs/Query/QueryTab.cpp UI/Explorer/Tabs/Query/QueryTextEdit.cpp UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp UI/Explorer/Tabs/Table/TableModel.cpp UI/Explorer/Tabs/Table/TableTab.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mysqlclient_en.ts $(DISTDIR)/
 
 
@@ -603,9 +615,9 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_MainWindow.cpp moc_DataBaseTree.cpp moc_Explorer.cpp moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_DataBaseModel.cpp moc_TableFilterProxyModel.cpp moc_SQLSyntaxHighlighter.cpp moc_DataBaseTab.cpp moc_TableFilterTextEdit.cpp moc_TableModel.cpp moc_TableTab.cpp
+compiler_moc_header_make_all: moc_MainWindow.cpp moc_DataBaseTree.cpp moc_Explorer.cpp moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_DataBaseModel.cpp moc_TableFilterProxyModel.cpp moc_SQLSyntaxHighlighter.cpp moc_DataBaseTab.cpp moc_QueryTab.cpp moc_QueryTextEdit.cpp moc_TableFilterTextEdit.cpp moc_TableModel.cpp moc_TableTab.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_MainWindow.cpp moc_DataBaseTree.cpp moc_Explorer.cpp moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_DataBaseModel.cpp moc_TableFilterProxyModel.cpp moc_SQLSyntaxHighlighter.cpp moc_DataBaseTab.cpp moc_TableFilterTextEdit.cpp moc_TableModel.cpp moc_TableTab.cpp
+	-$(DEL_FILE) moc_MainWindow.cpp moc_DataBaseTree.cpp moc_Explorer.cpp moc_EditSessionWindow.cpp moc_SessionWindow.cpp moc_DataBaseModel.cpp moc_TableFilterProxyModel.cpp moc_SQLSyntaxHighlighter.cpp moc_DataBaseTab.cpp moc_QueryTab.cpp moc_QueryTextEdit.cpp moc_TableFilterTextEdit.cpp moc_TableModel.cpp moc_TableTab.cpp
 moc_MainWindow.cpp: UI/Session/EditSessionWindow.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
@@ -1709,6 +1721,249 @@ moc_DataBaseTab.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/QTableView \
 		UI/Explorer/Tabs/Database/DataBaseTab.h
 	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Explorer/Tabs/Database/DataBaseTab.h -o moc_DataBaseTab.cpp
 
+moc_QueryTab.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/qsplitter.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qline.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QTableView \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtableview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		UI/Explorer/Tabs/Query/QueryTextEdit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		UI/Explorer/Tabs/Query/QueryTab.h
+	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Explorer/Tabs/Query/QueryTab.h -o moc_QueryTab.cpp
+
+moc_QueryTextEdit.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qline.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		UI/Explorer/Tabs/Query/QueryTextEdit.h
+	/home/stephane/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/stephane/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/workspace_cpp/mysqlclient -I/home/stephane/Qt/5.5/gcc_64/include -I/home/stephane/Qt/5.5/gcc_64/include/QtWidgets -I/home/stephane/Qt/5.5/gcc_64/include/QtGui -I/home/stephane/Qt/5.5/gcc_64/include/QtSql -I/home/stephane/Qt/5.5/gcc_64/include/QtCore UI/Explorer/Tabs/Query/QueryTextEdit.h -o moc_QueryTextEdit.cpp
+
 moc_TableFilterTextEdit.cpp: ../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
@@ -2693,7 +2948,9 @@ Explorer.o: UI/Explorer/Explorer.cpp UI/Explorer/Explorer.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QItemSelectionModel \
 		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
 		../../Qt/5.5/gcc_64/include/QtSql/QSqlError \
-		../../Qt/5.5/gcc_64/include/QtSql/qsqlerror.h
+		../../Qt/5.5/gcc_64/include/QtSql/qsqlerror.h \
+		UI/Explorer/Tabs/Query/QueryTab.h \
+		UI/Explorer/Tabs/Query/QueryTextEdit.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Explorer.o UI/Explorer/Explorer.cpp
 
 EditSessionWindow.o: UI/Session/EditSessionWindow.cpp UI/Session/EditSessionWindow.h \
@@ -3441,6 +3698,249 @@ DataBaseTab.o: UI/Explorer/Tabs/Database/DataBaseTab.cpp UI/Explorer/Tabs/Databa
 		../../Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DataBaseTab.o UI/Explorer/Tabs/Database/DataBaseTab.cpp
 
+QueryTab.o: UI/Explorer/Tabs/Query/QueryTab.cpp UI/Explorer/Tabs/Query/QueryTab.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qsplitter.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qline.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/QTableView \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtableview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		UI/Explorer/Tabs/Query/QueryTextEdit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o QueryTab.o UI/Explorer/Tabs/Query/QueryTab.cpp
+
+QueryTextEdit.o: UI/Explorer/Tabs/Query/QueryTextEdit.cpp UI/Explorer/Tabs/Query/QueryTextEdit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qline.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qset.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		../../Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qpen.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o QueryTextEdit.o UI/Explorer/Tabs/Query/QueryTextEdit.cpp
+
 TableFilterTextEdit.o: UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp UI/Explorer/Tabs/Table/TableFilterTextEdit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
@@ -3578,7 +4078,18 @@ TableFilterTextEdit.o: UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp UI/Explore
 		../../Qt/5.5/gcc_64/include/QtWidgets/qscrollbar.h \
 		../../Qt/5.5/gcc_64/include/QtCore/QDebug \
 		../../Qt/5.5/gcc_64/include/QtGui/QFont \
-		../../Qt/5.5/gcc_64/include/QtGui/QTextDocument
+		../../Qt/5.5/gcc_64/include/QtGui/QTextDocument \
+		UI/Explorer/Tabs/SQLSyntaxHighlighter.h \
+		../../Qt/5.5/gcc_64/include/QtGui/QSyntaxHighlighter \
+		../../Qt/5.5/gcc_64/include/QtGui/qsyntaxhighlighter.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextobject.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qtextlayout.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qglyphrun.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qrawfont.h \
+		../../Qt/5.5/gcc_64/include/QtGui/qfontdatabase.h \
+		../../Qt/5.5/gcc_64/include/QtGui/QTextCharFormat \
+		../../Qt/5.5/gcc_64/include/QtCore/QRegExp \
+		../../Qt/5.5/gcc_64/include/QtCore/QVector
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TableFilterTextEdit.o UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp
 
 TableModel.o: UI/Explorer/Tabs/Table/TableModel.cpp UI/Explorer/Tabs/Table/TableModel.h \
@@ -3821,7 +4332,10 @@ TableTab.o: UI/Explorer/Tabs/Table/TableTab.cpp UI/Explorer/Tabs/Table/TableTab.
 		../../Qt/5.5/gcc_64/include/QtWidgets/QLabel \
 		../../Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
 		../../Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
-		../../Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h
+		../../Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		UI/Explorer/Tabs/Table/TableModel.h \
+		../../Qt/5.5/gcc_64/include/QtSql/QSqlQueryModel \
+		../../Qt/5.5/gcc_64/include/QtCore/QObject
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TableTab.o UI/Explorer/Tabs/Table/TableTab.cpp
 
 moc_MainWindow.o: moc_MainWindow.cpp 
@@ -3850,6 +4364,12 @@ moc_SQLSyntaxHighlighter.o: moc_SQLSyntaxHighlighter.cpp
 
 moc_DataBaseTab.o: moc_DataBaseTab.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_DataBaseTab.o moc_DataBaseTab.cpp
+
+moc_QueryTab.o: moc_QueryTab.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_QueryTab.o moc_QueryTab.cpp
+
+moc_QueryTextEdit.o: moc_QueryTextEdit.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_QueryTextEdit.o moc_QueryTextEdit.cpp
 
 moc_TableFilterTextEdit.o: moc_TableFilterTextEdit.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TableFilterTextEdit.o moc_TableFilterTextEdit.cpp

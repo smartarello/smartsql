@@ -16,6 +16,7 @@
 #include <QDebug>
 #include <QSqlError>
 #include "Model/DataBaseModel.h"
+#include "Tabs/Query/QueryTab.h"
 
 namespace UI {
 namespace Explorer {
@@ -58,7 +59,9 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	db.open();
 
 	this->databaseTab = new Tabs::Database::DataBaseTab();
-	this->explorerTabs->addTab(this->databaseTab, "Database");
+	this->explorerTabs->addTab(this->databaseTab, tr("Database"));
+
+	this->explorerTabs->addTab(new Tabs::Query::QueryTab(), tr("Query"));
 
 	splitter->setStretchFactor(0, 1);
 	splitter->setStretchFactor(1, 3);

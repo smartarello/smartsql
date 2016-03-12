@@ -19,6 +19,7 @@ TableFilterProxyModel::TableFilterProxyModel(QObject *parent) : QSortFilterProxy
 
 bool TableFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
+	// Always accept the server and the database, only filter the table name
 	if (!sourceParent.isValid() || !sourceParent.parent().isValid()){
 		return true;
 	}
