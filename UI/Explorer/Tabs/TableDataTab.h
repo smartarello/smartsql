@@ -26,6 +26,9 @@ public:
 	virtual ~TableDataTab();
 	void setTable(QString tableName);
 
+public slots:
+	void queryError(QString query, QString error);
+
 private:
 	QTableView *tableData;
 	TableFilterTextEdit *whereConditionText;

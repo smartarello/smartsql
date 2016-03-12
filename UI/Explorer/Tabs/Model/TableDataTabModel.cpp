@@ -7,6 +7,7 @@
 
 #include <UI/Explorer/Tabs/Model/TableDataTabModel.h>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QDebug>
 namespace UI {
 namespace Explorer {
@@ -57,7 +58,15 @@ void TableDataTabModel::sort(int column, Qt::SortOrder order){
 void TableDataTabModel::refreshWithFilter(QString filter)
 {
 	this->filter = filter;
-	this->setQuery(this->buildQuery());
+	QString queryText = this->buildQuery();
+	QSqlQuery currentQuery = this->query();
+	this->setQuery(queryText);
+	if (this->lastError().isValid()){
+		qDebug() << this->lastError();
+		QString lastError =  this->lastError().text();
+		this->setQuery(currentQuery);
+		emit queryError(queryText, lastError);
+	}
 }
 
 QString TableDataTabModel::buildQuery()

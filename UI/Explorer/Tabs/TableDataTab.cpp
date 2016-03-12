@@ -12,6 +12,7 @@
 #include <QStringList>
 #include <QSqlQuery>
 #include <QVBoxLayout>
+#include <QMessageBox>
 #include <QLabel>
 #include <QHeaderView>
 #include <QCompleter>
@@ -51,6 +52,7 @@ TableDataTab::TableDataTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData->setModel(queryModel);
 
 	connect(this->whereConditionText, SIGNAL(filterChanged(QString)), queryModel, SLOT(refreshWithFilter(QString)));
+	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
 }
 
 void TableDataTab::setTable(QString tableName) {
@@ -62,6 +64,15 @@ void TableDataTab::setTable(QString tableName) {
 
 	QStringListModel *model =  new QStringListModel(QStringList(queryModel->getColumns()), completer);
 	completer->setModel(model);
+}
+
+void TableDataTab::queryError(QString query, QString error)
+{
+	QMessageBox *message = new QMessageBox(this);
+	message->setText(error);
+	message->setIcon(QMessageBox::Critical);
+	message->setDetailedText(query);
+	message->show();
 }
 
 TableDataTab::~TableDataTab() {

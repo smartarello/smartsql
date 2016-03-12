@@ -31,6 +31,9 @@ public:
 public slots:
 	void refreshWithFilter(QString filter);
 
+signals:
+	void queryError(QString query, QString error);
+
 private:
 	QString table;
 	QString filter;
