@@ -5,7 +5,7 @@
  *      Author: stephane
  */
 
-#include <UI/Explorer/Tabs/DataBaseTab.h>
+#include <UI/Explorer/Tabs/Database/DataBaseTab.h>
 #include <QSqlQueryModel>
 #include <QSqlQuery>
 #include <QHeaderView>
@@ -13,6 +13,7 @@
 namespace UI {
 namespace Explorer {
 namespace Tabs {
+namespace Database {
 
 DataBaseTab::DataBaseTab(QWidget * parent) : QTableView(parent) {
 
@@ -36,6 +37,7 @@ DataBaseTab::~DataBaseTab() {
 	// TODO Auto-generated destructor stub
 }
 
+} /* namespace Database */
 } /* namespace Tabs */
 } /* namespace Explorer */
 } /* namespace UI */

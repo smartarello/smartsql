@@ -57,14 +57,14 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	db.setDatabaseName(firstDataBase->text());
 	db.open();
 
-	this->databaseTab = new Tabs::DataBaseTab();
+	this->databaseTab = new Tabs::Database::DataBaseTab();
 	this->explorerTabs->addTab(this->databaseTab, "Database");
 
 	splitter->setStretchFactor(0, 1);
 	splitter->setStretchFactor(1, 3);
 	hboxlayout->addWidget(splitter);
 
-	this->tableTab = new Tabs::TableDataTab();
+	this->tableTab = new Tabs::Table::TableTab();
 
 	connect(this->tableFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterTable(QString)));
 	connect(this->dataBaseTree, SIGNAL (clicked(QModelIndex)), this, SLOT (dataBaseTreeClicked(QModelIndex)));

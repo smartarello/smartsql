@@ -17,6 +17,7 @@
 namespace UI {
 namespace Explorer {
 namespace Tabs {
+namespace Table {
 
 class TableFilterTextEdit: public QTextEdit {
 
@@ -43,6 +44,7 @@ private:
     QCompleter *autocomplete;
 };
 
+} /* namespace Table */
 } /* namespace Tabs */
 } /* namespace Explorer */
 } /* namespace UI */

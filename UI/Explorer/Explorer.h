@@ -8,13 +8,13 @@
 #ifndef UI_EXPLORER_EXPLORER_H_
 #define UI_EXPLORER_EXPLORER_H_
 
+#include <UI/Explorer/Tabs/Table/TableTab.h>
 #include <QWidget>
 #include <QLineEdit>
 #include <QModelIndex>
 #include <QTabWidget>
 #include "DataBaseTree.h"
-#include "Tabs/DataBaseTab.h"
-#include "Tabs/TableDataTab.h"
+#include "Tabs/Database/DataBaseTab.h"
 
 namespace UI {
 namespace Explorer {
@@ -35,8 +35,8 @@ private:
 	DataBaseTree *dataBaseTree;
 	QLineEdit *tableFilterLineEdit;
 	QTabWidget *explorerTabs;
-	Tabs::DataBaseTab *databaseTab;
-	Tabs::TableDataTab *tableTab;
+	Tabs::Database::DataBaseTab *databaseTab;
+	Tabs::Table::TableTab *tableTab;
 };
 
 } /* namespace Explorer */

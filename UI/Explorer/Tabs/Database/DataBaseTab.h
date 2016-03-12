@@ -14,6 +14,7 @@
 namespace UI {
 namespace Explorer {
 namespace Tabs {
+namespace Database {
 
 class DataBaseTab: public QTableView {
 
@@ -25,6 +26,7 @@ public:
 	void refresh();
 };
 
+} /* namespace Database */
 } /* namespace Tabs */
 } /* namespace Explorer */
 } /* namespace UI */

@@ -5,21 +5,21 @@
  *      Author: stephane
  */
 
-#include <UI/Explorer/Tabs/Model/TableDataTabModel.h>
+#include <UI/Explorer/Tabs/Table/TableModel.h>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 namespace UI {
 namespace Explorer {
 namespace Tabs {
-namespace Model {
+namespace Table {
 
-TableDataTabModel::TableDataTabModel(QObject * parent) : QSqlQueryModel(parent) {
+TableModel::TableModel(QObject * parent) : QSqlQueryModel(parent) {
 
 
 }
 
-void TableDataTabModel::setTable(QString table){
+void TableModel::setTable(QString table){
 	this->table = table;
 	this->sortOrder = "";
 	this->filter = "";
@@ -34,11 +34,11 @@ void TableDataTabModel::setTable(QString table){
 	}
 }
 
-QList<QString> TableDataTabModel::getColumns(){
+QList<QString> TableModel::getColumns(){
 	return this->columns;
 }
 
-void TableDataTabModel::sort(int column, Qt::SortOrder order){
+void TableModel::sort(int column, Qt::SortOrder order){
 	if (column >= this->columns.count()){
 		return ;
 	}
@@ -55,21 +55,22 @@ void TableDataTabModel::sort(int column, Qt::SortOrder order){
 	this->setQuery(this->buildQuery());
 }
 
-void TableDataTabModel::refreshWithFilter(QString filter)
+void TableModel::refreshWithFilter(QString filter)
 {
+	QString oldFilter = this->filter;
 	this->filter = filter;
 	QString queryText = this->buildQuery();
-	QSqlQuery currentQuery = this->query();
 	this->setQuery(queryText);
 	if (this->lastError().isValid()){
 		qDebug() << this->lastError();
 		QString lastError =  this->lastError().text();
-		this->setQuery(currentQuery);
+		this->filter = oldFilter;
+		this->setQuery(this->buildQuery());
 		emit queryError(queryText, lastError);
 	}
 }
 
-QString TableDataTabModel::buildQuery()
+QString TableModel::buildQuery()
 {
 	QString query = QString("SELECT * FROM %1 ").arg(this->table);
 	if (!this->filter.isEmpty()){
@@ -87,7 +88,7 @@ QString TableDataTabModel::buildQuery()
 	return query;
 }
 
-TableDataTabModel::~TableDataTabModel() {
+TableModel::~TableModel() {
 	// TODO Auto-generated destructor stub
 }
 

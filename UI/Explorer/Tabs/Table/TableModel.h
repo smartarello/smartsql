@@ -1,5 +1,5 @@
 /*
- * TableDataTabModel.h
+ * TableModel.h
  *
  *  Created on: Mar 4, 2016
  *      Author: stephane
@@ -16,15 +16,15 @@
 namespace UI {
 namespace Explorer {
 namespace Tabs {
-namespace Model {
+namespace Table {
 
-class TableDataTabModel: public QSqlQueryModel {
+class TableModel: public QSqlQueryModel {
 
 	Q_OBJECT
 
 public:
-	TableDataTabModel(QObject * parent = 0);
-	virtual ~TableDataTabModel();
+	TableModel(QObject * parent = 0);
+	virtual ~TableModel();
 	void setTable(QString table);
 	QList<QString> getColumns();
 
@@ -43,7 +43,7 @@ private:
 	QString buildQuery();
 };
 
-} /* namespace Model */
+} /* namespace Table */
 } /* namespace Tabs */
 } /* namespace Explorer */
 } /* namespace UI */

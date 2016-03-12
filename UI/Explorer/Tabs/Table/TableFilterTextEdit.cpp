@@ -5,7 +5,7 @@
  *      Author: stephane
  */
 
-#include <UI/Explorer/Tabs/TableFilterTextEdit.h>
+#include <UI/Explorer/Tabs/Table/TableFilterTextEdit.h>
 #include <QTextCursor>
 #include <QStringListModel>
 #include <qabstractitemview.h>
@@ -13,11 +13,12 @@
 #include <QDebug>
 #include <QFont>
 #include <QTextDocument>
-#include "SQLSyntaxHighlighter.h"
+#include "../SQLSyntaxHighlighter.h"
 
 namespace UI {
 namespace Explorer {
 namespace Tabs {
+namespace Table {
 
 TableFilterTextEdit::TableFilterTextEdit(QWidget *parent) : QTextEdit(parent) {
 
@@ -114,6 +115,7 @@ TableFilterTextEdit::~TableFilterTextEdit() {
 
 }
 
+} /* namespace Table */
 } /* namespace Tabs */
 } /* namespace Explorer */
 } /* namespace UI */

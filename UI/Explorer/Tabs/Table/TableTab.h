@@ -1,12 +1,12 @@
 /*
- * TableDataTab.h
+ * TableTab.h
  *
  *  Created on: Mar 4, 2016
  *      Author: stephane
  */
 
-#ifndef UI_EXPLORER_TABS_TABLEDATATAB_H_
-#define UI_EXPLORER_TABS_TABLEDATATAB_H_
+#ifndef UI_EXPLORER_TABS_TableTab_H_
+#define UI_EXPLORER_TABS_TableTab_H_
 
 #include <QSplitter>
 #include <QTableView>
@@ -16,14 +16,15 @@
 namespace UI {
 namespace Explorer {
 namespace Tabs {
+namespace Table {
 
-class TableDataTab: public QSplitter {
+class TableTab: public QSplitter {
 
 	Q_OBJECT
 
 public:
-	TableDataTab(QWidget *parent = 0);
-	virtual ~TableDataTab();
+	TableTab(QWidget *parent = 0);
+	virtual ~TableTab();
 	void setTable(QString tableName);
 
 public slots:
@@ -34,8 +35,9 @@ private:
 	TableFilterTextEdit *whereConditionText;
 };
 
+} /* namespace Table */
 } /* namespace Tabs */
 } /* namespace Explorer */
 } /* namespace UI */
 
-#endif /* UI_EXPLORER_TABS_TABLEDATATAB_H_ */
+#endif /* UI_EXPLORER_TABS_TableTab_H_ */

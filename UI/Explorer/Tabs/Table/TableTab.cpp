@@ -1,11 +1,11 @@
 /*
- * TableDataTab.cpp
+ * TableTab.cpp
  *
  *  Created on: Mar 4, 2016
  *      Author: stephane
  */
 
-#include <UI/Explorer/Tabs/TableDataTab.h>
+#include <UI/Explorer/Tabs/Table/TableTab.h>
 #include <QDebug>
 #include <QSqlTableModel>
 #include <QStringListModel>
@@ -16,13 +16,14 @@
 #include <QLabel>
 #include <QHeaderView>
 #include <QCompleter>
-#include "Model/TableDataTabModel.h"
+#include "TableModel.h"
 
 namespace UI {
 namespace Explorer {
 namespace Tabs {
+namespace Table {
 
-TableDataTab::TableDataTab(QWidget *parent) : QSplitter(parent) {
+TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 
 	this->setOrientation(Qt::Vertical);
 	this->tableData = new QTableView();
@@ -48,16 +49,16 @@ TableDataTab::TableDataTab(QWidget *parent) : QSplitter(parent) {
 	this->setStretchFactor(0, 4);
 	this->setStretchFactor(1, 1);
 
-	Model::TableDataTabModel *queryModel = new Model::TableDataTabModel();
+	TableModel *queryModel = new TableModel();
 	this->tableData->setModel(queryModel);
 
 	connect(this->whereConditionText, SIGNAL(filterChanged(QString)), queryModel, SLOT(refreshWithFilter(QString)));
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
 }
 
-void TableDataTab::setTable(QString tableName) {
+void TableTab::setTable(QString tableName) {
 
-	Model::TableDataTabModel *queryModel = (Model::TableDataTabModel *)this->tableData->model();
+	TableModel *queryModel = (TableModel *)this->tableData->model();
 	queryModel->setTable(tableName);
 
 	QCompleter *completer = this->whereConditionText->getAutocomplete();
@@ -66,7 +67,7 @@ void TableDataTab::setTable(QString tableName) {
 	completer->setModel(model);
 }
 
-void TableDataTab::queryError(QString query, QString error)
+void TableTab::queryError(QString query, QString error)
 {
 	QMessageBox *message = new QMessageBox(this);
 	message->setText(error);
@@ -75,10 +76,11 @@ void TableDataTab::queryError(QString query, QString error)
 	message->show();
 }
 
-TableDataTab::~TableDataTab() {
+TableTab::~TableTab() {
 
 }
 
+} /* namespace Table */
 } /* namespace Tabs */
 } /* namespace Explorer */
 } /* namespace UI */
