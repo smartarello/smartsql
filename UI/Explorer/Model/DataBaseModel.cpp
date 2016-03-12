@@ -31,7 +31,14 @@ DataBaseModel::DataBaseModel(QJsonObject sessionConf, QObject *parent) : QStanda
 	QList<QStandardItem *> dbList = this->getDataBaseList();
 
 	foreach (QStandardItem * db, dbList){
-		defaultHost->appendRow(db);
+
+		QList<QStandardItem *> cols;
+		cols << db;
+		QStandardItem *size = new QStandardItem();
+		size->setTextAlignment(Qt::AlignRight);
+		cols << size;
+
+		defaultHost->appendRow(cols);
 	}
 }
 
@@ -142,9 +149,8 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 					dataBaseItem->appendRow(cols);
 				}
 
-				QStandardItem *size = new QStandardItem(tableSize.value("DATABASE_SIZE"));
-				size->setTextAlignment(Qt::AlignRight);
-				//connectionItem->setChild(dataBaseItem->index().row(), 1, size);
+				QStandardItem *size = connectionItem->child(dataBaseItem->index().row(), 1);
+				size->setText(tableSize.value("DATABASE_SIZE"));
 
 				qDebug() << "Table list retrieves successfully";
 

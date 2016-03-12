@@ -22,6 +22,7 @@ SQLSyntaxHighlighter::SQLSyntaxHighlighter(QTextDocument *parent) : QSyntaxHighl
 	QStringList keywordPatterns;
 	keywordPatterns << "\\bselect\\b"
 			<< "\\bfrom\\b"
+			<< "\\bon\\b"
 			<< "\\bwhere\\b"
 			<< "\\band\\b"
 			<< "\\bor\\b"
