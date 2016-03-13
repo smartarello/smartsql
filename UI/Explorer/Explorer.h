@@ -32,6 +32,8 @@ signals:
 
 public slots:
 	void dataBaseTreeClicked(QModelIndex index);
+	void addQueryTab();
+	void closeQueryTab(int index);
 
 private:
 	DataBaseTree *dataBaseTree;

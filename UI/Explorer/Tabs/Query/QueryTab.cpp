@@ -62,7 +62,7 @@ void QueryTab::queryChanged(QString queryString)
 
 
 QueryTab::~QueryTab() {
-	// TODO Auto-generated destructor stub
+
 }
 
 } /* namespace Query */

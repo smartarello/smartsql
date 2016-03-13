@@ -14,6 +14,8 @@
 #include <QSplitter>
 #include <QItemSelectionModel>
 #include <QDebug>
+#include <QKeySequence>
+#include <QShortcut>
 #include <QSqlError>
 #include "Model/DataBaseModel.h"
 #include "Tabs/Query/QueryTab.h"
@@ -41,9 +43,10 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	splitter->addWidget(leftPartWidget);
 
 	this->explorerTabs = new QTabWidget(this);
+	this->explorerTabs->setTabsClosable(true);
+
+	QShortcut * addTabShortCut = new QShortcut(QKeySequence("Ctrl+N"), this->explorerTabs);
 	splitter->addWidget(this->explorerTabs);
-
-
 
 	Model::DataBaseModel *model = this->dataBaseTree->getDataBaseModel();
 	QStandardItem *rootItem = model->invisibleRootItem();
@@ -59,7 +62,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	db.open();
 
 	this->databaseTab = new Tabs::Database::DataBaseTab();
-	this->explorerTabs->addTab(this->databaseTab, tr("Database"));
+	this->explorerTabs->addTab(this->databaseTab, QString(tr("Database: %1")).arg(db.databaseName()));
 
 	Tabs::Query::QueryTab *queryTab = new Tabs::Query::QueryTab(this);
 	this->explorerTabs->addTab(queryTab, tr("Query"));
@@ -70,10 +73,28 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 
 	this->tableTab = new Tabs::Table::TableTab(this);
 
+	// The first tabs are not closable
+	this->explorerTabs->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
+	this->explorerTabs->tabBar()->tabButton(1, QTabBar::RightSide)->hide();
+
 	connect(this->tableFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterTable(QString)));
 	connect(this->dataBaseTree, SIGNAL (clicked(QModelIndex)), this, SLOT (dataBaseTreeClicked(QModelIndex)));
+	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
+	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
 }
 
+void Explorer::addQueryTab(){
+	Tabs::Query::QueryTab *queryTab = new Tabs::Query::QueryTab(this);
+	this->explorerTabs->addTab(queryTab, tr("Query"));
+	this->explorerTabs->setCurrentWidget(queryTab);
+}
+
+void Explorer::closeQueryTab(int index)
+{
+	if (index > 1){
+		this->explorerTabs->removeTab(index);
+	}
+}
 
 void Explorer::dataBaseTreeClicked(QModelIndex index)
 {
@@ -114,30 +135,36 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 
 	QSqlDatabase db = QSqlDatabase::database();
 	QJsonObject sessionConf = dbItem->parent()->data().toJsonObject();
-	db.close();
-	qDebug() << "Closing current connection";
-	qInfo() << "Connection to the new database: " + dataBaseName;
-	qDebug() << sessionConf;
 
-	db.setHostName(sessionConf.value("hostname").toString());
-	db.setUserName(sessionConf.value("user").toString());
-	db.setPassword(sessionConf.value("password").toString());
-	db.setPort(sessionConf.value("port").toInt());
-	db.setDatabaseName(dataBaseName);
+	if (dataBaseName != db.databaseName()){
+		db.close();
+		qDebug() << "Closing current connection";
+		qInfo() << "Connection to the new database: " + dataBaseName;
+		qDebug() << sessionConf;
 
-	db.open();
+		db.setHostName(sessionConf.value("hostname").toString());
+		db.setUserName(sessionConf.value("user").toString());
+		db.setPassword(sessionConf.value("password").toString());
+		db.setPort(sessionConf.value("port").toInt());
+		db.setDatabaseName(dataBaseName);
+
+		db.open();
+		this->databaseTab->refresh();
+		this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
+	}
 
 	if (!tableName.isNull()){
 		this->tableTab->setTable(tableName);
 		if (this->explorerTabs->indexOf(this->tableTab) == -1){
 			this->explorerTabs->insertTab(1, this->tableTab, tr("Data"));
+			this->explorerTabs->tabBar()->tabButton(1, QTabBar::RightSide)->hide();
 		}
 	}
 	else if (tableTabIndex != -1){
 		this->explorerTabs->removeTab(tableTabIndex);
 	}
 
-	this->databaseTab->refresh();
+
 	emit databaseChanged();
 }
 
