@@ -24,6 +24,9 @@ public:
 	QueryTab(QWidget *parent = 0);
 	virtual ~QueryTab();
 
+public slots:
+	void queryChanged(QString query);
+
 private:
 	QTableView *tableData;
 	QueryTextEdit *queryTextEdit;

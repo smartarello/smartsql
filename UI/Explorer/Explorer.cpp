@@ -61,13 +61,14 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	this->databaseTab = new Tabs::Database::DataBaseTab();
 	this->explorerTabs->addTab(this->databaseTab, tr("Database"));
 
-	this->explorerTabs->addTab(new Tabs::Query::QueryTab(), tr("Query"));
+	Tabs::Query::QueryTab *queryTab = new Tabs::Query::QueryTab(this);
+	this->explorerTabs->addTab(queryTab, tr("Query"));
 
 	splitter->setStretchFactor(0, 1);
 	splitter->setStretchFactor(1, 3);
 	hboxlayout->addWidget(splitter);
 
-	this->tableTab = new Tabs::Table::TableTab();
+	this->tableTab = new Tabs::Table::TableTab(this);
 
 	connect(this->tableFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterTable(QString)));
 	connect(this->dataBaseTree, SIGNAL (clicked(QModelIndex)), this, SLOT (dataBaseTreeClicked(QModelIndex)));
@@ -137,6 +138,7 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 	}
 
 	this->databaseTab->refresh();
+	emit databaseChanged();
 }
 
 Explorer::~Explorer() {

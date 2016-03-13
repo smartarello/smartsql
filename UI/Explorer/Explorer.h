@@ -27,9 +27,11 @@ public:
 	Explorer(QWidget *parent, QJsonObject sessionConf);
 	virtual ~Explorer();
 
+signals:
+	void databaseChanged();
+
 public slots:
 	void dataBaseTreeClicked(QModelIndex index);
-
 
 private:
 	DataBaseTree *dataBaseTree;

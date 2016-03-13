@@ -9,6 +9,8 @@
 #define UI_EXPLORER_TABS_QUERY_QUERYTEXTEDIT_H_
 
 #include <qtextedit.h>
+#include <QCompleter>
+#include <QStringListModel>
 
 namespace UI {
 namespace Explorer {
@@ -22,6 +24,26 @@ class QueryTextEdit: public QTextEdit {
 public:
 	QueryTextEdit(QWidget *parent = 0);
 	virtual ~QueryTextEdit();
+
+signals:
+	void queryChanged(QString query);
+
+protected:
+	void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
+
+private slots:
+	void insertCompletion(const QString &completion);
+
+public slots:
+		void databaseChanged();
+
+private:
+	QString textUnderCursor() const;
+	QStringList getTableList();
+	QCompleter *autocomplete;
+	QStringList tableList;
+	QStringListModel *autoCompleteModel;
+	void loadTableFields();
 };
 
 } /* namespace Query */
