@@ -12,6 +12,8 @@
 #include <QSqlQuery>
 #include <qsqlerror.h>
 #include <QMessageBox>
+#include <QSortFilterProxyModel>
+#include "QueryModel.h"
 
 namespace UI {
 namespace Explorer {
@@ -24,7 +26,8 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData = new QTableView(this);
 	this->tableData->setSortingEnabled(true);
 	this->tableData->verticalHeader()->hide();
-	QSqlQueryModel *model = new QSqlQueryModel();
+	QueryModel *model = new QueryModel();
+
 	this->tableData->setModel(model);
 
 	this->queryTextEdit = new QueryTextEdit();
@@ -41,7 +44,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 
 void QueryTab::queryChanged(QString queryString)
 {
-	QSqlQueryModel *model = (QSqlQueryModel *) this->tableData->model();
+	QueryModel *model = (QueryModel *) this->tableData->model();
 	QSqlQuery query;
 	query.exec(queryString);
 
@@ -55,6 +58,7 @@ void QueryTab::queryChanged(QString queryString)
 	}
 
 	if (query.isSelect()){
+		this->tableData->horizontalHeader()->setSortIndicator(0, Qt::DescendingOrder);
 		model->setQuery(query);
 	}
 }
