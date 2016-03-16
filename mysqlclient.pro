@@ -6,6 +6,7 @@ QT += widgets sql
 TEMPLATE = app
 TARGET = mysqlclient
 INCLUDEPATH += .
+RESOURCES     = mysqlclient.qrc
 
 # Input
 HEADERS += UI/MainWindow.h \

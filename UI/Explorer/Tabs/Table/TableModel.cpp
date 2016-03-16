@@ -7,6 +7,7 @@
 
 #include <UI/Explorer/Tabs/Table/TableModel.h>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QSqlError>
 #include <QDebug>
 namespace UI {
@@ -31,6 +32,13 @@ void TableModel::setTable(QString table){
 	this->columns = QList<QString>();
 	while(query.next()){
 		this->columns.append(query.value("Field").toString());
+	}
+
+	QSqlQuery queryIndex;
+	queryIndex.exec(QString("SHOW INDEX FROM %1 WHERE Key_name LIKE 'PRIMARY'").arg(this->table));
+	this->primaryKey = QStringList();
+	while(queryIndex.next()){
+		this->primaryKey << queryIndex.value("Column_name").toString();
 	}
 }
 
@@ -86,6 +94,55 @@ QString TableModel::buildQuery()
 	qDebug() << query;
 
 	return query;
+}
+
+Qt::ItemFlags TableModel::flags(const QModelIndex &index) const
+{
+	if (!index.isValid()){
+		return Qt::ItemIsEnabled;
+	}
+
+	return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+}
+
+bool TableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (index.isValid() && role == Qt::EditRole) {
+
+    	this->query().seek(index.row());
+    	QSqlRecord record = this->query().record();
+
+    	QString columnName = record.fieldName(index.column());
+
+    	QString updateQuery = QString("UPDATE %1 SET %2=:%3 WHERE ").arg(this->table).arg(columnName).arg(columnName);
+    	QStringList where;
+    	foreach(QString primaryKeyIndex, this->primaryKey) {
+    		where << QString("%1=:%2").arg(primaryKeyIndex).arg(primaryKeyIndex);
+    	}
+
+    	updateQuery += where.join(" AND ");
+
+    	QSqlQuery query ;
+    	query.prepare(updateQuery);
+    	query.bindValue(":"+columnName, value);
+
+    	foreach(QString primaryKeyIndex, this->primaryKey) {
+    		query.bindValue(":"+primaryKeyIndex, record.value(primaryKeyIndex));
+    	}
+
+    	query.exec();
+
+    	if (query.lastError().isValid()){
+    		emit queryError(updateQuery, query.lastError().text());
+    		return false;
+    	} else {
+    		this->query().exec();
+    		emit dataChanged(index, index);
+    		return true;
+    	}
+    }
+
+    return false;
 }
 
 TableModel::~TableModel() {

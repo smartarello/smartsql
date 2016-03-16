@@ -28,7 +28,7 @@ void QueryModel::sort(int column, Qt::SortOrder order)
 	}
 
 	QSqlRecord record = this->query().record();
-	if (record){
+	if (!record.isEmpty()){
 		QString field = record.fieldName(column);
 		if (field.isEmpty()){
 			return ;

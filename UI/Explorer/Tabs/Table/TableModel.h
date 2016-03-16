@@ -11,6 +11,7 @@
 #include <QSqlTableModel>
 #include <QSqlQueryModel>
 #include <QSqlDatabase>
+#include <QModelIndex>
 #include <QObject>
 
 namespace UI {
@@ -27,6 +28,8 @@ public:
 	virtual ~TableModel();
 	void setTable(QString table);
 	QList<QString> getColumns();
+	Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
+	bool setData(const QModelIndex &index, const QVariant &value, int role) Q_DECL_OVERRIDE;
 
 public slots:
 	void refreshWithFilter(QString filter);
@@ -39,6 +42,7 @@ private:
 	QString filter;
 	QString sortOrder;
 	QList<QString> columns;
+	QStringList primaryKey;
 	void sort(int column, Qt::SortOrder order);
 	QString buildQuery();
 };

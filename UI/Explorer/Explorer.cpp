@@ -72,6 +72,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	hboxlayout->addWidget(splitter);
 
 	this->tableTab = new Tabs::Table::TableTab(this);
+	this->tableTab->hide();
 
 	// The first tabs are not closable
 	this->explorerTabs->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
@@ -156,6 +157,7 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 	if (!tableName.isNull()){
 		this->tableTab->setTable(tableName);
 		if (this->explorerTabs->indexOf(this->tableTab) == -1){
+			this->tableTab->show();
 			this->explorerTabs->insertTab(1, this->tableTab, tr("Data"));
 			this->explorerTabs->tabBar()->tabButton(1, QTabBar::RightSide)->hide();
 		}

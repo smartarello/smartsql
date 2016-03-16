@@ -29,6 +29,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData = new QTableView();
 	this->tableData->setSortingEnabled(true);
 	this->tableData->verticalHeader()->hide();
+	this->tableData->setEditTriggers(QAbstractItemView::DoubleClicked);
 
 	this->whereConditionText = new TableFilterTextEdit();
 
@@ -38,7 +39,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	QVBoxLayout *bottomPartLayout = new QVBoxLayout();
 	bottomPart->setLayout(bottomPartLayout);
 
-	QLabel *filterLabel = new QLabel();
+	QLabel *filterLabel = new QLabel(this);
 	filterLabel->setText(tr("Filter:"));
 
 	bottomPartLayout->addWidget(filterLabel);
