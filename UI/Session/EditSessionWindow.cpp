@@ -58,7 +58,11 @@ EditSessionWindow::EditSessionWindow(QWidget *parent) : QWidget(parent){
 	QPushButton *testButton = new QPushButton(tr("Test connection"));
 	testButton->setFixedWidth(150);
 
+	QPushButton *openButton = new QPushButton(tr("Open"));
+	openButton->setFixedWidth(100);
+
 	hboxlayout->addWidget(testButton);
+	hboxlayout->addWidget(openButton);
 	hboxlayout->addWidget(this->saveButton);
 
 	buttonWidget->setLayout(hboxlayout);
@@ -68,6 +72,7 @@ EditSessionWindow::EditSessionWindow(QWidget *parent) : QWidget(parent){
 
 	connect(testButton, SIGNAL (released()), this, SLOT (testConnection()));
 	connect(this->saveButton, SIGNAL (released()), this->parent(), SLOT (handleSaveConnection()));
+	connect(openButton, SIGNAL (released()), this->parent(), SLOT (handleOpenConnection()));
 	connect(this->nameLineEdit, SIGNAL (textEdited(QString)), this, SLOT (edited()));
 	connect(this->hostLineEdit, SIGNAL (textEdited(QString)), this, SLOT (edited()));
 	connect(this->userLineEdit, SIGNAL (textEdited(QString)), this, SLOT (edited()));

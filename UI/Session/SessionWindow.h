@@ -41,6 +41,7 @@ public slots:
 		void handleSelectionChanged(const QItemSelection& selection);
 		void handleExit();
 		void handleDelete();
+		void handleOpenConnection();
 
 };
 };

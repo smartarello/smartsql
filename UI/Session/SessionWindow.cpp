@@ -25,6 +25,7 @@
 #include <QUuid>
 #include <QShortcut>
 #include "SessionWindow.h"
+#include "../MainWindow.h"
 
 namespace UI {
 
@@ -204,6 +205,12 @@ void SessionWindow::updateSelected()
 void SessionWindow::handleExit()
 {
 	QCoreApplication::quit();
+}
+
+void SessionWindow::handleOpenConnection()
+{
+	this->handleSaveConnection();
+	((MainWindow *)this->parent())->handleOpenConnection();
 }
 
 void SessionWindow::handleSaveConnection()
