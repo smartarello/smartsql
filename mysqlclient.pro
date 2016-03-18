@@ -23,6 +23,8 @@ HEADERS += UI/MainWindow.h \
            UI/Explorer/Tabs/Query/QueryTextEdit.h \
            UI/Explorer/Tabs/Table/TableFilterTextEdit.h \
            UI/Explorer/Tabs/Table/TableModel.h \
+           UI/Explorer/Tabs/TabView.h \
+           UI/Explorer/Tabs/TabBar.h \
            UI/Explorer/Tabs/Table/TableTab.h
 SOURCES += main.cpp \
            UI/MainWindow.cpp \
@@ -33,6 +35,8 @@ SOURCES += main.cpp \
            UI/Explorer/Model/DataBaseModel.cpp \
            UI/Explorer/Model/TableFilterProxyModel.cpp \
            UI/Explorer/Tabs/SQLSyntaxHighlighter.cpp \
+           UI/Explorer/Tabs/TabView.cpp \
+           UI/Explorer/Tabs/TabBar.cpp \
            UI/Explorer/Tabs/Database/DataBaseTab.cpp \
            UI/Explorer/Tabs/Query/QueryModel.cpp \
            UI/Explorer/Tabs/Query/QueryTab.cpp \

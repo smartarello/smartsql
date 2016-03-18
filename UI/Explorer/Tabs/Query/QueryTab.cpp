@@ -63,6 +63,11 @@ void QueryTab::queryChanged(QString queryString)
 	}
 }
 
+void QueryTab::focus()
+{
+	this->queryTextEdit->setFocus();
+}
+
 
 
 QueryTab::~QueryTab() {

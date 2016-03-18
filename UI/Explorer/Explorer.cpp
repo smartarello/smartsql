@@ -10,15 +10,18 @@
 #include <QVBoxLayout>
 #include <QSortFilterProxyModel>
 #include <QTreeView>
+#include <QToolButton>
 #include <QSqlDatabase>
 #include <QSplitter>
 #include <QItemSelectionModel>
 #include <QDebug>
 #include <QKeySequence>
 #include <QShortcut>
+#include <QPushButton>
 #include <QSqlError>
 #include "Model/DataBaseModel.h"
 #include "Tabs/Query/QueryTab.h"
+#include "Tabs/TabView.h"
 
 namespace UI {
 namespace Explorer {
@@ -42,8 +45,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 
 	splitter->addWidget(leftPartWidget);
 
-	this->explorerTabs = new QTabWidget(this);
-	this->explorerTabs->setTabsClosable(true);
+	this->explorerTabs = new Tabs::TabView(splitter);
 
 	QShortcut * addTabShortCut = new QShortcut(QKeySequence("Ctrl+N"), this->explorerTabs);
 	splitter->addWidget(this->explorerTabs);
@@ -83,12 +85,14 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	connect(this->dataBaseTree, SIGNAL (doubleClicked(QModelIndex)), this, SLOT (dataBaseTreeDoubleClicked(QModelIndex)));
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
 	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
+	connect(this->explorerTabs->tabBar(), SIGNAL(newTabRequested()), this, SLOT(addQueryTab()));
 }
 
 void Explorer::addQueryTab(){
 	Tabs::Query::QueryTab *queryTab = new Tabs::Query::QueryTab(this);
 	this->explorerTabs->addTab(queryTab, tr("Query"));
 	this->explorerTabs->setCurrentWidget(queryTab);
+	queryTab->focus();
 }
 
 void Explorer::closeQueryTab(int index)

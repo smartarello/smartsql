@@ -10,6 +10,7 @@
 
 #include <QSplitter>
 #include <QTableView>
+#include <QLabel>
 #include "TableFilterTextEdit.h"
 #include <QSqlDatabase>
 
@@ -29,9 +30,11 @@ public:
 
 public slots:
 	void queryError(QString query, QString error);
+	void applyFilterClicked(bool checked);
 
 private:
 	QTableView *tableData;
+	QLabel *tableInfoLabel;
 	TableFilterTextEdit *whereConditionText;
 };
 

@@ -23,6 +23,7 @@ class QueryTab: public QSplitter {
 public:
 	QueryTab(QWidget *parent = 0);
 	virtual ~QueryTab();
+	void focus();
 
 public slots:
 	void queryChanged(QString query);
