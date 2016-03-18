@@ -80,6 +80,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 
 	connect(this->tableFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterTable(QString)));
 	connect(this->dataBaseTree, SIGNAL (clicked(QModelIndex)), this, SLOT (dataBaseTreeClicked(QModelIndex)));
+	connect(this->dataBaseTree, SIGNAL (doubleClicked(QModelIndex)), this, SLOT (dataBaseTreeDoubleClicked(QModelIndex)));
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
 	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
 }
@@ -94,6 +95,21 @@ void Explorer::closeQueryTab(int index)
 {
 	if (index > 1){
 		this->explorerTabs->removeTab(index);
+	}
+}
+
+void Explorer::dataBaseTreeDoubleClicked(QModelIndex index)
+{
+	int tableTabIndex = this->explorerTabs->indexOf(this->tableTab) ;
+
+	if (tableTabIndex != -1){
+		QSortFilterProxyModel *model = (QSortFilterProxyModel *)this->dataBaseTree->model();
+		index = model->mapToSource(index);
+
+		// Click on a table
+		if (index.parent().parent().isValid()){
+			this->explorerTabs->setCurrentWidget(this->tableTab);
+		}
 	}
 }
 
@@ -151,8 +167,9 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 
 		db.open();
 		this->databaseTab->refresh();
-		this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
 	}
+
+	this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
 
 	if (!tableName.isNull()){
 		this->tableTab->setTable(tableName);
