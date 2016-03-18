@@ -9,7 +9,7 @@
 #define UI_EXPLORER_TABS_QUERY_QUERYTAB_H_
 
 #include <qsplitter.h>
-#include <QTableView>
+#include <QTabWidget>
 #include "QueryTextEdit.h"
 
 namespace UI {
@@ -26,11 +26,11 @@ public:
 	void focus();
 
 public slots:
-	void queryChanged(QString query);
+	void queryChanged();
 
 private:
-	QTableView *tableData;
 	QueryTextEdit *queryTextEdit;
+	QTabWidget *queryTabs;
 };
 
 } /* namespace Query */

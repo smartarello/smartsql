@@ -61,7 +61,7 @@ void QueryTextEdit::insertCompletion(const QString& completion)
 void QueryTextEdit::keyPressEvent(QKeyEvent *e)
 {
 	if (e->key() == Qt::Key_F5){
-		emit queryChanged(this->toPlainText());
+		emit queryChanged();
 		return;
 	}
 

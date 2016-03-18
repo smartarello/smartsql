@@ -6,6 +6,7 @@
  */
 
 #include <UI/Explorer/Tabs/TabBar.h>
+#include <QIcon>
 
 namespace UI {
 namespace Explorer {
@@ -13,9 +14,13 @@ namespace Tabs {
 
 TabBar::TabBar(QWidget * parent) : QTabBar(parent) {
 
-	this->plusButton = new QPushButton("+");
-	this->plusButton->setMaximumSize(20, 20) ;
-	this->plusButton->setMinimumSize(20, 20) ;
+	QIcon icon(":/resources/icons/plus.png");
+	this->plusButton = new QPushButton();
+	this->plusButton->setIcon(icon);
+	this->plusButton->setIconSize(QSize(18, 18));
+	this->plusButton->setMaximumSize(40, 25) ;
+	this->plusButton->setMinimumSize(40, 25) ;
+	this->plusButton->setToolTip(tr("Open a blank query tab (Ctrl+N)"));
 
 	this->plusButton->setParent(this);
 	this->movePlusButton();
@@ -32,7 +37,7 @@ void TabBar::movePlusButton()
 		 i++;
 	 }
 
-	 int h = this->geometry().bottom() - 20;
+	 int h = this->geometry().bottom() - 25;
 	 int w = this->width();
 	 if ( size > w ) {
 		 this->plusButton->move(w-54, h);
@@ -52,7 +57,7 @@ QSize TabBar::sizeHint() const
 	QSize sizeHint = QTabBar::sizeHint();
 	int width = sizeHint.width();
 	int height = sizeHint.height();
-	return QSize(width+25, height);
+	return QSize(width+70, height);
 }
 
 void TabBar::resizeEvent(QResizeEvent *event)

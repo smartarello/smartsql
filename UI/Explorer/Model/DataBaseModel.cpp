@@ -157,6 +157,7 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 
 				qDebug() << "Table list retrieves successfully";
 
+				emit databaseChanged();
 			}
 		}
 	}

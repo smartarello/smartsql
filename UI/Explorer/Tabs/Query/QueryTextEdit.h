@@ -26,7 +26,7 @@ public:
 	virtual ~QueryTextEdit();
 
 signals:
-	void queryChanged(QString query);
+	void queryChanged();
 
 protected:
 	void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;

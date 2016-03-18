@@ -38,6 +38,9 @@ private:
 	QList<QStandardItem *> getDataBaseList();
 	QMap<QString, QString> getTableSize();
 	QString getSizeString(double size);
+
+signals:
+	void databaseChanged();
 };
 
 } /* namespace Model */

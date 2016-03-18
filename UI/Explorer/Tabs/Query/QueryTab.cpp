@@ -10,6 +10,9 @@
 #include <QDebug>
 #include <QSqlQueryModel>
 #include <QSqlQuery>
+#include <QTableView>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <qsqlerror.h>
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
@@ -23,44 +26,68 @@ namespace Query {
 QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 
 	this->setOrientation(Qt::Vertical);
-	this->tableData = new QTableView(this);
-	this->tableData->setSortingEnabled(true);
-	this->tableData->verticalHeader()->hide();
-	QueryModel *model = new QueryModel();
 
-	this->tableData->setModel(model);
+
+	QWidget *topPart = new QWidget(this);
+	QVBoxLayout *topLayout = new QVBoxLayout();
+	topPart->setLayout(topLayout);
 
 	this->queryTextEdit = new QueryTextEdit();
+	topLayout->addWidget(this->queryTextEdit);
 
-	this->addWidget(this->queryTextEdit);
-	this->addWidget(this->tableData);
+	QPushButton *execButton = new QPushButton(tr("Execute"));
+	execButton->setToolTip(tr("Execute query (F5)"));
+	execButton->setFixedWidth(100);
+	topLayout->addWidget(execButton);
+
+	this->queryTabs = new QTabWidget(this);
+
+	this->addWidget(topPart);
+	this->addWidget(this->queryTabs);
 
 	this->setStretchFactor(0, 1);
 	this->setStretchFactor(1, 4);
 
 	connect(parent, SIGNAL (databaseChanged()), this->queryTextEdit, SLOT (databaseChanged()));
-	connect(this->queryTextEdit, SIGNAL (queryChanged(QString)), this, SLOT (queryChanged(QString)));
+	connect(this->queryTextEdit, SIGNAL (queryChanged(QString)), this, SLOT (queryChanged()));
+	connect(execButton, SIGNAL (clicked(bool)), this, SLOT (queryChanged()));
 }
 
-void QueryTab::queryChanged(QString queryString)
+void QueryTab::queryChanged()
 {
-	QueryModel *model = (QueryModel *) this->tableData->model();
-	QSqlQuery query;
-	query.exec(queryString);
+	QStringList queries = this->queryTextEdit->toPlainText().split(";");
 
-	if (query.lastError().isValid()){
-		qDebug() << query.lastError();
-		QMessageBox *message = new QMessageBox(this);
-		message->setText(query.lastError().databaseText());
-		message->setIcon(QMessageBox::Critical);
-		message->show();
-		return ;
+	foreach (QString sql, queries) {
+		QSqlQuery query;
+		query.exec(sql);
+
+		if (query.lastError().isValid()) {
+			qDebug() << query.lastError();
+			QMessageBox *message = new QMessageBox(this);
+			message->setText(query.lastError().databaseText());
+			message->setIcon(QMessageBox::Critical);
+			message->show();
+			return ;
+		}
+
+		if (query.isSelect()) {
+			QTableView *tableData = new QTableView();
+			tableData->setSortingEnabled(true);
+			tableData->verticalHeader()->hide();
+			QueryModel *model = new QueryModel();
+
+			tableData->setModel(model);
+
+			tableData->horizontalHeader()->setSortIndicator(0, Qt::DescendingOrder);
+			model->setQuery(query);
+
+
+			int rows = query.numRowsAffected();
+			this->queryTabs->addTab(tableData, QString(tr("Result (%1 rows)")).arg(rows));
+		}
 	}
 
-	if (query.isSelect()){
-		this->tableData->horizontalHeader()->setSortIndicator(0, Qt::DescendingOrder);
-		model->setQuery(query);
-	}
+
 }
 
 void QueryTab::focus()

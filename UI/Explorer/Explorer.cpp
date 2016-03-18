@@ -18,6 +18,7 @@
 #include <QKeySequence>
 #include <QShortcut>
 #include <QPushButton>
+#include <QMessageBox>
 #include <QSqlError>
 #include "Model/DataBaseModel.h"
 #include "Tabs/Query/QueryTab.h"
@@ -86,6 +87,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
 	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
 	connect(this->explorerTabs->tabBar(), SIGNAL(newTabRequested()), this, SLOT(addQueryTab()));
+	connect(model, SIGNAL(databaseChanged()), this, SLOT(refreshDatabase()));
 }
 
 void Explorer::addQueryTab(){
@@ -169,11 +171,21 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 		db.setPort(sessionConf.value("port").toInt());
 		db.setDatabaseName(dataBaseName);
 
-		db.open();
-		this->databaseTab->refresh();
-	}
+		if (!db.open()){
+			qDebug() << db.lastError();
 
-	this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
+			QMessageBox *message = new QMessageBox();
+			message->setWindowTitle(tr("Connection error"));
+			message->setText(tr("Unable to connect to the Data Base"));
+			message->setDetailedText(db.lastError().text());
+			message->setIcon(QMessageBox::Critical);
+			message->exec();
+
+			return;
+		}
+
+		this->refreshDatabase();
+	}
 
 	if (!tableName.isNull()){
 		this->tableTab->setTable(tableName);
@@ -189,6 +201,13 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 
 
 	emit databaseChanged();
+}
+
+void Explorer::refreshDatabase()
+{
+	QSqlDatabase db = QSqlDatabase::database();
+	this->databaseTab->refresh();
+	this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(db.databaseName()));
 }
 
 Explorer::~Explorer() {

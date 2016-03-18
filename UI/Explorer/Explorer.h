@@ -35,6 +35,7 @@ public slots:
 	void dataBaseTreeDoubleClicked(QModelIndex index);
 	void addQueryTab();
 	void closeQueryTab(int index);
+	void refreshDatabase();
 
 private:
 	DataBaseTree *dataBaseTree;

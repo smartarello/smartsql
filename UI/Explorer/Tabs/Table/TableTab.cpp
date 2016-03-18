@@ -54,6 +54,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 
 	QPushButton *filterButton = new QPushButton(tr("Apply"));
 	filterButton->setFixedWidth(100);
+	filterButton->setToolTip("Apply filter (F5)");
 
 	bottomPartLayout->addWidget(filterLabel);
 	bottomPartLayout->addWidget(this->whereConditionText);
