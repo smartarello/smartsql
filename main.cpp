@@ -11,8 +11,11 @@ int main(int argc, char *argv[])
 	qInfo() << "Start the application";
     QApplication app(argc, argv);
 
-    QString fontPath = ":/resources/fonts/DejaVuSans.ttf";
-    int fontId = QFontDatabase::addApplicationFont(fontPath);
+    QFontDatabase::addApplicationFont(":/resources/fonts/cour.pfa");
+    QFontDatabase::addApplicationFont(":/resources/fonts/couri.pfa");
+    QFontDatabase::addApplicationFont(":/resources/fonts/courb.pfa");
+
+    int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/DejaVuSans.ttf");
     if (fontId != -1)
     {
         QFont font("DejaVuSans");

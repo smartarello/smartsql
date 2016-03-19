@@ -96,10 +96,18 @@ void QueryTab::queryChanged()
 		}
 		else {
 			QTextEdit *resultText = new QTextEdit();
+			QFont font = QFont("Courier");
+			font.setPointSize(12);
+			font.setItalic(true);
+			resultText->setFont(font);
 			resultText->setReadOnly(true);
 
 			int rows = query.numRowsAffected();
-			resultText->setPlainText(QString(tr("Affected rows: %1")).arg(rows));
+
+
+			QString affectedRows = QString(tr("Affected rows: %1")).arg(rows);
+
+			resultText->setPlainText(affectedRows + "\n\n" + query.lastQuery());
 			this->queryTabs->addTab(resultText, QString(tr("Result (%1 rows)")).arg(rows));
 		}
 	}

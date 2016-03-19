@@ -29,6 +29,7 @@ namespace Explorer {
 
 Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 
+
 	this->dataBaseTree = new DataBaseTree(this, sessionConf);
 
 	QSplitter *splitter = new QSplitter(Qt::Horizontal);

@@ -13,6 +13,7 @@
 #include <QSqlError>
 #include "Session/SessionWindow.h"
 #include "Explorer/Explorer.h"
+#include "ToolBar.h"
 
 namespace UI {
 
@@ -40,6 +41,9 @@ void MainWindow::handleOpenConnection()
 	if (db.open()){
 		db.close();
 		this->showMaximized();
+
+		this->addToolBar(new ToolBar(this));
+
 		Explorer::Explorer *explorer = new Explorer::Explorer(this, conf);
 		this->setCentralWidget(explorer);
 	}
@@ -61,6 +65,11 @@ void MainWindow::handleOpenConnection()
 
 		message->exec();
 	}
+}
+
+void MainWindow::openSessionManager()
+{
+	qDebug() << "Open session manager";
 }
 
 MainWindow::~MainWindow() {

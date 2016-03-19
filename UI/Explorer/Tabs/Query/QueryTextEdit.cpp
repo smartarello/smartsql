@@ -21,7 +21,7 @@ namespace Query {
 
 QueryTextEdit::QueryTextEdit(QWidget *parent) : QTextEdit(parent) {
 
-	QFont font = QFont("Monospace");
+	QFont font = QFont("Courier");
 	font.setPointSize(12);
 	this->setFont(font);
 
@@ -107,8 +107,7 @@ void QueryTextEdit::keyPressEvent(QKeyEvent *e)
 		this->autoCompleteModel->setStringList(this->tableList);
 	}
 
-	if (!isShortcut && (hasModifier || e->text().isEmpty() || completionPrefix.length() < 3
-			|| eow.contains(e->text().right(1)))) {
+	if (!isShortcut) {
 		this->autocomplete->popup()->hide();
 		return;
 	}

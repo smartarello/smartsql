@@ -10,6 +10,7 @@ RESOURCES     = mysqlclient.qrc
 
 # Input
 HEADERS += UI/MainWindow.h \
+			UI/ToolBar.h \
            UI/Explorer/DataBaseTree.h \
            UI/Explorer/Explorer.h \
            UI/Session/EditSessionWindow.h \
@@ -28,6 +29,7 @@ HEADERS += UI/MainWindow.h \
            UI/Explorer/Tabs/Table/TableTab.h
 SOURCES += main.cpp \
            UI/MainWindow.cpp \
+           UI/ToolBar.cpp \
            UI/Explorer/DataBaseTree.cpp \
            UI/Explorer/Explorer.cpp \
            UI/Session/EditSessionWindow.cpp \
