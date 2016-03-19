@@ -28,6 +28,7 @@ class DataBaseModel : public QStandardItemModel {
 public:
 	DataBaseModel(QJsonObject sessionConf, QObject * parent = 0);
 	virtual ~DataBaseModel();
+	void addDatabase(QJsonObject sessionConf);
 
 protected:
 	bool canFetchMore(const QModelIndex & parent) const Q_DECL_OVERRIDE;

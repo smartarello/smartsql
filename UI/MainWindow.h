@@ -11,6 +11,9 @@
 #include <UI/Session/EditSessionWindow.h>
 #include <QMainWindow>
 #include <QDebug>
+#include <QJsonObject>
+
+#include "Explorer/Explorer.h"
 
 namespace UI {
 
@@ -23,8 +26,12 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
+private:
+	QMainWindow *sessionManager;
+	Explorer::Explorer *explorer;
+
 public slots:
-	void handleOpenConnection();
+	void handleOpenConnection(QJsonObject sessionConfiguration);
 	void openSessionManager();
 
 };

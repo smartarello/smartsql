@@ -112,7 +112,7 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	       SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
 	       this, SLOT(handleSelectionChanged(QItemSelection)));
 
-	 connect(this->sessionList, SIGNAL(doubleClicked(QModelIndex)), this->parent(), SLOT( handleOpenConnection() ) );
+	 connect(this->sessionList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT( handleOpenConnection() ) );
 
 	 QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this->sessionList);
 	 connect(shortcut, SIGNAL(activated()), this, SLOT(handleDelete()));
@@ -210,7 +210,7 @@ void SessionWindow::handleExit()
 void SessionWindow::handleOpenConnection()
 {
 	this->handleSaveConnection();
-	((MainWindow *)this->parent())->handleOpenConnection();
+	emit openConnection(this->getSelectedSession());
 }
 
 void SessionWindow::handleSaveConnection()

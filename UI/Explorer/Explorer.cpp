@@ -62,6 +62,9 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	this->dataBaseTree->selectionModel()->setCurrentIndex(index, (QItemSelectionModel::Select | QItemSelectionModel::Rows));
 
 	QSqlDatabase db = QSqlDatabase::database();
+	if (db.isOpen()) {
+		db.close();
+	}
 	db.setDatabaseName(firstDataBase->text());
 	db.open();
 
@@ -146,14 +149,14 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 		dbIndex = index.parent();
 
 		// Show table details
-		dbItem = root->child(0)->child(dbIndex.row());
+		dbItem = root->child(dbIndex.parent().row())->child(dbIndex.row());
 		QStandardItem *tableItem = dbItem->child(index.row());
 
 		dataBaseName = dbItem->text();
 		tableName = tableItem->text();
 	}
 	else{
-		dbItem = root->child(0)->child(dbIndex.row());
+		dbItem = root->child(dbIndex.parent().row())->child(dbIndex.row());
 		dataBaseName = dbItem->text();
 	}
 
@@ -209,6 +212,11 @@ void Explorer::refreshDatabase()
 	QSqlDatabase db = QSqlDatabase::database();
 	this->databaseTab->refresh();
 	this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(db.databaseName()));
+}
+
+void Explorer::addDatabase(QJsonObject sessionConfiguration)
+{
+	this->dataBaseTree->getDataBaseModel()->addDatabase(sessionConfiguration);
 }
 
 Explorer::~Explorer() {

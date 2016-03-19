@@ -11,6 +11,8 @@
 #include <QDebug>
 #include <QSqlError>
 
+#include "../../../Util/DataBase.h"
+
 namespace UI {
 namespace Explorer {
 namespace Model {
@@ -18,15 +20,34 @@ namespace Model {
 DataBaseModel::DataBaseModel(QJsonObject sessionConf, QObject *parent) : QStandardItemModel(parent) {
 
 	this->setColumnCount(2);
+	this->addDatabase(sessionConf);
+}
+
+void DataBaseModel::addDatabase(QJsonObject sessionConf)
+{
+	QString sessionName = sessionConf.value("name").toString();
+	QString sessionUuid = sessionConf.value("uuid").toString();
 	QStandardItem *rootItem = this->invisibleRootItem();
 
-	QSqlDatabase db = QSqlDatabase::database();
-	QString name = db.hostName();
+	// Search if the session is already open
+	for (int i = 0; i < rootItem->rowCount(); i++) {
+		QStandardItem *host = rootItem->child(i, 0);
+		QJsonObject conf = host->data().toJsonObject();
+		QString itemUuid = conf.value("uuid").toString();
 
-	QStandardItem *defaultHost = new QStandardItem(name);
-	defaultHost->setData(QVariant(sessionConf));
+		if (itemUuid == sessionUuid) {
+			return;
+		}
+	}
 
-	rootItem->appendRow(defaultHost);
+	if (!Util::DataBase::open(sessionConf)) {
+		return;
+	}
+
+	QStandardItem *host = new QStandardItem(sessionName);
+	host->setData(QVariant(sessionConf));
+
+	rootItem->appendRow(host);
 
 	QList<QStandardItem *> dbList = this->getDataBaseList();
 
@@ -38,13 +59,12 @@ DataBaseModel::DataBaseModel(QJsonObject sessionConf, QObject *parent) : QStanda
 		size->setTextAlignment(Qt::AlignRight);
 		cols << size;
 
-		defaultHost->appendRow(cols);
+		host->appendRow(cols);
 	}
 }
 
 QList<QStandardItem *> DataBaseModel::getDataBaseList()
 {
-
 	QSqlQuery query;
 	query.exec("SHOW DATABASES");
 
@@ -55,7 +75,6 @@ QList<QStandardItem *> DataBaseModel::getDataBaseList()
 		QStandardItem *currentDB = new QStandardItem(dbname);
 		dbList.append(currentDB);
 	}
-
 
 	return dbList;
 }

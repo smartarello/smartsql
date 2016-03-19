@@ -22,9 +22,11 @@ class DataBaseTree: public QTreeView {
 public:
 	DataBaseTree(QWidget *parent, QJsonObject sessionUuid);
 	virtual ~DataBaseTree();
+	Model::DataBaseModel * getDataBaseModel();
+
 public slots:
 	void filterTable(QString text);
-	Model::DataBaseModel * getDataBaseModel();
+
 
 private:
 	Model::DataBaseModel *dataBaseModel;

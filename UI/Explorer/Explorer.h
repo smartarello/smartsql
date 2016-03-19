@@ -26,6 +26,7 @@ class Explorer: public QWidget {
 public:
 	Explorer(QWidget *parent, QJsonObject sessionConf);
 	virtual ~Explorer();
+	void addDatabase(QJsonObject sessionConfiguration);
 
 signals:
 	void databaseChanged();

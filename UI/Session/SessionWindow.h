@@ -11,6 +11,7 @@
 #include <QListView>
 #include <QItemSelection>
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QStandardItemModel>
 #include "EditSessionWindow.h"
 
@@ -42,6 +43,9 @@ public slots:
 		void handleExit();
 		void handleDelete();
 		void handleOpenConnection();
+
+signals:
+	void openConnection(QJsonObject sessionConfiguration);
 
 };
 };
