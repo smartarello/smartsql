@@ -29,6 +29,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 
 
 	QWidget *topPart = new QWidget(this);
+
 	QVBoxLayout *topLayout = new QVBoxLayout();
 	topPart->setLayout(topLayout);
 
@@ -45,19 +46,28 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	this->addWidget(topPart);
 	this->addWidget(this->queryTabs);
 
-	this->setStretchFactor(0, 1);
-	this->setStretchFactor(1, 4);
+	QList<int> sizes;
+	sizes << 100;
+	sizes << 200;
+	this->setSizes(sizes);
 
 	connect(parent, SIGNAL (databaseChanged()), this->queryTextEdit, SLOT (databaseChanged()));
-	connect(this->queryTextEdit, SIGNAL (queryChanged(QString)), this, SLOT (queryChanged()));
+	connect(this->queryTextEdit, SIGNAL (queryChanged()), this, SLOT (queryChanged()));
 	connect(execButton, SIGNAL (clicked(bool)), this, SLOT (queryChanged()));
 }
 
 void QueryTab::queryChanged()
 {
+	this->queryTabs->clear();
+
 	QStringList queries = this->queryTextEdit->toPlainText().split(";");
 
 	foreach (QString sql, queries) {
+
+		if (sql.trimmed().isEmpty()) {
+			continue;
+		}
+
 		QSqlQuery query;
 		query.exec(sql);
 
@@ -81,13 +91,18 @@ void QueryTab::queryChanged()
 			tableData->horizontalHeader()->setSortIndicator(0, Qt::DescendingOrder);
 			model->setQuery(query);
 
-
 			int rows = query.numRowsAffected();
 			this->queryTabs->addTab(tableData, QString(tr("Result (%1 rows)")).arg(rows));
 		}
+		else {
+			QTextEdit *resultText = new QTextEdit();
+			resultText->setReadOnly(true);
+
+			int rows = query.numRowsAffected();
+			resultText->setPlainText(QString(tr("Affected rows: %1")).arg(rows));
+			this->queryTabs->addTab(resultText, QString(tr("Result (%1 rows)")).arg(rows));
+		}
 	}
-
-
 }
 
 void QueryTab::focus()
