@@ -9,5 +9,6 @@
     <file>resources/icons/disconnect.png</file>   
     <file>resources/icons/stop.png</file>   
     <file>resources/icons/play.png</file>   
+    <file>resources/icons/exit.png</file>   
 </qresource>
 </RCC>

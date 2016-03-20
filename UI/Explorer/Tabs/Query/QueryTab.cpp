@@ -117,11 +117,14 @@ void QueryTab::handleQueryResultReady()
 
 	this->executeButton->setEnabled(true);
 	this->stopButton->setEnabled(false);
-	QList<QSqlQuery> queries = this->queryWorker->getQueryResult();
+	QList<QueryExecutionResult> results = this->queryWorker->getQueryResult();
 	this->queryWorker->deleteLater();
 
 	this->queryTabs->clear();
-	foreach(QSqlQuery query, queries) {
+	foreach(QueryExecutionResult result, results) {
+
+		QSqlQuery query = result.query;
+		double seconds = result.msec / 1000.0;
 		if (query.lastError().isValid()) {
 			qDebug() << query.lastError();
 			QMessageBox *message = new QMessageBox(this);
@@ -143,7 +146,7 @@ void QueryTab::handleQueryResultReady()
 			model->setQuery(query);
 
 			int rows = query.numRowsAffected();
-			this->queryTabs->addTab(tableData, QString(tr("Result (%1 rows)")).arg(rows));
+			this->queryTabs->addTab(tableData, QString(tr("Result (%1 rows, %2 sec)")).arg(rows).arg(seconds));
 		}
 		else {
 			QTextEdit *resultText = new QTextEdit();

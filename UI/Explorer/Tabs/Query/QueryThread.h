@@ -13,6 +13,11 @@
 #include <QSqlDatabase>
 #include <QSqlResult>
 
+struct QueryExecutionResult {
+	QSqlQuery query;
+	qint64 msec; // millisecond
+} ;
+
 namespace UI {
 namespace Explorer {
 namespace Tabs {
@@ -26,11 +31,11 @@ public:
 	QueryThread(QSqlDatabase database, QStringList queryList, QObject * parent = 0);
 	virtual ~QueryThread();
 	virtual void run();
-	QList<QSqlQuery> getQueryResult();
+	QList<QueryExecutionResult> getQueryResult();
 
 private:
 	QStringList queries;
-	QList<QSqlQuery> queryResult;
+	QList<QueryExecutionResult> queryResult;
 	QSqlDatabase database;
 
 signals:

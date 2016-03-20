@@ -26,15 +26,19 @@ class SessionWindow : public QWidget
 public:
 	explicit SessionWindow(QWidget *parent);
 	~SessionWindow();
-	QJsonObject getSelectedSession();
+	void disableExitButton();
+
 
 private:
 	QListView *sessionList;
 	EditSessionWindow * editSession;
 	QJsonArray sessionStore;
+	QStandardItemModel *model;
+	QPushButton *exitButton;
+
+	QJsonObject getSelectedSession();
 	void updateSelected();
 	void persistSessionStore();
-	QStandardItemModel *model;
 
 public slots:
 		void handleNewConnection();

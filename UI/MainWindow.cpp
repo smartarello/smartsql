@@ -10,6 +10,7 @@
 #include <QSqlDatabase>
 #include <QMessageBox>
 #include <QSqlError>
+#include <QApplication>
 
 
 
@@ -82,15 +83,18 @@ void MainWindow::openSessionManager()
 	if (this->sessionManager == 0) {
 		this->sessionManager = new QMainWindow(this);
 		Session::SessionWindow *sessionList = new Session::SessionWindow(this->sessionManager);
+		sessionList->disableExitButton();
 		this->sessionManager->setCentralWidget(sessionList);
 
 		connect(sessionList, SIGNAL(openConnection(QJsonObject)), this, SLOT(handleOpenConnection(QJsonObject)));
 
 		this->sessionManager->show();
 	}
-	//qDebug() << this->sessionManager;
-//	QMainWindow *test = new QMainWindow(this);
-//	test->show();
+}
+
+void MainWindow::exit()
+{
+	QApplication::quit();
 }
 
 MainWindow::~MainWindow() {

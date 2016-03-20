@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QSqlResult>
+#include <QDateTime>
 
 namespace UI {
 namespace Explorer {
@@ -30,9 +31,15 @@ void QueryThread::run()
 		foreach(QString sql, this->queries) {
 
 			QSqlQuery query(sql, this->database);
+
+			QDateTime mStartTime = QDateTime::currentDateTime();
 			query.exec();
 
-			this->queryResult << query;
+			QueryExecutionResult result;
+			result.msec = mStartTime.msecsTo(QDateTime::currentDateTime());
+			result.query = query;
+
+			this->queryResult << result;
 
 			if (query.lastError().isValid()) {
 				break;
@@ -46,7 +53,7 @@ void QueryThread::run()
 	emit queryResultReady();
 }
 
-QList<QSqlQuery> QueryThread::getQueryResult()
+QList<QueryExecutionResult> QueryThread::getQueryResult()
 {
 	return this->queryResult;
 }

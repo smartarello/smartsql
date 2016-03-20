@@ -96,7 +96,7 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 QHBoxLayout *rightPartLayout = new QHBoxLayout;
 	 rightPartLayout->setAlignment(Qt::AlignRight);
 	 rightPartWidget->setLayout(rightPartLayout);
-	 QPushButton *exitButton = new QPushButton(tr("Exit"));
+	 exitButton = new QPushButton(tr("Exit"));
 	 exitButton->setFixedWidth(100);
 	 rightPartLayout->addWidget(exitButton);
 	 buttonLayout->addWidget(rightPartWidget);
@@ -256,6 +256,11 @@ QJsonObject SessionWindow::getSelectedSession()
 	QModelIndex index = this->sessionList->currentIndex();
 	QJsonObject session = this->sessionStore.at(index.row()).toObject();
 	return session;
+}
+
+void SessionWindow::disableExitButton()
+{
+	exitButton->hide();
 }
 
 SessionWindow::~SessionWindow(){
