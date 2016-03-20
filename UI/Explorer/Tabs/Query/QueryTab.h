@@ -10,7 +10,9 @@
 
 #include <qsplitter.h>
 #include <QTabWidget>
+#include <QPushButton>
 #include "QueryTextEdit.h"
+#include "QueryThread.h"
 
 namespace UI {
 namespace Explorer {
@@ -27,10 +29,15 @@ public:
 
 public slots:
 	void queryChanged();
+	void stopQueries();
+	void handleQueryResultReady();
 
 private:
 	QueryTextEdit *queryTextEdit;
 	QTabWidget *queryTabs;
+	QueryThread *queryWorker;
+	QPushButton *executeButton;
+	QPushButton *stopButton;
 };
 
 } /* namespace Query */

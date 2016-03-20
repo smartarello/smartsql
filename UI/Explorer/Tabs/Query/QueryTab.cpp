@@ -16,6 +16,7 @@
 #include <qsqlerror.h>
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
+#include <QUuid>
 #include "QueryModel.h"
 
 namespace UI {
@@ -33,13 +34,32 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	QVBoxLayout *topLayout = new QVBoxLayout();
 	topPart->setLayout(topLayout);
 
+	QWidget *buttonContainer = new QWidget(this);
+	QHBoxLayout *buttonLayout = new QHBoxLayout();
+	buttonContainer->setLayout(buttonLayout);
+	buttonLayout->setAlignment(Qt::AlignLeft);
+
 	this->queryTextEdit = new QueryTextEdit();
 	topLayout->addWidget(this->queryTextEdit);
 
-	QPushButton *execButton = new QPushButton(tr("Execute"));
-	execButton->setToolTip(tr("Execute query (F5)"));
-	execButton->setFixedWidth(100);
-	topLayout->addWidget(execButton);
+	this->executeButton = new QPushButton();
+	this->executeButton->setIcon(QIcon(":/resources/icons/play.png"));
+	this->executeButton->setIconSize(QSize(25, 25));
+	this->executeButton->setToolTip(tr("Execute query (F5)"));
+	this->executeButton->setFixedWidth(50);
+	this->executeButton->setFixedHeight(30);
+	buttonLayout->addWidget(this->executeButton);
+
+	this->stopButton = new QPushButton();
+	this->stopButton->setIcon(QIcon(":/resources/icons/stop.png"));
+	this->stopButton->setIconSize(QSize(25, 25));
+	this->stopButton->setToolTip(tr("Cancel running queries"));
+	this->stopButton->setFixedWidth(50);
+	this->stopButton->setFixedHeight(30);
+	this->stopButton->setEnabled(false);
+	buttonLayout->addWidget(this->stopButton);
+
+	topLayout->addWidget(buttonContainer);
 
 	this->queryTabs = new QTabWidget(this);
 
@@ -47,20 +67,28 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	this->addWidget(this->queryTabs);
 
 	QList<int> sizes;
-	sizes << 100;
-	sizes << 200;
+	sizes << 80;
+	sizes << 300;
 	this->setSizes(sizes);
 
 	connect(parent, SIGNAL (databaseChanged()), this->queryTextEdit, SLOT (databaseChanged()));
 	connect(this->queryTextEdit, SIGNAL (queryChanged()), this, SLOT (queryChanged()));
-	connect(execButton, SIGNAL (clicked(bool)), this, SLOT (queryChanged()));
+	connect(this->executeButton, SIGNAL (clicked(bool)), this, SLOT (queryChanged()));
+	connect(this->stopButton, SIGNAL (clicked(bool)), this, SLOT (stopQueries()));
+}
+
+void QueryTab::stopQueries()
+{
+	this->queryWorker->terminate();
+	this->queryWorker->deleteLater();
+	this->executeButton->setEnabled(true);
+	this->stopButton->setEnabled(false);
 }
 
 void QueryTab::queryChanged()
 {
-	this->queryTabs->clear();
-
 	QStringList queries = this->queryTextEdit->toPlainText().split(";");
+	QStringList filteredQueries;
 
 	foreach (QString sql, queries) {
 
@@ -68,9 +96,32 @@ void QueryTab::queryChanged()
 			continue;
 		}
 
-		QSqlQuery query;
-		query.exec(sql);
+		filteredQueries << sql;
+	}
 
+	if (!filteredQueries.isEmpty()) {
+		this->executeButton->setEnabled(false);
+		this->stopButton->setEnabled(true);
+		QSqlDatabase db = QSqlDatabase::database();
+		QSqlDatabase threadDB = QSqlDatabase::cloneDatabase(db, QUuid::createUuid().toString());
+		this->queryWorker = new QueryThread(threadDB, filteredQueries);
+		connect(this->queryWorker, SIGNAL(queryResultReady()), this, SLOT(handleQueryResultReady()));
+		this->queryWorker->start();
+	}
+
+}
+
+void QueryTab::handleQueryResultReady()
+{
+	qDebug() << "Queries result ready";
+
+	this->executeButton->setEnabled(true);
+	this->stopButton->setEnabled(false);
+	QList<QSqlQuery> queries = this->queryWorker->getQueryResult();
+	this->queryWorker->deleteLater();
+
+	this->queryTabs->clear();
+	foreach(QSqlQuery query, queries) {
 		if (query.lastError().isValid()) {
 			qDebug() << query.lastError();
 			QMessageBox *message = new QMessageBox(this);
@@ -103,7 +154,6 @@ void QueryTab::queryChanged()
 			resultText->setReadOnly(true);
 
 			int rows = query.numRowsAffected();
-
 
 			QString affectedRows = QString(tr("Affected rows: %1")).arg(rows);
 

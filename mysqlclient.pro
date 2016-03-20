@@ -22,6 +22,7 @@ HEADERS += UI/MainWindow.h \
            UI/Explorer/Tabs/Database/DataBaseTab.h \
            UI/Explorer/Tabs/Query/QueryModel.h \
            UI/Explorer/Tabs/Query/QueryTab.h \
+           UI/Explorer/Tabs/Query/QueryThread.h \
            UI/Explorer/Tabs/Query/QueryTextEdit.h \
            UI/Explorer/Tabs/Table/TableFilterTextEdit.h \
            UI/Explorer/Tabs/Table/TableModel.h \
@@ -44,6 +45,7 @@ SOURCES += main.cpp \
            UI/Explorer/Tabs/Database/DataBaseTab.cpp \
            UI/Explorer/Tabs/Query/QueryModel.cpp \
            UI/Explorer/Tabs/Query/QueryTab.cpp \
+           UI/Explorer/Tabs/Query/QueryThread.cpp \
            UI/Explorer/Tabs/Query/QueryTextEdit.cpp \
            UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp \
            UI/Explorer/Tabs/Table/TableModel.cpp \

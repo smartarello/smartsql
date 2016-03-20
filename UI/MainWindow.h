@@ -12,6 +12,8 @@
 #include <QMainWindow>
 #include <QDebug>
 #include <QJsonObject>
+#include <QSqlQuery>
+#include <QMetaType>
 
 #include "Explorer/Explorer.h"
 
@@ -20,7 +22,6 @@ namespace UI {
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
-
 
 public:
 	explicit MainWindow(QWidget *parent = 0);
@@ -36,6 +37,8 @@ public slots:
 
 };
 };
+
+
 
 #endif /* UI_MAINWINDOW_H_ */
 

@@ -22,8 +22,12 @@ SQLSyntaxHighlighter::SQLSyntaxHighlighter(QTextDocument *parent) : QSyntaxHighl
 	QStringList keywordPatterns;
 	keywordPatterns << "\\bselect\\b"
 			<< "\\bfrom\\b"
+			<< "\\bdelete\\b"
 			<< "\\bon\\b"
 			<< "\\blimit\\b"
+			<< "\\bgroup\\b"
+			<< "\\basc\\b"
+			<< "\\bdesc\\b"
 			<< "\\border\\b"
 			<< "\\bby\\b"
 			<< "\\basc\\b"
@@ -40,6 +44,7 @@ SQLSyntaxHighlighter::SQLSyntaxHighlighter(QTextDocument *parent) : QSyntaxHighl
 			<< "\\bjoin\\b"
 			<< "\\bcreate\\b"
 			<< "\\btable\\b"
+			<< "\\btables\\b"
 			<< "\\bexplain\\b"
 			<< "\\bleft\\b"
 			<< "\\binner\\b" ;
