@@ -41,6 +41,7 @@ public slots:
 private:
 	DataBaseTree *dataBaseTree;
 	QLineEdit *tableFilterLineEdit;
+	QLineEdit *databaseFilterLineEdit;
 	QTabWidget *explorerTabs;
 	Tabs::Database::DataBaseTab *databaseTab;
 	Tabs::Table::TableTab *tableTab;

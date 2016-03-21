@@ -40,21 +40,42 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 
 	QWidget *leftPartWidget = new QWidget(this);
 	QVBoxLayout *leftPartlayout = new QVBoxLayout;
+	leftPartlayout->setContentsMargins(0, 0, 0, 0);
 	leftPartWidget->setLayout(leftPartlayout);
+
+	QWidget *databaseFilterContainer = new QWidget(this);
+	QHBoxLayout *databaseFilterLayout = new QHBoxLayout();
+	databaseFilterLayout->setContentsMargins(0, 0, 0, 0);
+	databaseFilterContainer->setLayout(databaseFilterLayout);
+
+	QLabel *databaseIconLabel = new QLabel();
+	databaseIconLabel->setToolTip(tr("Database filter"));
+	QPixmap iconDatabase(":/resources/icons/database-icon-24.png");
+	databaseIconLabel->setPixmap(iconDatabase);
+
+	databaseFilterLayout->addWidget(databaseIconLabel);
+	this->databaseFilterLineEdit = new QLineEdit();
+	this->databaseFilterLineEdit->setPlaceholderText(tr("Database filter"));
+	databaseFilterLayout->addWidget(this->databaseFilterLineEdit);
+
 
 	QWidget *tableFilterContainer = new QWidget(this);
 	QHBoxLayout *tableFilterLayout = new QHBoxLayout();
+	tableFilterLayout->setContentsMargins(0, 0, 0, 0);
 	tableFilterContainer->setLayout(tableFilterLayout);
 
 	QLabel *tableIconLabel = new QLabel();
+	tableIconLabel->setToolTip(tr("Table filter"));
 	QPixmap icon(":/resources/icons/database-table-icon-24.png");
 	tableIconLabel->setPixmap(icon);
 
 	tableFilterLayout->addWidget(tableIconLabel);
 	this->tableFilterLineEdit = new QLineEdit();
+	this->tableFilterLineEdit->setPlaceholderText(tr("Table filter"));
 	tableFilterLayout->addWidget(this->tableFilterLineEdit);
 
 
+	leftPartlayout->addWidget(databaseFilterContainer);
 	leftPartlayout->addWidget(tableFilterContainer);
 	leftPartlayout->addWidget(this->dataBaseTree);
 
@@ -99,6 +120,8 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	this->explorerTabs->tabBar()->tabButton(1, QTabBar::RightSide)->hide();
 
 	connect(this->tableFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterTable(QString)));
+	connect(this->databaseFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterDatabase(QString)));
+
 	connect(this->dataBaseTree, SIGNAL (clicked(QModelIndex)), this, SLOT (dataBaseTreeClicked(QModelIndex)));
 	connect(this->dataBaseTree, SIGNAL (doubleClicked(QModelIndex)), this, SLOT (dataBaseTreeDoubleClicked(QModelIndex)));
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));

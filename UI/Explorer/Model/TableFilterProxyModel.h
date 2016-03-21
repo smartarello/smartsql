@@ -24,6 +24,12 @@ public:
 	TableFilterProxyModel(QObject * parent = 0);
 	virtual ~TableFilterProxyModel();
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+	void setTableFilter(QString tableFilter);
+	void setDatabaseFilter(QString databaseFilter);
+
+private:
+	QString database;
+	QString table;
 };
 
 } /* namespace Model */

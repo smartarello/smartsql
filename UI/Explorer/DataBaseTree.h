@@ -26,6 +26,7 @@ public:
 
 public slots:
 	void filterTable(QString text);
+	void filterDatabase(QString text);
 
 
 private:

@@ -39,7 +39,12 @@ Model::DataBaseModel * DataBaseTree::getDataBaseModel()
 
 void DataBaseTree::filterTable(QString text)
 {
-	((Model::TableFilterProxyModel *)this->model())->setFilterRegExp(text);
+	((Model::TableFilterProxyModel *)this->model())->setTableFilter(text);
+}
+
+void DataBaseTree::filterDatabase(QString text)
+{
+	((Model::TableFilterProxyModel *)this->model())->setDatabaseFilter(text);
 }
 
 
