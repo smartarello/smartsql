@@ -19,6 +19,8 @@
 #include <QVariant>
 #include <QHeaderView>
 #include <QCompleter>
+#include <QMenu>
+#include <QAction>
 #include "TableModel.h"
 
 namespace UI {
@@ -33,6 +35,9 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData->setSortingEnabled(true);
 	this->tableData->verticalHeader()->hide();
 	this->tableData->setEditTriggers(QAbstractItemView::DoubleClicked);
+
+	this->tableData->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(this->tableData, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
 
 	this->whereConditionText = new TableFilterTextEdit();
 
@@ -110,6 +115,24 @@ void TableTab::setTable(QString tableName) {
 
 	QStringListModel *model =  new QStringListModel(QStringList(queryModel->getColumns()), completer);
 	completer->setModel(model);
+}
+
+void TableTab::customContextMenuRequested(QPoint point)
+{
+	this->contextMenuIndex = this->tableData->indexAt(point);
+
+	QMenu *menu = new QMenu(this);
+	QAction *setNullAction = new QAction(tr("Set NULL"), this);
+	menu->addAction(setNullAction);
+
+	connect(setNullAction, SIGNAL(triggered(bool)), SLOT(handleSetNullAction()));
+
+	menu->popup(this->tableData->viewport()->mapToGlobal(point));
+}
+
+void TableTab::handleSetNullAction()
+{
+	((TableModel *)this->tableData->model())->setData(this->contextMenuIndex, QVariant(), Qt::EditRole);
 }
 
 void TableTab::queryError(QString query, QString error)

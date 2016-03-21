@@ -31,11 +31,14 @@ public:
 public slots:
 	void queryError(QString query, QString error);
 	void applyFilterClicked(bool checked);
+	void customContextMenuRequested(QPoint point);
+	void handleSetNullAction();
 
 private:
 	QTableView *tableData;
 	QLabel *tableInfoLabel;
 	TableFilterTextEdit *whereConditionText;
+	QModelIndex contextMenuIndex;
 };
 
 } /* namespace Table */

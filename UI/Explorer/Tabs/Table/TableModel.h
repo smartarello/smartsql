@@ -30,6 +30,7 @@ public:
 	QList<QString> getColumns();
 	Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
 	bool setData(const QModelIndex &index, const QVariant &value, int role) Q_DECL_OVERRIDE;
+	virtual QVariant data(const QModelIndex & item, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
 public slots:
 	void refreshWithFilter(QString filter);

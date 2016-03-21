@@ -133,6 +133,7 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
     	query.exec();
 
     	if (query.lastError().isValid()){
+    		qDebug() << query.lastError();
     		emit queryError(updateQuery, query.lastError().text());
     		return false;
     	} else {
@@ -143,6 +144,17 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
     }
 
     return false;
+}
+
+QVariant TableModel::data(const QModelIndex & item, int role) const
+{
+	QVariant value = QSqlQueryModel::data(item, role);
+
+	if (value.isNull() && role == Qt::DisplayRole) {
+		value = QVariant("(NULL)");
+	}
+
+	return value;
 }
 
 TableModel::~TableModel() {

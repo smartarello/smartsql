@@ -47,6 +47,8 @@ SQLSyntaxHighlighter::SQLSyntaxHighlighter(QTextDocument *parent) : QSyntaxHighl
 			<< "\\btables\\b"
 			<< "\\bexplain\\b"
 			<< "\\bleft\\b"
+			<< "\\bis\\b"
+			<< "\\bnull\\b"
 			<< "\\binner\\b" ;
 
 	foreach (const QString &pattern, keywordPatterns) {
