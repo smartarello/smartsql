@@ -20,6 +20,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QSqlError>
+#include <QPixmap>
 #include "Model/DataBaseModel.h"
 #include "Tabs/Query/QueryTab.h"
 #include "Tabs/TabView.h"
@@ -37,12 +38,24 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	QHBoxLayout *hboxlayout = new QHBoxLayout;
 	this->setLayout(hboxlayout);
 
-	QWidget *leftPartWidget = new QWidget;
+	QWidget *leftPartWidget = new QWidget(this);
 	QVBoxLayout *leftPartlayout = new QVBoxLayout;
 	leftPartWidget->setLayout(leftPartlayout);
 
+	QWidget *tableFilterContainer = new QWidget(this);
+	QHBoxLayout *tableFilterLayout = new QHBoxLayout();
+	tableFilterContainer->setLayout(tableFilterLayout);
+
+	QLabel *tableIconLabel = new QLabel();
+	QPixmap icon(":/resources/icons/database-table-icon-24.png");
+	tableIconLabel->setPixmap(icon);
+
+	tableFilterLayout->addWidget(tableIconLabel);
 	this->tableFilterLineEdit = new QLineEdit();
-	leftPartlayout->addWidget(this->tableFilterLineEdit);
+	tableFilterLayout->addWidget(this->tableFilterLineEdit);
+
+
+	leftPartlayout->addWidget(tableFilterContainer);
 	leftPartlayout->addWidget(this->dataBaseTree);
 
 	splitter->addWidget(leftPartWidget);

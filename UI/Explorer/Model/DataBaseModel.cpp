@@ -46,6 +46,7 @@ void DataBaseModel::addDatabase(QJsonObject sessionConf)
 
 	QStandardItem *host = new QStandardItem(sessionName);
 	host->setData(QVariant(sessionConf));
+	host->setData(QIcon(":/resources/icons/database-server-icon.png"),Qt::DecorationRole);
 
 	rootItem->appendRow(host);
 
@@ -53,6 +54,7 @@ void DataBaseModel::addDatabase(QJsonObject sessionConf)
 
 	foreach (QStandardItem * db, dbList){
 
+		db->setData(QIcon(":/resources/icons/database-icon.png"),Qt::DecorationRole);
 		QList<QStandardItem *> cols;
 		cols << db;
 		QStandardItem *size = new QStandardItem();
@@ -160,7 +162,11 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 
 					if (iterator.key() != "DATABASE_SIZE"){
 						QList<QStandardItem *> cols;
-						cols << new QStandardItem(iterator.key());
+
+						QStandardItem *table = new QStandardItem(iterator.key());
+						table->setData(QIcon(":/resources/icons/database-table-icon.png"),Qt::DecorationRole);
+
+						cols << table;
 						QStandardItem *size = new QStandardItem(iterator.value());
 						size->setTextAlignment(Qt::AlignRight);
 						cols << size;

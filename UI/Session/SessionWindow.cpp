@@ -145,7 +145,7 @@ void SessionWindow::handleNewConnection()
 
 	QStandardItem *rootItem = this->model->invisibleRootItem();
 	QStandardItem *item = new QStandardItem("Unamed");
-	item->setData(QIcon("resources/icons/mysql_logo.png"),Qt::DecorationRole);
+	item->setData(QIcon(":/resources/icons/mysql_logo.png"),Qt::DecorationRole);
 	rootItem->appendRow(item);
 	this->sessionList->setCurrentIndex(this->model->index(this->sessionStore.count() - 1, 0));
 
@@ -230,7 +230,8 @@ void SessionWindow::handleSaveConnection()
 		this->persistSessionStore();
 
 		QStandardItem *rootItem = this->model->invisibleRootItem();
-		rootItem->setChild(index.row(), new QStandardItem( this->editSession->getName()));
+		QStandardItem *item = rootItem->child(index.row(), 0);
+		item->setText(this->editSession->getName());
 
 		this->sessionList->setCurrentIndex(index);
 	}

@@ -10,5 +10,10 @@
     <file>resources/icons/stop.png</file>   
     <file>resources/icons/play.png</file>   
     <file>resources/icons/exit.png</file>   
+    <file>resources/icons/mysql_logo.png</file>   
+    <file>resources/icons/database-icon.png</file>   
+    <file>resources/icons/database-table-icon.png</file>   
+    <file>resources/icons/database-table-icon-24.png</file>   
+    <file>resources/icons/database-server-icon.png</file>   
 </qresource>
 </RCC>
