@@ -215,8 +215,6 @@ void SessionWindow::handleOpenConnection()
 
 void SessionWindow::handleSaveConnection()
 {
-	QPushButton *button = (QPushButton *)sender();
-	button->setDisabled(true);
 	QModelIndex index = this->sessionList->currentIndex();
 	if (index.row() < this->sessionStore.count()){
 		QJsonObject session = this->sessionStore.at(index.row()).toObject();

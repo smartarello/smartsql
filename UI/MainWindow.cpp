@@ -87,9 +87,10 @@ void MainWindow::openSessionManager()
 		this->sessionManager->setCentralWidget(sessionList);
 
 		connect(sessionList, SIGNAL(openConnection(QJsonObject)), this, SLOT(handleOpenConnection(QJsonObject)));
-
-		this->sessionManager->show();
 	}
+
+	this->sessionManager->show();
+
 }
 
 void MainWindow::exit()
