@@ -33,6 +33,8 @@ public slots:
 	void applyFilterClicked(bool checked);
 	void customContextMenuRequested(QPoint point);
 	void handleSetNullAction();
+	void handleCopyAction();
+	void handleDeleteAction();
 
 private:
 	QTableView *tableData;

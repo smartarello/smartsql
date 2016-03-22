@@ -21,6 +21,8 @@
 #include <QCompleter>
 #include <QMenu>
 #include <QAction>
+#include <QClipboard>
+#include <QApplication>
 #include "TableModel.h"
 
 namespace UI {
@@ -72,6 +74,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 
 	TableModel *queryModel = new TableModel();
 	this->tableData->setModel(queryModel);
+	this->tableData->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	connect(this->whereConditionText, SIGNAL(filterChanged(QString)), queryModel, SLOT(refreshWithFilter(QString)));
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
@@ -122,10 +125,22 @@ void TableTab::customContextMenuRequested(QPoint point)
 	this->contextMenuIndex = this->tableData->indexAt(point);
 
 	QMenu *menu = new QMenu(this);
+
+	QAction *copyAction = new QAction(tr("Copy"), this);
+	copyAction->setShortcut(QKeySequence(tr("Ctrl+C")));
+	menu->addAction(copyAction);
+
+	menu->addSeparator();
+
 	QAction *setNullAction = new QAction(tr("Set NULL"), this);
 	menu->addAction(setNullAction);
 
+	QAction *deleteAction = new QAction(tr("Delete selected row"), this);
+	menu->addAction(deleteAction);
+
 	connect(setNullAction, SIGNAL(triggered(bool)), SLOT(handleSetNullAction()));
+	connect(copyAction, SIGNAL(triggered(bool)), SLOT(handleCopyAction()));
+	connect(deleteAction, SIGNAL(triggered(bool)), SLOT(handleDeleteAction()));
 
 	menu->popup(this->tableData->viewport()->mapToGlobal(point));
 }
@@ -133,6 +148,19 @@ void TableTab::customContextMenuRequested(QPoint point)
 void TableTab::handleSetNullAction()
 {
 	((TableModel *)this->tableData->model())->setData(this->contextMenuIndex, QVariant(), Qt::EditRole);
+}
+
+void TableTab::handleCopyAction()
+{
+	QVariant cellData = this->tableData->model()->data(this->contextMenuIndex);
+	QClipboard *clipboard = QApplication::clipboard();
+	clipboard->setText(cellData.toString());
+}
+
+void TableTab::handleDeleteAction()
+{
+	TableModel * model = ((TableModel *)this->tableData->model());
+	model->removeRows(this->contextMenuIndex.row(), 1, this->contextMenuIndex.parent());
 }
 
 void TableTab::queryError(QString query, QString error)

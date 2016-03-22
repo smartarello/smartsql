@@ -13,13 +13,16 @@
 #include <QSqlDatabase>
 #include <QModelIndex>
 #include <QObject>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QAbstractTableModel>
 
 namespace UI {
 namespace Explorer {
 namespace Tabs {
 namespace Table {
 
-class TableModel: public QSqlQueryModel {
+class TableModel: public QAbstractTableModel {
 
 	Q_OBJECT
 
@@ -30,7 +33,12 @@ public:
 	QList<QString> getColumns();
 	Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
 	bool setData(const QModelIndex &index, const QVariant &value, int role) Q_DECL_OVERRIDE;
-	virtual QVariant data(const QModelIndex & item, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+	QVariant data(const QModelIndex & item, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+	bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) Q_DECL_OVERRIDE;
+	void setQuery(QString sql);
+	int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
+	int columnCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
 public slots:
 	void refreshWithFilter(QString filter);
@@ -46,6 +54,8 @@ private:
 	QStringList primaryKey;
 	void sort(int column, Qt::SortOrder order);
 	QString buildQuery();
+	QSqlQuery query;
+	QList<QSqlRecord> results;
 };
 
 } /* namespace Table */
