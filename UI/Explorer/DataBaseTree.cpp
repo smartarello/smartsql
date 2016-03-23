@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QHeaderView>
 #include <QModelIndexList>
+#include <QMenu>
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
 
 namespace UI {
@@ -18,6 +19,9 @@ namespace Explorer {
 DataBaseTree::DataBaseTree(QWidget *parent, QJsonObject sessionConf) : QTreeView(parent) {
 
 	this->dataBaseModel = new Model::DataBaseModel(sessionConf);
+
+	this->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(this, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
 
 	Model::TableFilterProxyModel *filter = new Model::TableFilterProxyModel();
 	filter->setSourceModel(this->dataBaseModel);
@@ -45,6 +49,54 @@ void DataBaseTree::filterTable(QString text)
 void DataBaseTree::filterDatabase(QString text)
 {
 	((Model::TableFilterProxyModel *)this->model())->setDatabaseFilter(text);
+}
+
+void DataBaseTree::customContextMenuRequested(QPoint point)
+{
+	this->contextMenuIndex = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->indexAt(point));
+	QModelIndexList list = this->selectionModel()->selectedRows(0);
+	QMenu *menu = new QMenu(this);
+
+
+
+	if (!this->contextMenuIndex.parent().isValid()){
+		QAction *showProcessesAction = new QAction(tr("Processes"), this);
+		menu->addAction(showProcessesAction);
+
+		QAction *createDatabaseAction = new QAction(tr("Create database"), this);
+		menu->addAction(createDatabaseAction);
+
+		QAction *disconnectAction = new QAction(tr("Disconnect"), this);
+		disconnectAction->setIcon(QIcon(":/resources/icons/disconnect.png"));
+		menu->addAction(disconnectAction);
+
+		menu->addSeparator();
+
+		QAction *refreshAction = new QAction(tr("Refresh"), this);
+		refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
+		menu->addAction(refreshAction);
+
+		connect(showProcessesAction, SIGNAL(triggered(bool)), SLOT(handleShowProcesses()));
+	} else if (!this->contextMenuIndex.parent().parent().isValid()) {
+		QAction *showProcessesAction = new QAction(tr("Create table"), this);
+		menu->addAction(showProcessesAction);
+
+		menu->addSeparator();
+
+		QAction *refreshAction = new QAction(tr("Refresh"), this);
+		refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
+		menu->addAction(refreshAction);
+	}
+
+
+
+	menu->popup(this->viewport()->mapToGlobal(point));
+}
+
+void DataBaseTree::handleShowProcesses()
+{
+	ShowProcessesWindow *showProcesses = new ShowProcessesWindow(this);
+	showProcesses->show();
 }
 
 

@@ -8,6 +8,12 @@
     <file>resources/icons/connect.png</file>   
     <file>resources/icons/disconnect.png</file>   
     <file>resources/icons/stop.png</file>   
+    <file>resources/icons/copy-icon.png</file>   
+    <file>resources/icons/paste-icon.png</file>   
+    <file>resources/icons/delete-icon.png</file>   
+    <file>resources/icons/filter-icon.png</file>   
+    <file>resources/icons/refresh-icon.png</file>   
+    <file>resources/icons/empty-document-icon.png</file>   
     <file>resources/icons/play.png</file>   
     <file>resources/icons/exit.png</file>   
     <file>resources/icons/mysql_logo.png</file>   

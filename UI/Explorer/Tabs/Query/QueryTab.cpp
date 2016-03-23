@@ -136,17 +136,14 @@ void QueryTab::handleQueryResultReady()
 
 		if (query.isSelect()) {
 			QTableView *tableData = new QTableView();
-			tableData->setSortingEnabled(true);
 			tableData->verticalHeader()->hide();
 			QueryModel *model = new QueryModel();
 
 			tableData->setModel(model);
 
-			tableData->horizontalHeader()->setSortIndicator(0, Qt::DescendingOrder);
 			model->setQuery(query);
-
-			int rows = query.numRowsAffected();
-			this->queryTabs->addTab(tableData, QString(tr("Result (%1 rows, %2 sec)")).arg(rows).arg(seconds));
+			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(query.size()).arg(seconds);
+			this->queryTabs->addTab(tableData, headerText);
 		}
 		else {
 			QTextEdit *resultText = new QTextEdit();
@@ -156,12 +153,12 @@ void QueryTab::handleQueryResultReady()
 			resultText->setFont(font);
 			resultText->setReadOnly(true);
 
-			int rows = query.numRowsAffected();
 
-			QString affectedRows = QString(tr("Affected rows: %1")).arg(rows);
+			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(query.numRowsAffected()).arg(seconds);
+			QString affectedRows = QString(tr("Affected rows: %1")).arg(query.numRowsAffected());
 
 			resultText->setPlainText(affectedRows + "\n\n" + query.lastQuery());
-			this->queryTabs->addTab(resultText, QString(tr("Result (%1 rows)")).arg(rows));
+			this->queryTabs->addTab(resultText, headerText);
 		}
 	}
 }

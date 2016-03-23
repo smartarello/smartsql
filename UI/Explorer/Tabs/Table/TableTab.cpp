@@ -23,6 +23,7 @@
 #include <QAction>
 #include <QClipboard>
 #include <QApplication>
+#include <QInputDialog>
 #include "TableModel.h"
 
 namespace UI {
@@ -124,25 +125,105 @@ void TableTab::customContextMenuRequested(QPoint point)
 {
 	this->contextMenuIndex = this->tableData->indexAt(point);
 
+	TableModel * model = ((TableModel *)this->tableData->model());
+	QModelIndexList list = this->tableData->selectionModel()->selectedRows(0);
 	QMenu *menu = new QMenu(this);
 
 	QAction *copyAction = new QAction(tr("Copy"), this);
-	copyAction->setShortcut(QKeySequence(tr("Ctrl+C")));
+	copyAction->setIcon(QIcon(":/resources/icons/copy-icon.png"));
 	menu->addAction(copyAction);
+
+	QAction *pasteAction = new QAction(tr("Paste"), this);
+	pasteAction->setIcon(QIcon(":/resources/icons/paste-icon.png"));
+	menu->addAction(pasteAction);
 
 	menu->addSeparator();
 
 	QAction *setNullAction = new QAction(tr("Set NULL"), this);
+	setNullAction->setIcon(QIcon(":/resources/icons/empty-document-icon.png"));
 	menu->addAction(setNullAction);
 
 	QAction *deleteAction = new QAction(tr("Delete selected row"), this);
+	deleteAction->setIcon(QIcon(":/resources/icons/delete-icon.png"));
 	menu->addAction(deleteAction);
+
+	QList<QString> columns = model->getColumns();
+	if (columns.size() > this->contextMenuIndex.column()) {
+		menu->addSeparator();
+
+		QString colTitle = columns.at(this->contextMenuIndex.column());
+		QAction *filterLikeAction = new QAction(QString(tr("`%1` LIKE \"%...%\"")).arg(colTitle), this);
+		filterLikeAction->setIcon(QIcon(":/resources/icons/filter-icon.png"));
+		menu->addAction(filterLikeAction);
+
+		QAction *filterEqualAction = new QAction(QString(tr("`%1` LIKE \"...\"")).arg(colTitle), this);
+		filterEqualAction->setIcon(QIcon(":/resources/icons/filter-icon.png"));
+		menu->addAction(filterEqualAction);
+
+		connect(filterLikeAction, SIGNAL(triggered(bool)), SLOT(handleFilterColumnLikeAction()));
+		connect(filterEqualAction, SIGNAL(triggered(bool)), SLOT(handleFilterColumnEqualAction()));
+
+		if (list.size() > 1) {
+			filterLikeAction->setEnabled(false);
+			filterEqualAction->setEnabled(false);
+		}
+	}
+
+	QAction *refreshAction = new QAction(tr("Refresh"), this);
+	refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
+	menu->addAction(refreshAction);
 
 	connect(setNullAction, SIGNAL(triggered(bool)), SLOT(handleSetNullAction()));
 	connect(copyAction, SIGNAL(triggered(bool)), SLOT(handleCopyAction()));
+	connect(pasteAction, SIGNAL(triggered(bool)), SLOT(handlePastAction()));
 	connect(deleteAction, SIGNAL(triggered(bool)), SLOT(handleDeleteAction()));
+	connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked(bool)));
+
+	if (list.size() > 1) {
+		setNullAction->setEnabled(false);
+		copyAction->setEnabled(false);
+		pasteAction->setEnabled(false);
+	}
 
 	menu->popup(this->tableData->viewport()->mapToGlobal(point));
+}
+
+void TableTab::handleFilterColumnLikeAction()
+{
+	TableModel * model = ((TableModel *)this->tableData->model());
+	QList<QString> columns = model->getColumns();
+	QString colTitle = columns.at(this->contextMenuIndex.column());
+
+	bool ok;
+	QString text = QInputDialog::getText(this,
+			"",
+			QString(tr("`%1` LIKE \"%...%\"")).arg(colTitle),
+			QLineEdit::Normal,
+			"", &ok);
+
+	if (ok && !text.isEmpty()) {
+		this->whereConditionText->setText(QString(tr("`%1` LIKE \"%%2%\"")).arg(colTitle).arg(text));
+		this->applyFilterClicked(true);
+	}
+}
+
+void TableTab::handleFilterColumnEqualAction()
+{
+	TableModel * model = ((TableModel *)this->tableData->model());
+	QList<QString> columns = model->getColumns();
+	QString colTitle = columns.at(this->contextMenuIndex.column());
+
+	bool ok;
+	QString text = QInputDialog::getText(this,
+			"",
+			QString(tr("`%1` LIKE \"...\"")).arg(colTitle),
+			QLineEdit::Normal,
+			"", &ok);
+
+	if (ok && !text.isEmpty()) {
+		this->whereConditionText->setText(QString(tr("`%1` LIKE \"%2\"")).arg(colTitle).arg(text));
+		this->applyFilterClicked(true);
+	}
 }
 
 void TableTab::handleSetNullAction()
@@ -155,12 +236,26 @@ void TableTab::handleCopyAction()
 	QVariant cellData = this->tableData->model()->data(this->contextMenuIndex);
 	QClipboard *clipboard = QApplication::clipboard();
 	clipboard->setText(cellData.toString());
+
+}
+
+void TableTab::handlePastAction()
+{
+	QClipboard *clipboard = QApplication::clipboard();
+	QString value = clipboard->text(QClipboard::Clipboard);
+	this->tableData->model()->setData(this->contextMenuIndex, QVariant(value), Qt::EditRole);
 }
 
 void TableTab::handleDeleteAction()
 {
 	TableModel * model = ((TableModel *)this->tableData->model());
-	model->removeRows(this->contextMenuIndex.row(), 1, this->contextMenuIndex.parent());
+	QModelIndexList list = this->tableData->selectionModel()->selectedRows(0);
+
+	if (list.isEmpty()) {
+		return ;
+	}
+
+	model->removeRows(list.first().row(), list.count(), list.first().parent());
 }
 
 void TableTab::queryError(QString query, QString error)
@@ -168,7 +263,10 @@ void TableTab::queryError(QString query, QString error)
 	QMessageBox *message = new QMessageBox(this);
 	message->setText(error);
 	message->setIcon(QMessageBox::Critical);
-	message->setDetailedText(query);
+	if (!query.isEmpty()) {
+		message->setDetailedText(query);
+	}
+
 	message->show();
 }
 

@@ -11,6 +11,7 @@
 #include <QTreeView>
 #include <QJsonObject>
 #include "Model/DataBaseModel.h"
+#include "ShowProcessesWindow.h"
 
 namespace UI {
 namespace Explorer {
@@ -27,10 +28,13 @@ public:
 public slots:
 	void filterTable(QString text);
 	void filterDatabase(QString text);
+	void customContextMenuRequested(QPoint point);
+	void handleShowProcesses();
 
 
 private:
 	Model::DataBaseModel *dataBaseModel;
+	QModelIndex contextMenuIndex;
 };
 
 } /* namespace Explorer */

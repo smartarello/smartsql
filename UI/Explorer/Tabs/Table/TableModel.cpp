@@ -25,8 +25,6 @@ void TableModel::setTable(QString table){
 	this->sortOrder = "";
 	this->filter = "";
 
-	this->setQuery(this->buildQuery());
-
 	QSqlQuery query;
 	query.exec(QString("SHOW COLUMNS FROM %1").arg(this->table));
 	this->columns = QList<QString>();
@@ -41,12 +39,12 @@ void TableModel::setTable(QString table){
 		this->primaryKey << queryIndex.value("Column_name").toString();
 	}
 
-	emit layoutChanged();
+	this->reload();
 }
 
 int TableModel::rowCount(const QModelIndex & parent) const
 {
-	return query.size();
+	return this->results.size();
 }
 
 int TableModel::columnCount(const QModelIndex & parent) const
@@ -85,8 +83,7 @@ void TableModel::sort(int column, Qt::SortOrder order){
 
 	this->sortOrder = col + " " + sortOrder;
 
-	this->setQuery(this->buildQuery());
-	emit layoutChanged();
+	this->reload();
 }
 
 void TableModel::refreshWithFilter(QString filter)
@@ -94,14 +91,7 @@ void TableModel::refreshWithFilter(QString filter)
 	QString oldFilter = this->filter;
 	this->filter = filter;
 	QString queryText = this->buildQuery();
-	this->setQuery(queryText);
-	if (this->query.lastError().isValid()){
-		qDebug() << this->query.lastError();
-		QString lastError =  this->query.lastError().text();
-		this->filter = oldFilter;
-		this->setQuery(this->buildQuery());
-		emit queryError(queryText, lastError);
-	}
+	this->reload();
 }
 
 QString TableModel::buildQuery()
@@ -116,8 +106,6 @@ QString TableModel::buildQuery()
 	}
 
 	query += " LIMIT 1000";
-
-	qDebug() << query;
 
 	return query;
 }
@@ -174,7 +162,7 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
 QVariant TableModel::data(const QModelIndex &index, int role) const
 {
-	if ((role == Qt::DisplayRole || role == Qt::EditRole) && index.isValid() && index.row() < query.size()) {
+	if ((role == Qt::DisplayRole || role == Qt::EditRole) && index.isValid() && index.row() < this->results.size()) {
 		QSqlRecord record = this->results.at(index.row());
 		return record.value(index.column());
 	}
@@ -184,30 +172,38 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
 
 bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 {
-	if (this->results.count() < row) {
+	int lastRow = row + count -1;
+	if (this->results.count() < row || this->results.count() <= lastRow) {
 		return false;
 	}
 
-	beginRemoveRows(parent, row, row);
-
-	QSqlRecord record = this->results.at(row);
-
+	// Compute the DELETE statement
 	QString deleteQuery = QString("DELETE FROM %1 WHERE ").arg(this->table);
-	QStringList where;
-	foreach(QString primaryKeyIndex, this->primaryKey) {
-		where << QString("%1=:%2").arg(primaryKeyIndex).arg(primaryKeyIndex);
+	QStringList orStatement;
+
+	QList<QSqlRecord> recordToRemove;
+
+	for (int i = row; i <= lastRow; i++) {
+
+		QSqlRecord record = this->results.at(i);
+		recordToRemove << record;
+
+		// Adds a WHERE condition with the primary key for the current record
+		QStringList where;
+		foreach(QString primaryKeyIndex, this->primaryKey) {
+			where << QString("%1='%2'").arg(primaryKeyIndex).arg(record.value(primaryKeyIndex).toString());
+		}
+
+		orStatement << where.join(" AND ");
 	}
 
-	deleteQuery += where.join(" AND ");
+
+	deleteQuery += "(" + orStatement.join(") OR (") + ")";
+
+	qDebug() << deleteQuery;
 
 	QSqlQuery query ;
-	query.prepare(deleteQuery);
-
-	foreach(QString primaryKeyIndex, this->primaryKey) {
-		query.bindValue(":"+primaryKeyIndex, record.value(primaryKeyIndex));
-	}
-
-	query.exec();
+	query.exec(deleteQuery);
 
 	if (query.lastError().isValid()){
 		qDebug() << query.lastError();
@@ -215,17 +211,35 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 		return false;
 	}
 
-	this->results.removeAt(row);
+
+	beginRemoveRows(parent, row, lastRow);
+
+	foreach (QSqlRecord record, recordToRemove) {
+		this->results.removeOne(record);
+	}
+
 	endRemoveRows();
 	return true;
 }
 
-void TableModel::setQuery(QString sql)
+void TableModel::reload()
 {
+	QString sql = this->buildQuery();
+	qDebug() << sql;
 	this->query.exec(sql);
-	this->results = QList<QSqlRecord>();
-	while (this->query.next()) {
-		this->results << this->query.record();
+
+	if (this->query.lastError().isValid()){
+		this->filter = "";
+		qDebug() << this->query.lastError();
+		QString lastError =  this->query.lastError().text();
+		emit queryError("", lastError);
+	} else {
+		this->results = QList<QSqlRecord>();
+		while (this->query.next()) {
+			this->results << this->query.record();
+		}
+
+		emit layoutChanged();
 	}
 }
 
