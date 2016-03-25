@@ -125,6 +125,10 @@ void TableTab::customContextMenuRequested(QPoint point)
 {
 	this->contextMenuIndex = this->tableData->indexAt(point);
 
+	if (!this->contextMenuIndex.isValid()){
+		return ;
+	}
+
 	TableModel * model = ((TableModel *)this->tableData->model());
 	QModelIndexList list = this->tableData->selectionModel()->selectedRows(0);
 	QMenu *menu = new QMenu(this);

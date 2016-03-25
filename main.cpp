@@ -11,15 +11,22 @@ int main(int argc, char *argv[])
 	qInfo() << "Start the application";
     QApplication app(argc, argv);
 
-    QFontDatabase::addApplicationFont(":/resources/fonts/cour.pfa");
+    if (QFontDatabase::addApplicationFont(":/resources/fonts/cour.pfa") == -1) {
+    	qDebug() << "Unable to load font";
+    }
+
     QFontDatabase::addApplicationFont(":/resources/fonts/couri.pfa");
     QFontDatabase::addApplicationFont(":/resources/fonts/courb.pfa");
 
-    int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/DejaVuSans.ttf");
+    int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-R.ttf");
     if (fontId != -1)
     {
-        QFont font("DejaVuSans");
+        QFont font("Ubuntu Regular");
         app.setFont(font);
+
+        qDebug() << "App font familly: " + app.font().family();
+    } else {
+    	qWarning() << "Font not found";
     }
 
 //    QTranslator qtTranslator;font.defaultFamily()

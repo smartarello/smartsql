@@ -45,12 +45,14 @@ void QueryThread::run()
 				break;
 			}
 		}
+
+		this->database.close();
+		emit queryResultReady();
+	} else {
+		qWarning() << this->database.lastError();
 	}
 
-	this->database.close();
-
 	qDebug() << "End of thread execution";
-	emit queryResultReady();
 }
 
 QList<QueryExecutionResult> QueryThread::getQueryResult()

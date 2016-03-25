@@ -67,10 +67,15 @@ void DataBaseModel::addDatabase(QJsonObject sessionConf)
 
 QList<QStandardItem *> DataBaseModel::getDataBaseList()
 {
+	QList<QStandardItem *> dbList;
+
 	QSqlQuery query;
 	query.exec("SHOW DATABASES");
 
-	QList<QStandardItem *> dbList;
+	if (query.lastError().isValid()) {
+		qWarning() << query.lastError();
+		return dbList;
+	}
 
 	while (query.next()) {
 		QString dbname = query.value(0).toString();
@@ -148,7 +153,7 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 				qDebug() << "Loading table list for: " + db.databaseName();
 
 				if (!db.open()){
-					qDebug() << db.lastError().text();
+					qWarning() << db.lastError().text();
 					return ;
 				}
 
@@ -192,7 +197,11 @@ QMap<QString, QString> DataBaseModel::getTableSize()
 {
 	QMap<QString, QString> size;
 	QSqlQuery query;
-	query.exec("show table status");
+
+	if (!query.exec("show table status")) {
+		qWarning() << query.lastError();
+		return size;
+	}
 
 	double dataBaseTotalSize = 0;
 
@@ -229,7 +238,7 @@ QString DataBaseModel::getSizeString(double size) {
 }
 
 DataBaseModel::~DataBaseModel() {
-	// TODO Auto-generated destructor stub
+
 }
 
 } /* namespace Model */

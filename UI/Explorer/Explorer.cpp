@@ -100,7 +100,9 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 		db.close();
 	}
 	db.setDatabaseName(firstDataBase->text());
-	db.open();
+	if (!db.open()) {
+		qWarning() << db.lastError();
+	}
 
 	this->databaseTab = new Tabs::Database::DataBaseTab();
 	this->explorerTabs->addTab(this->databaseTab, QString(tr("Database: %1")).arg(db.databaseName()));

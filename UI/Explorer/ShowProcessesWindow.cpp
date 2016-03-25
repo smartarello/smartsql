@@ -7,13 +7,21 @@
 
 #include <UI/Explorer/ShowProcessesWindow.h>
 #include <QVBoxLayout>
+#include <QUuid>
 #include <QSqlQueryModel>
 #include <QHeaderView>
 
 namespace UI {
 namespace Explorer {
 
-ShowProcessesWindow::ShowProcessesWindow(QWidget * parent) : QMainWindow(parent) {
+ShowProcessesWindow::ShowProcessesWindow(QJsonObject sessionConf, QWidget * parent) : QMainWindow(parent) {
+
+	QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", QUuid::createUuid().toString());
+
+	db.setHostName(sessionConf.value("hostname").toString());
+	db.setUserName(sessionConf.value("user").toString());
+	db.setPassword(sessionConf.value("password").toString());
+	db.setPort(sessionConf.value("port").toInt());
 
 	this->setMinimumSize(900, 300);
 
@@ -25,12 +33,20 @@ ShowProcessesWindow::ShowProcessesWindow(QWidget * parent) : QMainWindow(parent)
 
 	this->processListTable->verticalHeader()->hide();
 	QSqlQueryModel *model = new QSqlQueryModel();
-	model->setQuery("SELECT * FROM `information_schema`.`PROCESSLIST`");
 	this->processListTable->setModel(model);
 
 	containerLayout->addWidget(this->processListTable);
 
 	this->setCentralWidget(container);
+
+	this->worker = new ProcessListThread(db);
+	connect(this->worker, SIGNAL(processListReady()), SLOT(processListReady()));
+	this->worker->start();
+}
+
+void ShowProcessesWindow::processListReady()
+{
+	((QSqlQueryModel *)this->processListTable->model())->setQuery(this->worker->getQuery());
 }
 
 ShowProcessesWindow::~ShowProcessesWindow() {

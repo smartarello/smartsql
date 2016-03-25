@@ -54,10 +54,13 @@ void DataBaseTree::filterDatabase(QString text)
 void DataBaseTree::customContextMenuRequested(QPoint point)
 {
 	this->contextMenuIndex = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->indexAt(point));
+
+	if (!this->contextMenuIndex.isValid()) {
+		return ;
+	}
+
 	QModelIndexList list = this->selectionModel()->selectedRows(0);
 	QMenu *menu = new QMenu(this);
-
-
 
 	if (!this->contextMenuIndex.parent().isValid()){
 		QAction *showProcessesAction = new QAction(tr("Processes"), this);
@@ -95,7 +98,13 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 
 void DataBaseTree::handleShowProcesses()
 {
-	ShowProcessesWindow *showProcesses = new ShowProcessesWindow(this);
+	QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(this->contextMenuIndex.row(), 0);
+	QJsonObject sessionConf = serverItem->data().toJsonObject();
+
+	qDebug() << "Open process list window";
+	qDebug() << sessionConf;
+
+	ShowProcessesWindow *showProcesses = new ShowProcessesWindow(sessionConf, this);
 	showProcesses->show();
 }
 

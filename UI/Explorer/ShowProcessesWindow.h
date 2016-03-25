@@ -10,6 +10,8 @@
 
 #include <qmainwindow.h>
 #include <QTableView>
+#include <QJsonObject>
+#include "ProcessListThread.h"
 
 namespace UI {
 namespace Explorer {
@@ -19,11 +21,15 @@ class ShowProcessesWindow: public QMainWindow {
 	Q_OBJECT
 
 public:
-	ShowProcessesWindow(QWidget * parent = 0);
+	ShowProcessesWindow(QJsonObject sessionConf, QWidget * parent = 0);
 	virtual ~ShowProcessesWindow();
+
+public slots:
+	void processListReady();
 
 private:
 	QTableView *processListTable;
+	ProcessListThread *worker;
 };
 
 } /* namespace Explorer */

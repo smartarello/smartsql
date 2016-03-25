@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>resources/fonts/DejaVuSans.ttf</file>   
+    <file>resources/fonts/Ubuntu-R.ttf</file>   
     <file>resources/fonts/cour.pfa</file>   
     <file>resources/fonts/courb.pfa</file>   
     <file>resources/fonts/couri.pfa</file>   
