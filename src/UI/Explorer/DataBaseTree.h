@@ -30,6 +30,7 @@ public slots:
 	void filterDatabase(QString text);
 	void customContextMenuRequested(QPoint point);
 	void handleShowProcesses();
+	void handleRefreshDatabase();
 
 
 private:

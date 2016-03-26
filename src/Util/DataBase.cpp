@@ -17,7 +17,7 @@ DataBase::DataBase() {
 
 }
 
-bool DataBase::open(QJsonObject sessionConfiguration)
+bool DataBase::open(QJsonObject sessionConfiguration, QString database)
 {
 	QSqlDatabase db = QSqlDatabase::database();
 
@@ -25,7 +25,7 @@ bool DataBase::open(QJsonObject sessionConfiguration)
 	QString userName = sessionConfiguration.value("user").toString();
 	int port = sessionConfiguration.value("port").toInt();
 
-	if (!db.isOpen() || hostName != db.hostName() || db.userName() != userName || port != db.port()) {
+	if (!db.isOpen() || hostName != db.hostName() || db.userName() != userName || port != db.port() || database != db.databaseName()) {
 
 		if (db.isOpen()) {
 			db.close();
@@ -33,7 +33,7 @@ bool DataBase::open(QJsonObject sessionConfiguration)
 
 		db.setHostName(hostName);
 		db.setUserName(userName);
-		db.setDatabaseName("");
+		db.setDatabaseName(database);
 		db.setPassword(sessionConfiguration.value("password").toString());
 		db.setPort(port);
 
@@ -41,6 +41,8 @@ bool DataBase::open(QJsonObject sessionConfiguration)
 			qDebug() << db.lastError();
 			return false;
 		}
+
+		qInfo() << "Open database connection: " + db.userName() + "@" + db.hostName() + ":" + database;
 	}
 
 	return true;

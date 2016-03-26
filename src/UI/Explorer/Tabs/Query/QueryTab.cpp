@@ -123,26 +123,25 @@ void QueryTab::handleQueryResultReady()
 	this->queryTabs->clear();
 	foreach(QueryExecutionResult result, results) {
 
-		QSqlQuery query = result.query;
 		double seconds = result.msec / 1000.0;
-		if (query.lastError().isValid()) {
-			qDebug() << query.lastError();
+		if (result.query.lastError().isValid()) {
+			qDebug() << result.query.lastError();
 			QMessageBox *message = new QMessageBox(this);
-			message->setText(query.lastError().databaseText());
+			message->setText(result.query.lastError().databaseText());
 			message->setIcon(QMessageBox::Critical);
 			message->show();
 			return ;
 		}
 
-		if (query.isSelect()) {
+		if (result.query.isSelect()) {
 			QTableView *tableData = new QTableView();
 			tableData->verticalHeader()->hide();
 			QueryModel *model = new QueryModel();
 
 			tableData->setModel(model);
 
-			model->setQuery(query);
-			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(query.size()).arg(seconds);
+			model->setQuery(result.query);
+			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(result.query.size()).arg(seconds);
 			this->queryTabs->addTab(tableData, headerText);
 		}
 		else {
@@ -154,10 +153,10 @@ void QueryTab::handleQueryResultReady()
 			resultText->setReadOnly(true);
 
 
-			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(query.numRowsAffected()).arg(seconds);
-			QString affectedRows = QString(tr("Affected rows: %1")).arg(query.numRowsAffected());
+			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(result.query.numRowsAffected()).arg(seconds);
+			QString affectedRows = QString(tr("Affected rows: %1")).arg(result.query.numRowsAffected());
 
-			resultText->setPlainText(affectedRows + "\n\n" + query.lastQuery());
+			resultText->setPlainText(affectedRows + "\n\n" + result.query.lastQuery());
 			this->queryTabs->addTab(resultText, headerText);
 		}
 	}

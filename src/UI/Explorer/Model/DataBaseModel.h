@@ -29,6 +29,7 @@ public:
 	DataBaseModel(QJsonObject sessionConf, QObject * parent = 0);
 	virtual ~DataBaseModel();
 	void addDatabase(QJsonObject sessionConf);
+	void refresh(const QModelIndex & parent);
 
 protected:
 	bool canFetchMore(const QModelIndex & parent) const Q_DECL_OVERRIDE;

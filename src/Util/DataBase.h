@@ -17,7 +17,7 @@ public:
 	DataBase();
 	virtual ~DataBase();
 
-	static bool open(QJsonObject sessionConfiguration);
+	static bool open(QJsonObject sessionConfiguration, QString database = "");
 };
 
 } /* namespace Util */

@@ -80,6 +80,7 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 		menu->addAction(refreshAction);
 
 		connect(showProcessesAction, SIGNAL(triggered(bool)), SLOT(handleShowProcesses()));
+		connect(refreshAction, SIGNAL(triggered(bool)), SLOT(handleRefreshDatabase()));
 	} else if (!this->contextMenuIndex.parent().parent().isValid()) {
 		QAction *showProcessesAction = new QAction(tr("Create table"), this);
 		menu->addAction(showProcessesAction);
@@ -88,6 +89,8 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 
 		QAction *refreshAction = new QAction(tr("Refresh"), this);
 		refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
+		connect(refreshAction, SIGNAL(triggered(bool)), SLOT(handleRefreshDatabase()));
+
 		menu->addAction(refreshAction);
 	}
 
@@ -106,6 +109,11 @@ void DataBaseTree::handleShowProcesses()
 
 	ShowProcessesWindow *showProcesses = new ShowProcessesWindow(sessionConf, this);
 	showProcesses->show();
+}
+
+void DataBaseTree::handleRefreshDatabase()
+{
+	this->dataBaseModel->refresh(this->contextMenuIndex);
 }
 
 

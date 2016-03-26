@@ -99,7 +99,7 @@ bool DataBaseModel::canFetchMore(const QModelIndex & parent) const
 
 			if (dataBaseItem != 0){
 
-				return (dataBaseItem->rowCount() == 0);
+				return (dataBaseItem->rowCount() == 0 && this->hasChildren(parent));
 			}
 		}
 	}
@@ -107,15 +107,39 @@ bool DataBaseModel::canFetchMore(const QModelIndex & parent) const
 	return false;
 }
 
-bool DataBaseModel::hasChildren(const QModelIndex & parent) const
+bool DataBaseModel::hasChildren(const QModelIndex & index) const
 {
-	QModelIndex root = parent.parent();
-	if (root.isValid() && !root.parent().isValid()){
+	QStandardItem *rootItem = this->invisibleRootItem();
+
+	if (!index.isValid()) {
 		return true;
-	}
-	else if (!parent.isValid() || !root.isValid())
-	{
-		return  true;
+	} else if (!index.parent().isValid()) {
+		// Server node: is there database ?
+
+		QStandardItem *serverItem = rootItem->child(index.row());
+		QJsonObject serverConf = serverItem->data().toJsonObject();
+
+		if (Util::DataBase::open(serverConf)) {
+			QSqlQuery query;
+			if (query.exec("SHOW DATABASES")) {
+				return query.size() > 0;
+			}
+		}
+
+	} else if (!index.parent().parent().isValid()) {
+		// Database node: is there table ?
+
+		QStandardItem *serverItem = rootItem->child(index.parent().row());
+		QJsonObject serverConf = serverItem->data().toJsonObject();
+		QStandardItem *dataBaseItem = serverItem->child(index.row());
+
+		if (Util::DataBase::open(serverConf, dataBaseItem->text())) {
+			QSqlQuery query;
+			if (query.exec("SHOW TABLES")) {
+				return query.size() > 0;
+			}
+		}
+
 	}
 
 	return false;
@@ -234,6 +258,149 @@ QString DataBaseModel::getSizeString(double size) {
 			size = size / 1024;
 			return QString("%1 Gb").arg(QString::number(size, 'f', 2));
 		}
+	}
+}
+
+void DataBaseModel::refresh(const QModelIndex & index)
+{
+	QStandardItem *rootItem = this->invisibleRootItem();
+
+	// Refresh Server node, reload database list
+	if (!index.parent().isValid()) {
+		qInfo() << "Reload database list";
+
+		QStandardItem *serverItem = rootItem->child(index.row());
+		QJsonObject serverConf = serverItem->data().toJsonObject();
+
+		if (Util::DataBase::open(serverConf)) {
+			QList<QStandardItem *> dbList = this->getDataBaseList();
+
+			// Process item to add
+			foreach (QStandardItem *db, dbList) {
+
+				bool bdFound = false;
+				for (int i = 0; i < serverItem->rowCount(); i++) {
+					QStandardItem *currentItem = serverItem->child(i, 0);
+					if (db->text() == currentItem->text()) {
+						bdFound = true;
+						break;
+					}
+				}
+
+				// Item not found in the current model, it should be added
+				if (!bdFound) {
+					qDebug() << "New database detected : "+ db->text();
+
+					db->setData(QIcon(":/resources/icons/database-icon.png"),Qt::DecorationRole);
+					QList<QStandardItem *> cols;
+					cols << db;
+					QStandardItem *size = new QStandardItem();
+					size->setTextAlignment(Qt::AlignRight);
+					cols << size;
+
+					serverItem->appendRow(db);
+				}
+			}
+
+			// Process item to remove
+			int i = 0;
+			while (i < serverItem->rowCount()) {
+				QStandardItem *currentItem = serverItem->child(i, 0);
+
+				bool bdFound = false;
+				foreach (QStandardItem *db, dbList) {
+					if (db->text() == currentItem->text()) {
+						bdFound = true;
+						break;
+					}
+				}
+
+				if (!bdFound) {
+					qDebug() << "Remove the database: " + currentItem->text();
+					serverItem->removeRow(i); // Do not increase `i` in this case, because we are removing the current index
+				} else {
+					i++;
+				}
+			}
+
+			serverItem->sortChildren(0);
+		}
+
+
+	} else if (!index.parent().parent().isValid()) { // Refresh Database node, reload table list
+
+		QStandardItem *serverItem = rootItem->child(index.parent().row());
+		QStandardItem *dbItem = serverItem->child(index.row());
+
+		qInfo() << "Reload table list for: "+dbItem->text();
+
+		QJsonObject serverConf = serverItem->data().toJsonObject();
+
+		if (Util::DataBase::open(serverConf)) {
+			QMap<QString, QString> tableSize = this->getTableSize();
+
+			QMapIterator<QString, QString> iterator(tableSize);
+			while(iterator.hasNext()){
+				iterator.next();
+
+
+				if (iterator.key() != "DATABASE_SIZE"){
+
+					bool tableFound = false;
+					for (int i = 0; i < dbItem->rowCount(); i++) {
+						QStandardItem *currentItem = dbItem->child(i, 0);
+						if (iterator.key() == currentItem->text()) {
+							tableFound = true;
+							break;
+						}
+					}
+
+					if (!tableFound) {
+
+						QList<QStandardItem *> cols;
+
+						QStandardItem *table = new QStandardItem(iterator.key());
+						table->setData(QIcon(":/resources/icons/database-table-icon.png"),Qt::DecorationRole);
+
+						cols << table;
+						QStandardItem *size = new QStandardItem(iterator.value());
+						size->setTextAlignment(Qt::AlignRight);
+						cols << size;
+
+						dbItem->appendRow(cols);
+					}
+				}
+			}
+
+			// Process item to remove
+			int i = 0;
+			while (i < dbItem->rowCount()) {
+				QStandardItem *currentItem = dbItem->child(i, 0);
+
+				bool tableFound = false;
+				QMapIterator<QString, QString> iterator(tableSize);
+				while(iterator.hasNext()){
+					iterator.next();
+
+					if (iterator.key() == currentItem->text()) {
+						tableFound = true;
+						break;
+					}
+				}
+
+				if (!tableFound) {
+					qDebug() << "Remove the table: " + currentItem->text();
+					dbItem->removeRow(i); // Do not increase `i` in this case, because we are removing the current index
+				} else {
+					i++;
+				}
+			}
+
+			dbItem->sortChildren(0);
+		}
+	} else if (!index.parent().parent().parent().isValid()) {
+		// Table node: refresh table size
+
 	}
 }
 

@@ -30,10 +30,12 @@ void QueryThread::run()
 	if (this->database.open()) {
 		foreach(QString sql, this->queries) {
 
-			QSqlQuery query(sql, this->database);
+			qDebug() << sql;
+
+			QSqlQuery query(this->database);
 
 			QDateTime mStartTime = QDateTime::currentDateTime();
-			query.exec();
+			query.exec(sql);
 
 			QueryExecutionResult result;
 			result.msec = mStartTime.msecsTo(QDateTime::currentDateTime());
@@ -42,11 +44,11 @@ void QueryThread::run()
 			this->queryResult << result;
 
 			if (query.lastError().isValid()) {
+				qDebug() << "Error when running query in thread";
 				break;
 			}
 		}
 
-		this->database.close();
 		emit queryResultReady();
 	} else {
 		qWarning() << this->database.lastError();
