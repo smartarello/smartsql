@@ -1,0 +1,27 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>resources/fonts/DejaVuSans.ttf</file>
+    <file>resources/fonts/Ubuntu-R.ttf</file>
+    <file>resources/fonts/cour.pfa</file>
+    <file>resources/fonts/courb.pfa</file>
+    <file>resources/fonts/couri.pfa</file>
+    <file>resources/icons/plus.png</file>
+    <file>resources/icons/connect.png</file>
+    <file>resources/icons/disconnect.png</file>
+    <file>resources/icons/stop.png</file>
+    <file>resources/icons/copy-icon.png</file>
+    <file>resources/icons/paste-icon.png</file>
+    <file>resources/icons/delete-icon.png</file>
+    <file>resources/icons/filter-icon.png</file>
+    <file>resources/icons/refresh-icon.png</file>
+    <file>resources/icons/empty-document-icon.png</file>
+    <file>resources/icons/play.png</file>
+    <file>resources/icons/exit.png</file>
+    <file>resources/icons/mysql_logo.png</file>
+    <file>resources/icons/database-icon.png</file>
+    <file>resources/icons/database-icon-24.png</file>
+    <file>resources/icons/database-table-icon.png</file>
+    <file>resources/icons/database-table-icon-24.png</file>
+    <file>resources/icons/database-server-icon.png</file>
+</qresource>
+</RCC>
