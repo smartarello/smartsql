@@ -10,6 +10,9 @@
 #include <QDebug>
 #include <QHeaderView>
 #include <QModelIndexList>
+#include <QKeySequence>
+#include <QShortcut>
+#include <QMessageBox>
 #include <QMenu>
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
 
@@ -34,6 +37,12 @@ DataBaseTree::DataBaseTree(QWidget *parent, QJsonObject sessionConf) : QTreeView
 	// The first column with the table name takes all the space.
 	this->header()->setStretchLastSection(false);
 	this->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+
+	QShortcut* refreshShortcut = new QShortcut(QKeySequence(Qt::Key_F5), this);
+	connect(refreshShortcut, SIGNAL(activated()), SLOT(handleRefreshDatabase()));
+
+	QShortcut* deleteShortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this);
+	connect(deleteShortcut, SIGNAL(activated()), SLOT(handleDrop()));
 }
 
 Model::DataBaseModel * DataBaseTree::getDataBaseModel()
@@ -63,6 +72,7 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 	QMenu *menu = new QMenu(this);
 
 	if (!this->contextMenuIndex.parent().isValid()){
+		// Server node
 		QAction *showProcessesAction = new QAction(tr("Processes"), this);
 		menu->addAction(showProcessesAction);
 
@@ -77,31 +87,36 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 
 		QAction *refreshAction = new QAction(tr("Refresh"), this);
 		refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
+		refreshAction->setShortcut(QKeySequence(Qt::Key_F5));
 		menu->addAction(refreshAction);
 
 		connect(showProcessesAction, SIGNAL(triggered(bool)), SLOT(handleShowProcesses()));
 		connect(refreshAction, SIGNAL(triggered(bool)), SLOT(handleRefreshDatabase()));
 	} else if (!this->contextMenuIndex.parent().parent().isValid()) {
-		QAction *showProcessesAction = new QAction(tr("Create table"), this);
-		menu->addAction(showProcessesAction);
+		// Database node
+
+		QAction *dropDatabaseAction = new QAction(tr("Drop..."), this);
+		dropDatabaseAction->setShortcut(QKeySequence(Qt::Key_Delete));
+		dropDatabaseAction->setIcon(QIcon(":/resources/icons/delete-icon.png"));
+		menu->addAction(dropDatabaseAction);
 
 		menu->addSeparator();
 
 		QAction *refreshAction = new QAction(tr("Refresh"), this);
+		refreshAction->setShortcut(QKeySequence(Qt::Key_F5));
 		refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
 		connect(refreshAction, SIGNAL(triggered(bool)), SLOT(handleRefreshDatabase()));
+		connect(dropDatabaseAction, SIGNAL(triggered(bool)), SLOT(handleDrop()));
 
 		menu->addAction(refreshAction);
 	}
-
-
 
 	menu->popup(this->viewport()->mapToGlobal(point));
 }
 
 void DataBaseTree::handleShowProcesses()
 {
-	QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(this->contextMenuIndex.row(), 0);
+	QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(this->currentIndex().row(), 0);
 	QJsonObject sessionConf = serverItem->data().toJsonObject();
 
 	qDebug() << "Open process list window";
@@ -113,9 +128,34 @@ void DataBaseTree::handleShowProcesses()
 
 void DataBaseTree::handleRefreshDatabase()
 {
-	this->dataBaseModel->refresh(this->contextMenuIndex);
+	QModelIndex index = this->currentIndex();
+	this->dataBaseModel->refresh(index);
 }
 
+void DataBaseTree::handleDrop()
+{
+	if (this->currentIndex().isValid() && this->currentIndex().parent().isValid() && !this->currentIndex().parent().parent().isValid()) {
+
+		// Drop database
+		QMessageBox *confirm = new QMessageBox();
+		confirm->setText("Drop database ?");
+		confirm->setIcon(QMessageBox::Question);
+		confirm->setWindowTitle("Confirm");
+		confirm->setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes);
+		int ret = confirm->exec();
+
+		if (ret == QMessageBox::Yes){
+			if (!this->dataBaseModel->dropDatabase(this->currentIndex())) {
+				QMessageBox *message = new QMessageBox();
+				message->setWindowTitle(tr("Error"));
+				message->setText(tr("Unable to drop the database"));
+				message->setIcon(QMessageBox::Critical);
+				message->exec();
+			}
+		}
+	}
+
+}
 
 DataBaseTree::~DataBaseTree() {
 

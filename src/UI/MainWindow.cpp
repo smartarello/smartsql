@@ -64,7 +64,7 @@ void MainWindow::handleOpenConnection(QJsonObject sessionConfiguration)
 
 		QMessageBox *message = new QMessageBox();
 		message->setWindowTitle(tr("Connection error"));
-		message->setText(tr("Unable to connect to the Data Base"));
+		message->setText(tr("Unable to connect to the database"));
 		message->setDetailedText(err.text());
 		message->setIcon(QMessageBox::Critical);
 

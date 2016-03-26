@@ -31,6 +31,7 @@ public slots:
 	void customContextMenuRequested(QPoint point);
 	void handleShowProcesses();
 	void handleRefreshDatabase();
+	void handleDrop();
 
 
 private:

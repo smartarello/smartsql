@@ -88,6 +88,7 @@ QList<QStandardItem *> DataBaseModel::getDataBaseList()
 
 bool DataBaseModel::canFetchMore(const QModelIndex & parent) const
 {
+
 	QModelIndex root = parent.parent();
 	if (root.isValid() && !root.parent().isValid()){
 		QStandardItem *rootItem = this->invisibleRootItem();
@@ -98,8 +99,8 @@ bool DataBaseModel::canFetchMore(const QModelIndex & parent) const
 			QStandardItem *dataBaseItem = connectionItem->child(parent.row());
 
 			if (dataBaseItem != 0){
-
-				return (dataBaseItem->rowCount() == 0 && this->hasChildren(parent));
+				QVariant data = dataBaseItem->data();
+				return data.isNull();
 			}
 		}
 	}
@@ -127,18 +128,8 @@ bool DataBaseModel::hasChildren(const QModelIndex & index) const
 		}
 
 	} else if (!index.parent().parent().isValid()) {
-		// Database node: is there table ?
 
-		QStandardItem *serverItem = rootItem->child(index.parent().row());
-		QJsonObject serverConf = serverItem->data().toJsonObject();
-		QStandardItem *dataBaseItem = serverItem->child(index.row());
-
-		if (Util::DataBase::open(serverConf, dataBaseItem->text())) {
-			QSqlQuery query;
-			if (query.exec("SHOW TABLES")) {
-				return query.size() > 0;
-			}
-		}
+		return true;
 
 	}
 
@@ -209,6 +200,9 @@ void DataBaseModel::fetchMore(const QModelIndex & parent)
 				QStandardItem *size = connectionItem->child(dataBaseItem->index().row(), 1);
 				size->setText(tableSize.value("DATABASE_SIZE"));
 
+				 // Mark data as loaded
+				dataBaseItem->setData(QVariant(true));
+
 				qDebug() << "Table list retrieves successfully";
 
 				emit databaseChanged();
@@ -261,16 +255,36 @@ QString DataBaseModel::getSizeString(double size) {
 	}
 }
 
+bool DataBaseModel::dropDatabase(const QModelIndex & index)
+{
+	QStandardItem *rootItem = this->invisibleRootItem();
+	QStandardItem *serverItem = rootItem->child(index.parent().row());
+	QStandardItem *databaseItem = serverItem->child(index.row());
+
+	QJsonObject serverConf = serverItem->data().toJsonObject();
+	if (Util::DataBase::open(serverConf, databaseItem->text())) {
+		QSqlQuery dropQuery;
+
+		if (dropQuery.exec("DROP DATABASE "+databaseItem->text())){
+			serverItem->removeRow(index.row());
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void DataBaseModel::refresh(const QModelIndex & index)
 {
 	QStandardItem *rootItem = this->invisibleRootItem();
 
 	// Refresh Server node, reload database list
 	if (!index.parent().isValid()) {
-		qInfo() << "Reload database list";
 
 		QStandardItem *serverItem = rootItem->child(index.row());
 		QJsonObject serverConf = serverItem->data().toJsonObject();
+
+		qInfo() << "Reload database list: " + serverItem->text();
 
 		if (Util::DataBase::open(serverConf)) {
 			QList<QStandardItem *> dbList = this->getDataBaseList();
@@ -336,7 +350,7 @@ void DataBaseModel::refresh(const QModelIndex & index)
 
 		QJsonObject serverConf = serverItem->data().toJsonObject();
 
-		if (Util::DataBase::open(serverConf)) {
+		if (Util::DataBase::open(serverConf, dbItem->text())) {
 			QMap<QString, QString> tableSize = this->getTableSize();
 
 			QMapIterator<QString, QString> iterator(tableSize);
@@ -396,6 +410,7 @@ void DataBaseModel::refresh(const QModelIndex & index)
 				}
 			}
 
+			dbItem->setData(QVariant(true)); // Mark data as loaded
 			dbItem->sortChildren(0);
 		}
 	} else if (!index.parent().parent().parent().isValid()) {

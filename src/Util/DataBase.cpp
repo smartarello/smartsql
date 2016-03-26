@@ -42,7 +42,7 @@ bool DataBase::open(QJsonObject sessionConfiguration, QString database)
 			return false;
 		}
 
-		qInfo() << "Open database connection: " + db.userName() + "@" + db.hostName() + ":" + database;
+		qInfo() << "Open database connection: " + db.userName() + "@" + db.hostName() + ":" + QString::number(db.port()) + "/" + db.databaseName();
 	}
 
 	return true;
