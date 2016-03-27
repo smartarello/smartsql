@@ -30,6 +30,7 @@ DataBaseTree::DataBaseTree(QWidget *parent, QJsonObject sessionConf) : QTreeView
 
 	Model::TableFilterProxyModel *filter = new Model::TableFilterProxyModel();
 	filter->setSourceModel(this->dataBaseModel);
+    filter->sort(0);
 
 	this->setModel(filter);
 	this->setHeaderHidden(true);
@@ -143,6 +144,10 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 	menu->popup(this->viewport()->mapToGlobal(point));
 }
 
+/**
+ * Called by the contextual Menu to create a new database
+ * @brief DataBaseTree::handleCreateDatabase
+ */
 void DataBaseTree::handleCreateDatabase()
 {
     ServerAction::NewDatabaseWindow *newDatabaseWindow = new ServerAction::NewDatabaseWindow();
@@ -151,19 +156,26 @@ void DataBaseTree::handleCreateDatabase()
     newDatabaseWindow->show();
 }
 
+/**
+ * Called when the user has specified the database name et the collation
+ *
+ * @param databaseName The new database name
+ * @param collation The collation (e.g utf8_general_ci)
+ */
 void DataBaseTree::createDatabase(QString databaseName, QString collation)
 {
     this->dataBaseModel->addDatabase(databaseName, collation);
     this->handleRefreshDatabase();
 }
 
+/**
+ * Show a new window with the database process list.
+ */
 void DataBaseTree::handleShowProcesses()
 {
-	QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(this->contextMenuIndex.row(), 0);
+    QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
+    QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.row(), 0);
 	QJsonObject sessionConf = serverItem->data().toJsonObject();
-
-	qDebug() << "Open process list window";
-	qDebug() << sessionConf;
 
 	ServerAction::ShowProcessesWindow *showProcesses = new ServerAction::ShowProcessesWindow(sessionConf, this);
 	showProcesses->show();
@@ -173,6 +185,8 @@ void DataBaseTree::handleRefreshDatabase()
 {
 	QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
 	this->dataBaseModel->refresh(index);
+
+    ((Model::TableFilterProxyModel *)this->model())->sort(0);
 }
 
 void DataBaseTree::handleDrop()

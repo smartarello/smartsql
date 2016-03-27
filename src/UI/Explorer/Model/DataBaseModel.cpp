@@ -150,65 +150,11 @@ bool DataBaseModel::hasChildren(const QModelIndex & index) const
 	return false;
 }
 
-void DataBaseModel::fetchMore(const QModelIndex & parent)
+void DataBaseModel::fetchMore(const QModelIndex & index)
 {
-	QModelIndex root = parent.parent();
-	if (root.isValid() && !root.parent().isValid()){
-		QStandardItem *rootItem = this->invisibleRootItem();
-		QStandardItem *connectionItem = rootItem->child(root.row());
-
-		if (connectionItem != 0){
-
-			QStandardItem *dataBaseItem = connectionItem->child(parent.row());
-
-			if (dataBaseItem != 0){
-
-				QJsonObject sessionConf = connectionItem->data().toJsonObject();
-
-				qDebug() << "Loading table list for: " + dataBaseItem->text();
-
-				if (!Util::DataBase::open(sessionConf, dataBaseItem->text())){
-					qDebug() << "DataBaseModel::fetchMore - Unable to open the connection";
-					return ;
-				}
-
-				QMap<QString, QString> tableSize = this->getTableSize();
-
-				qDebug() << "Table count: " + QString::number(tableSize.count());
-
-				QMapIterator<QString, QString> iterator(tableSize);
-				while(iterator.hasNext()){
-					iterator.next();
-
-					if (iterator.key() != "DATABASE_SIZE"){
-						QList<QStandardItem *> cols;
-
-						QStandardItem *table = new QStandardItem(iterator.key());
-						table->setData(QIcon(":/resources/icons/database-table-icon.png"),Qt::DecorationRole);
-
-						cols << table;
-						QStandardItem *size = new QStandardItem(iterator.value());
-						size->setTextAlignment(Qt::AlignRight);
-						cols << size;
-
-
-						dataBaseItem->appendRow(cols);
-					}
-
-				}
-
-				QStandardItem *size = connectionItem->child(dataBaseItem->index().row(), 1);
-				size->setText(tableSize.value("DATABASE_SIZE"));
-
-				 // Mark data as loaded
-				dataBaseItem->setData(QVariant(true));
-				dataBaseItem->sortChildren(0);
-
-				qDebug() << "Table list retrieves successfully";
-
-				emit databaseChanged();
-			}
-		}
+    if (index.parent().isValid() && !index.parent().parent().isValid()){
+        this->refresh(index);
+        emit databaseChanged();
 	}
 }
 
@@ -381,7 +327,6 @@ void DataBaseModel::refresh(const QModelIndex & index)
 				}
 			}
 
-			serverItem->sortChildren(0);
 		}
 
 
@@ -455,7 +400,8 @@ void DataBaseModel::refresh(const QModelIndex & index)
 			}
 
 			dbItem->setData(QVariant(true)); // Mark data as loaded
-			dbItem->sortChildren(0);
+            QStandardItem *dbSize = serverItem->child(index.row(), 1);
+            dbSize->setText(tableSize.value("DATABASE_SIZE"));
 		}
 	} else if (!index.parent().parent().parent().isValid()) {
 		// Table node: refresh table size

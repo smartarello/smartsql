@@ -38,7 +38,7 @@ public:
 protected:
 	bool canFetchMore(const QModelIndex & parent) const Q_DECL_OVERRIDE;
 	bool hasChildren(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
-	void fetchMore(const QModelIndex & parent) Q_DECL_OVERRIDE;
+    void fetchMore(const QModelIndex & index) Q_DECL_OVERRIDE;
 
 private:
 	QList<QStandardItem *> getDataBaseList();
