@@ -17,6 +17,7 @@
 #include <QSqlRecord>
 #include <QAbstractTableModel>
 
+
 namespace UI {
 namespace Explorer {
 namespace Tabs {

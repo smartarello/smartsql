@@ -30,6 +30,7 @@ public:
 
 signals:
 	void databaseChanged();
+	void closeExplorer();
 
 public slots:
 	void dataBaseTreeClicked(QModelIndex index);
@@ -37,6 +38,7 @@ public slots:
 	void addQueryTab();
 	void closeQueryTab(int index);
 	void refreshDatabase();
+	void handleCloseExplorer();
 
 private:
 	DataBaseTree *dataBaseTree;

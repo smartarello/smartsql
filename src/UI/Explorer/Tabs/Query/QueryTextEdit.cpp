@@ -13,6 +13,8 @@
 #include <QDebug>
 #include <QAbstractItemView>
 #include <QScrollBar>
+#include <QSqlError>
+
 
 namespace UI {
 namespace Explorer {
@@ -134,13 +136,14 @@ QString QueryTextEdit::textUnderCursor() const
 
 QStringList QueryTextEdit::getTableList()
 {
-	QSqlQuery query;
-	query.exec("show table status");
-
 	QStringList tables;
-
-	while (query.next()){
-		tables << query.value("Name").toString();
+	QSqlQuery query;
+	if (query.exec("show table status")) {
+		while (query.next()){
+				tables << query.value("Name").toString();
+			}
+	} else {
+		qDebug() << "QueryTextEdit::getTableList - " + query.lastError().text();
 	}
 
 	return tables;
@@ -169,15 +172,18 @@ void QueryTextEdit::loadTableFields()
 
 		QString queryString = QString("SHOW COLUMNS FROM %1").arg(tableName);
 		QSqlQuery query;
-		query.exec(queryString);
+		if (query.exec(queryString)) {
 
-		QStringList columns;
+			QStringList columns;
 
-		while (query.next()){
-			columns << query.value("Field").toString();
+			while (query.next()){
+				columns << query.value("Field").toString();
+			}
+
+			this->autoCompleteModel->setStringList(columns);
+		} else {
+			qDebug() << "QueryTextEdit::loadTableFields - " + query.lastError().text();
 		}
-
-		this->autoCompleteModel->setStringList(columns);
 	}
 }
 

@@ -118,14 +118,13 @@ void QueryTab::handleQueryResultReady()
 	this->executeButton->setEnabled(true);
 	this->stopButton->setEnabled(false);
 	QList<QueryExecutionResult> results = this->queryWorker->getQueryResult();
-	this->queryWorker->deleteLater();
+
 
 	this->queryTabs->clear();
 	foreach(QueryExecutionResult result, results) {
 
 		double seconds = result.msec / 1000.0;
 		if (result.query.lastError().isValid()) {
-			qDebug() << result.query.lastError();
 			QMessageBox *message = new QMessageBox(this);
 			message->setText(result.query.lastError().databaseText());
 			message->setIcon(QMessageBox::Critical);

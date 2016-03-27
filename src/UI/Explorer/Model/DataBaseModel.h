@@ -30,7 +30,9 @@ public:
 	virtual ~DataBaseModel();
 	void addDatabase(QJsonObject sessionConf);
 	void refresh(const QModelIndex & parent) ;
-	bool dropDatabase(const QModelIndex & index);
+	void dropDatabase(const QModelIndex & index);
+	void dropTable(const QModelIndex & index);
+	void truncateTable(const QModelIndex & index);
 
 protected:
 	bool canFetchMore(const QModelIndex & parent) const Q_DECL_OVERRIDE;
@@ -44,6 +46,7 @@ private:
 
 signals:
 	void databaseChanged();
+	void queryError(QString error);
 };
 
 } /* namespace Model */

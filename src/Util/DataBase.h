@@ -9,6 +9,7 @@
 #define UTIL_DATABASE_H_
 
 #include <QJsonObject>
+#include <QSqlDatabase>
 
 namespace Util {
 
@@ -18,6 +19,9 @@ public:
 	virtual ~DataBase();
 
 	static bool open(QJsonObject sessionConfiguration, QString database = "");
+
+private:
+	static QSqlDatabase defaultConnection;
 };
 
 } /* namespace Util */

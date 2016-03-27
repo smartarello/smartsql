@@ -99,7 +99,7 @@ void TableTab::setTable(QString tableName) {
 	query.exec();
 
 	if (query.lastError().isValid()) {
-		qDebug() << query.lastError();
+		qDebug() << "TableTab::setTable - " + query.lastError().text();
 		this->tableInfoLabel->setText("");
 	} else {
 		if (query.next()){

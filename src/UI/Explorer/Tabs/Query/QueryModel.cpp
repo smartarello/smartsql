@@ -43,7 +43,7 @@ void QueryModel::sort(int column, Qt::SortOrder order)
 		query.exec(sqlQuery);
 
 		if (query.lastError().isValid()){
-			qDebug() << query.lastError();
+			qDebug() << "QueryModel::sort - " + query.lastError().text();
 		} else {
 			this->setQuery(query);
 		}

@@ -23,7 +23,6 @@ namespace UI {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), sessionManager(0), explorer(0) {
 
 	// Init MySQL Driver
-	QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
 	this->setWindowTitle(tr("MySQL explorer"));
 	Session::SessionWindow *sessionList = new Session::SessionWindow(this);
 	this->setCentralWidget(sessionList);
@@ -33,10 +32,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), sessionManager(0)
 
 void MainWindow::handleOpenConnection(QJsonObject sessionConfiguration)
 {
-	qInfo() << "Opening connection...";
-
-	qDebug() << sessionConfiguration;
-
 	if (Util::DataBase::open(sessionConfiguration)){
 		if (this->explorer == 0) {
 
@@ -46,6 +41,9 @@ void MainWindow::handleOpenConnection(QJsonObject sessionConfiguration)
 
 			this->explorer = new Explorer::Explorer(this, sessionConfiguration);
 			this->setCentralWidget(explorer);
+
+			connect(this->explorer, SIGNAL(closeExplorer()), SLOT(closeExplorer()));
+
 		} else {
 
 			if (this->sessionManager != 0) {
@@ -91,6 +89,16 @@ void MainWindow::openSessionManager()
 
 	this->sessionManager->show();
 
+}
+
+void MainWindow::closeExplorer()
+{
+	qDebug() << "Close Explorer";
+	Session::SessionWindow *sessionList = new Session::SessionWindow(this);
+	this->setCentralWidget(sessionList);
+	this->showNormal();
+
+	connect(sessionList, SIGNAL(openConnection(QJsonObject)), this, SLOT(handleOpenConnection(QJsonObject)));
 }
 
 void MainWindow::exit()

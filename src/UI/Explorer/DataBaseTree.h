@@ -32,7 +32,12 @@ public slots:
 	void handleShowProcesses();
 	void handleRefreshDatabase();
 	void handleDrop();
+	void handleTruncateTable();
+	void handleDisconnect();
+	void queryError(QString error);
 
+signals:
+	void closeExplorer();
 
 private:
 	Model::DataBaseModel *dataBaseModel;

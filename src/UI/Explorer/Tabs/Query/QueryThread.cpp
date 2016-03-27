@@ -11,6 +11,7 @@
 #include <QSqlResult>
 #include <QDateTime>
 
+
 namespace UI {
 namespace Explorer {
 namespace Tabs {
@@ -30,21 +31,22 @@ void QueryThread::run()
 	if (this->database.open()) {
 		foreach(QString sql, this->queries) {
 
-			qDebug() << sql;
-
 			QSqlQuery query(this->database);
 
 			QDateTime mStartTime = QDateTime::currentDateTime();
-			query.exec(sql);
+			if (query.exec(sql)) {
 
-			QueryExecutionResult result;
-			result.msec = mStartTime.msecsTo(QDateTime::currentDateTime());
-			result.query = query;
+				QueryExecutionResult result;
+				result.msec = mStartTime.msecsTo(QDateTime::currentDateTime());
+				result.query = query;
 
-			this->queryResult << result;
-
-			if (query.lastError().isValid()) {
-				qDebug() << "Error when running query in thread";
+				this->queryResult << result;
+			} else {
+				qDebug() << "QueryThread::run - " + query.lastError().text();
+				QueryExecutionResult result;
+				result.msec = 0;
+				result.query = query;
+				this->queryResult << result;
 				break;
 			}
 		}

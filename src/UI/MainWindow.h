@@ -35,6 +35,7 @@ public slots:
 	void handleOpenConnection(QJsonObject sessionConfiguration);
 	void openSessionManager();
 	void exit();
+	void closeExplorer();
 
 };
 };

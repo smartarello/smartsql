@@ -8,6 +8,7 @@
 #include <UI/Explorer/Tabs/Database/DataBaseTab.h>
 #include <QSqlQueryModel>
 #include <QSqlQuery>
+#include <QDebug>
 #include <QHeaderView>
 
 namespace UI {

@@ -6,11 +6,12 @@
  */
 
 #include <Util/DataBase.h>
-#include <QSqlDatabase>
 #include <QSqlError>
 #include <QDebug>
 
 namespace Util {
+
+QSqlDatabase DataBase::defaultConnection;
 
 DataBase::DataBase() {
 
@@ -19,30 +20,32 @@ DataBase::DataBase() {
 
 bool DataBase::open(QJsonObject sessionConfiguration, QString database)
 {
-	QSqlDatabase db = QSqlDatabase::database();
+	if (!defaultConnection.isValid()) {
+		defaultConnection = QSqlDatabase::addDatabase("QMYSQL");
+	}
 
 	QString hostName = sessionConfiguration.value("hostname").toString();
 	QString userName = sessionConfiguration.value("user").toString();
 	int port = sessionConfiguration.value("port").toInt();
 
-	if (!db.isOpen() || hostName != db.hostName() || db.userName() != userName || port != db.port() || database != db.databaseName()) {
+	if (!defaultConnection.isOpen() || hostName != defaultConnection.hostName() || defaultConnection.userName() != userName || port != defaultConnection.port() || database != defaultConnection.databaseName()) {
 
-		if (db.isOpen()) {
-			db.close();
+		if (defaultConnection.isOpen()) {
+			defaultConnection.close();
 		}
 
-		db.setHostName(hostName);
-		db.setUserName(userName);
-		db.setDatabaseName(database);
-		db.setPassword(sessionConfiguration.value("password").toString());
-		db.setPort(port);
+		defaultConnection.setHostName(hostName);
+		defaultConnection.setUserName(userName);
+		defaultConnection.setDatabaseName(database);
+		defaultConnection.setPassword(sessionConfiguration.value("password").toString());
+		defaultConnection.setPort(port);
 
-		if (!db.open()) {
-			qDebug() << db.lastError();
+		if (!defaultConnection.open()) {
+			qDebug() << "DataBase::open - " + defaultConnection.lastError().text();
 			return false;
 		}
 
-		qInfo() << "Open database connection: " + db.userName() + "@" + db.hostName() + ":" + QString::number(db.port()) + "/" + db.databaseName();
+		qInfo() << "Open database connection: " + defaultConnection.userName() + "@" + defaultConnection.hostName() + ":" + QString::number(defaultConnection.port()) + "/" + defaultConnection.databaseName();
 	}
 
 	return true;

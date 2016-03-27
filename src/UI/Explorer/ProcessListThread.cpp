@@ -27,7 +27,7 @@ void ProcessListThread::run()
 			if (this->query.exec("SELECT * FROM `information_schema`.`PROCESSLIST`")) {
 				emit processListReady();
 			} else {
-				qWarning() << this->query.lastError();
+				qWarning() << "ProcessListThread::run - " + this->query.lastError().text();
 				return; // Stop the thread execution
 			}
 
