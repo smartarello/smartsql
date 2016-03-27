@@ -28,11 +28,12 @@ class DataBaseModel : public QStandardItemModel {
 public:
 	DataBaseModel(QJsonObject sessionConf, QObject * parent = 0);
 	virtual ~DataBaseModel();
-	void addDatabase(QJsonObject sessionConf);
+	void addServer(QJsonObject sessionConf);
 	void refresh(const QModelIndex & parent) ;
 	void dropDatabase(const QModelIndex & index);
 	void dropTable(const QModelIndex & index);
 	void truncateTable(const QModelIndex & index);
+    void addDatabase(QString databaseName, QString collation);
 
 protected:
 	bool canFetchMore(const QModelIndex & parent) const Q_DECL_OVERRIDE;

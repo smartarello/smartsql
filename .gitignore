@@ -5,3 +5,4 @@
 moc_*.cpp
 mysqlclient
 Makefile
+mysqlclient.pro.user

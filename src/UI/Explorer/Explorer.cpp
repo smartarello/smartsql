@@ -235,7 +235,7 @@ void Explorer::refreshDatabase()
 
 void Explorer::addDatabase(QJsonObject sessionConfiguration)
 {
-	this->dataBaseTree->getDataBaseModel()->addDatabase(sessionConfiguration);
+    this->dataBaseTree->getDataBaseModel()->addServer(sessionConfiguration);
 }
 
 void Explorer::handleCloseExplorer()

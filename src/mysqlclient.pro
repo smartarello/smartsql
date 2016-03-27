@@ -16,8 +16,8 @@ HEADERS += UI/MainWindow.h \
 			UI/ToolBar.h \
 			Util/DataBase.h \
            UI/Explorer/DataBaseTree.h \
-           UI/Explorer/ShowProcessesWindow.h \
-           UI/Explorer/ProcessListThread.h \
+           UI/Explorer/ServerAction/ShowProcessesWindow.h \
+           UI/Explorer/ServerAction/ProcessListThread.h \
            UI/Explorer/Explorer.h \
            UI/Session/EditSessionWindow.h \
            UI/Session/SessionWindow.h \
@@ -33,15 +33,16 @@ HEADERS += UI/MainWindow.h \
            UI/Explorer/Tabs/Table/TableModel.h \
            UI/Explorer/Tabs/TabView.h \
            UI/Explorer/Tabs/TabBar.h \
-           UI/Explorer/Tabs/Table/TableTab.h
+           UI/Explorer/Tabs/Table/TableTab.h \
+    UI/Explorer/ServerAction/NewDatabaseWindow.h
 SOURCES += main.cpp \
 		Util/DataBase.cpp \
            UI/MainWindow.cpp \
            UI/ToolBar.cpp \
            UI/Explorer/DataBaseTree.cpp \
            UI/Explorer/Explorer.cpp \
-           UI/Explorer/ShowProcessesWindow.cpp \
-           UI/Explorer/ProcessListThread.cpp \
+           UI/Explorer/ServerAction/ShowProcessesWindow.cpp \
+           UI/Explorer/ServerAction/ProcessListThread.cpp \
            UI/Session/EditSessionWindow.cpp \
            UI/Session/SessionWindow.cpp \
            UI/Explorer/Model/DataBaseModel.cpp \
@@ -56,9 +57,12 @@ SOURCES += main.cpp \
            UI/Explorer/Tabs/Query/QueryTextEdit.cpp \
            UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp \
            UI/Explorer/Tabs/Table/TableModel.cpp \
-           UI/Explorer/Tabs/Table/TableTab.cpp
+           UI/Explorer/Tabs/Table/TableTab.cpp \
+    UI/Explorer/ServerAction/NewDatabaseWindow.cpp
 TRANSLATIONS += mysqlclient_en.ts
 
 win32:debug {
     CONFIG += console
 }
+
+DISTFILES +=

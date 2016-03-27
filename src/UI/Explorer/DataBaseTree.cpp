@@ -16,6 +16,7 @@
 #include <QMenu>
 #include "Explorer.h"
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
+#include "ServerAction/NewDatabaseWindow.h"
 
 namespace UI {
 namespace Explorer {
@@ -79,9 +80,11 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 	if (!this->contextMenuIndex.parent().isValid()){
 		// Server node
 		QAction *showProcessesAction = new QAction(tr("Processes"), this);
+        showProcessesAction->setIcon(QIcon(":/resources/icons/database-process-icon.png"));
 		menu->addAction(showProcessesAction);
 
 		QAction *createDatabaseAction = new QAction(tr("Create database"), this);
+        createDatabaseAction->setIcon(QIcon(":/resources/icons/database-add-icon.png"));
 		menu->addAction(createDatabaseAction);
 
 		QAction *disconnectAction = new QAction(tr("Disconnect"), this);
@@ -98,6 +101,7 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 		connect(showProcessesAction, SIGNAL(triggered(bool)), SLOT(handleShowProcesses()));
 		connect(refreshAction, SIGNAL(triggered(bool)), SLOT(handleRefreshDatabase()));
 		connect(disconnectAction, SIGNAL (triggered(bool)), SLOT (handleDisconnect()));
+        connect(createDatabaseAction, SIGNAL (triggered(bool)), SLOT (handleCreateDatabase()));
 	} else if (!this->contextMenuIndex.parent().parent().isValid()) {
 		// Database node
 
@@ -139,6 +143,20 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 	menu->popup(this->viewport()->mapToGlobal(point));
 }
 
+void DataBaseTree::handleCreateDatabase()
+{
+    ServerAction::NewDatabaseWindow *newDatabaseWindow = new ServerAction::NewDatabaseWindow();
+
+    connect(newDatabaseWindow, SIGNAL(createDatabase(QString, QString)), SLOT(createDatabase(QString, QString)));
+    newDatabaseWindow->show();
+}
+
+void DataBaseTree::createDatabase(QString databaseName, QString collation)
+{
+    this->dataBaseModel->addDatabase(databaseName, collation);
+    this->handleRefreshDatabase();
+}
+
 void DataBaseTree::handleShowProcesses()
 {
 	QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(this->contextMenuIndex.row(), 0);
@@ -147,7 +165,7 @@ void DataBaseTree::handleShowProcesses()
 	qDebug() << "Open process list window";
 	qDebug() << sessionConf;
 
-	ShowProcessesWindow *showProcesses = new ShowProcessesWindow(sessionConf, this);
+	ServerAction::ShowProcessesWindow *showProcesses = new ServerAction::ShowProcessesWindow(sessionConf, this);
 	showProcesses->show();
 }
 

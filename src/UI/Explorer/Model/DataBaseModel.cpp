@@ -20,10 +20,10 @@ namespace Model {
 DataBaseModel::DataBaseModel(QJsonObject sessionConf, QObject *parent) : QStandardItemModel(parent) {
 
 	this->setColumnCount(2);
-	this->addDatabase(sessionConf);
+    this->addServer(sessionConf);
 }
 
-void DataBaseModel::addDatabase(QJsonObject sessionConf)
+void DataBaseModel::addServer(QJsonObject sessionConf)
 {
 	QString sessionName = sessionConf.value("name").toString();
 	QString sessionUuid = sessionConf.value("uuid").toString();
@@ -64,6 +64,17 @@ void DataBaseModel::addDatabase(QJsonObject sessionConf)
 
 		host->appendRow(cols);
 	}
+}
+
+void DataBaseModel::addDatabase(QString databaseName, QString collation)
+{
+    QString sql = QString("CREATE DATABASE %1 COLLATE=%2").arg(databaseName).arg(collation);
+
+    QSqlQuery query;
+    if (!query.exec(sql)) {
+        qDebug() << "DataBaseModel::addDatabase - " + query.lastError().text();
+        emit queryError(query.lastError().text());
+    }
 }
 
 QList<QStandardItem *> DataBaseModel::getDataBaseList()
@@ -345,7 +356,7 @@ void DataBaseModel::refresh(const QModelIndex & index)
 					size->setTextAlignment(Qt::AlignRight);
 					cols << size;
 
-					serverItem->appendRow(db);
+                    serverItem->appendRow(cols);
 				}
 			}
 

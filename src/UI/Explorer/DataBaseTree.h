@@ -11,7 +11,7 @@
 #include <QTreeView>
 #include <QJsonObject>
 #include "Model/DataBaseModel.h"
-#include "ShowProcessesWindow.h"
+#include "ServerAction/ShowProcessesWindow.h"
 
 namespace UI {
 namespace Explorer {
@@ -35,6 +35,8 @@ public slots:
 	void handleTruncateTable();
 	void handleDisconnect();
 	void queryError(QString error);
+    void handleCreateDatabase();
+    void createDatabase(QString databaseName, QString collation);
 
 signals:
 	void closeExplorer();
