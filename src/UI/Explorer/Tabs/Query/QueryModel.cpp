@@ -10,6 +10,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
+#include <QVariant>
+#include <QFont>
 
 namespace UI {
 namespace Explorer {
@@ -21,33 +23,24 @@ QueryModel::QueryModel(QObject * parent) : QSqlQueryModel(parent) {
 
 }
 
-void QueryModel::sort(int column, Qt::SortOrder order)
+
+QVariant QueryModel::data(const QModelIndex &index, int role) const
 {
-	if (!this->query().isValid()){
-		return;
-	}
+    QVariant value = QSqlQueryModel::data(index, role);
+    if (value.isNull() && role == Qt::DisplayRole) {
+            return QVariant("(NULL)");
+    } else if (role == Qt::FontRole) {
 
-	QSqlRecord record = this->query().record();
-	if (!record.isEmpty()){
-		QString field = record.fieldName(column);
-		if (field.isEmpty()){
-			return ;
-		}
+        QVariant data = QSqlQueryModel::data(index, Qt::DisplayRole);
+        if (data.isNull()) {
+            QFont font("Courier");
+            font.setItalic(true);
+            return QVariant(font);
+        }
+    }
 
-		QString sqlQuery = "SELECT * FROM (" + this->query().lastQuery() + ") as mysqlexplorer_tmp ORDER BY "+field;
-		if (order == Qt::AscendingOrder){
-			sqlQuery += " DESC";
-		}
 
-		QSqlQuery query;
-		query.exec(sqlQuery);
-
-		if (query.lastError().isValid()){
-			qDebug() << "QueryModel::sort - " + query.lastError().text();
-		} else {
-			this->setQuery(query);
-		}
-	}
+    return value;
 }
 
 QueryModel::~QueryModel() {

@@ -20,11 +20,9 @@ class QueryModel: public QSqlQueryModel {
 	Q_OBJECT
 
 public:
-	QueryModel(QObject * parent = 0);
+    QueryModel(QObject * parent = 0);
 	virtual ~QueryModel();
-
-private:
-	void sort(int column, Qt::SortOrder order);
+    QVariant data(const QModelIndex &index, int role) const;
 };
 
 } /* namespace Query */

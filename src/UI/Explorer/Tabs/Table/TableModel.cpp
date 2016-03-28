@@ -10,6 +10,7 @@
 #include <QSqlRecord>
 #include <QSqlError>
 #include <QDebug>
+#include <QFont>
 
 namespace UI {
 namespace Explorer {
@@ -167,10 +168,22 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
 QVariant TableModel::data(const QModelIndex &index, int role) const
 {
-	if ((role == Qt::DisplayRole || role == Qt::EditRole) && index.isValid() && index.row() < this->results.size()) {
+    if ((role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::FontRole) && index.isValid() && index.row() < this->results.size()) {
 		QSqlRecord record = this->results.at(index.row());
-		return record.value(index.column());
-	}
+        QVariant value = record.value(index.column());
+
+        if (role == Qt::DisplayRole || role == Qt::EditRole) {
+            if (value.isNull() && role == Qt::DisplayRole) {
+                value = QVariant("(NULL)");
+            }
+
+            return value;
+        } else if (value.isNull()) { // Qt::FontRole
+            QFont font("Courier");
+            font.setItalic(true);
+            return QVariant(font);
+        }
+    }
 
 	return QVariant();
 }
