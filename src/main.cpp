@@ -13,12 +13,12 @@ int main(int argc, char *argv[])
 
 
 
-    int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-R.ttf");
+    int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/Lato-Regular.ttf");
     QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-B.ttf");
     QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-RI.ttf");
     if (fontId != -1)
     {
-        QFont font("Ubuntu Regular");
+        QFont font("Lato Regular");
         app.setFont(font);
     } else {
         qWarning() << "Unable to load the font: Ubuntu-R.ttf";

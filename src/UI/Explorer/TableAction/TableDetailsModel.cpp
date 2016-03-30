@@ -1,13 +1,8 @@
 #include "TableDetailsModel.h"
-
-#include <QSqlQuery>
-#include <QSqlError>
 #include <QDebug>
 
-TableDetailsModel::TableDetailsModel(QString table, QSqlDatabase db, QObject *parent) : database(db), QAbstractTableModel(parent)
+TableDetailsModel::TableDetailsModel(QString createString, QObject *parent) : QAbstractTableModel(parent)
 {
-    this->table = table;
-
     // Column headers
     this->headers << tr("Name");
     this->headers << tr("Data type");
@@ -16,52 +11,58 @@ TableDetailsModel::TableDetailsModel(QString table, QSqlDatabase db, QObject *pa
     this->headers << tr("Allow NULL");
     this->headers << tr("Default");
 
-    database.open();
-    QSqlQuery query(database);
-    if (query.exec(QString("SHOW CREATE TABLE %1").arg(this->table))) {
-        if (query.next()) {
-            QString createString = query.value(1).toString();
-            QStringList createParts = createString.split("\n");
-            createParts.removeAt(0); // Removes the first line with CREATE TABLE
-            foreach(QString part, createParts) {
 
-                // e.g `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                QRegExp line("^\\s*`(\\S+)` (\\w+)\\(?(\\d*)\\)?", Qt::CaseInsensitive);
-                if (line.indexIn(part) != -1) { // Column definition
-                    ColumnDefinition column;
-                    column.name = line.cap(1);
-                    column.type = line.cap(2);
-                    column.length = -1;
+    QStringList createParts = createString.split("\n");
+    createParts.removeAt(0); // Removes the first line with CREATE TABLE
+    foreach(QString part, createParts) {
 
-                    if (line.captureCount() == 3) {
-                        QString length = line.cap(3);
-                        if (!length.isEmpty()) {
-                            column.length = line.cap(3).toInt();
-                        }
-                    }
+        // e.g `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        QRegExp line("^\\s*`(\\S+)` (\\w+)\\(?(\\d*)\\)?", Qt::CaseInsensitive);
+        if (line.indexIn(part) != -1) { // Column definition
+            ColumnDefinition column;
+            column.name = line.cap(1);
+            column.type = line.cap(2);
+            column.length = -1;
 
-                    QRegExp unsignedRx("unsigned", Qt::CaseInsensitive);
-                    if (unsignedRx.indexIn(part) != -1) {
-                        column.unsignedCol = true;
-                    } else {
-                        column.unsignedCol = false;
-                    }
-
-                    QRegExp notNullRx("not null", Qt::CaseInsensitive);
-                    if (notNullRx.indexIn(part) != -1) {
-                        column.allowNull = false;
-                    } else {
-                        column.allowNull = true;
-                    }
-
-
-                    this->columns << column;
+            if (line.captureCount() == 3) {
+                QString length = line.cap(3);
+                if (!length.isEmpty()) {
+                    column.length = line.cap(3).toInt();
                 }
             }
+
+            QRegExp unsignedRx("unsigned", Qt::CaseInsensitive);
+            if (unsignedRx.indexIn(part) != -1) {
+                column.unsignedCol = true;
+            } else {
+                column.unsignedCol = false;
+            }
+
+            QRegExp notNullRx("not null", Qt::CaseInsensitive);
+            if (notNullRx.indexIn(part) != -1) {
+                column.allowNull = false;
+            } else {
+                column.allowNull = true;
+            }
+
+            QRegExp defaultValueRx("default '(\\w)'", Qt::CaseInsensitive);
+            if (defaultValueRx.indexIn(part) != -1) {
+                column.defaultValue = defaultValueRx.cap(1);
+            } else {
+                column.defaultValue = "";
+            }
+
+            defaultValueRx = QRegExp("default null", Qt::CaseInsensitive);
+            if (defaultValueRx.indexIn(part) != -1) {
+                column.defaultValue = QVariant();
+            }
+
+
+
+            this->columns << column;
         }
-    } else {
-        qDebug() << "TableDetailsModel::TableDetailsModel - " + query.lastError().text();
     }
+
 }
 
 
@@ -103,17 +104,27 @@ QVariant TableDetailsModel::data(const QModelIndex &index, int role) const
             case 3:
                 if (col.unsignedCol) {
                     return tr("Yes");
-                } else {
-                    return tr("No");
                 }
+                 break;
 
             case 4:
                 if (col.allowNull) {
                     return tr("Yes");
-                } else {
-                    return tr("No");
                 }
+                 break;
+
+            case 5:
+                if (col.defaultValue.isNull()) {
+                    return "NULL";
+                } else {
+                    return col.defaultValue;
+                }
+
             }
+        } else if (role == Qt::FontRole && index.column() == 5 && col.defaultValue.isNull()) {
+            QFont font("Ubuntu Regular");
+            font.setItalic(true);
+            return QVariant(font);
         }
     }
 

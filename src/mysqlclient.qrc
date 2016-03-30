@@ -24,5 +24,7 @@
         <file>resources/fonts/UbuntuMono-R.ttf</file>
         <file>resources/fonts/Ubuntu-RI.ttf</file>
         <file>resources/fonts/Ubuntu-B.ttf</file>
+        <file>resources/fonts/Lato-Light.ttf</file>
+        <file>resources/fonts/Lato-Regular.ttf</file>
     </qresource>
 </RCC>
