@@ -11,22 +11,25 @@ int main(int argc, char *argv[])
 	qInfo() << "Start the application";
     QApplication app(argc, argv);
 
-    if (QFontDatabase::addApplicationFont(":/resources/fonts/cour.pfa") == -1) {
-    	qDebug() << "Unable to load font";
-    }
 
-    QFontDatabase::addApplicationFont(":/resources/fonts/couri.pfa");
-    QFontDatabase::addApplicationFont(":/resources/fonts/courb.pfa");
 
     int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-R.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-B.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-RI.ttf");
     if (fontId != -1)
     {
         QFont font("Ubuntu Regular");
         app.setFont(font);
-
-        qDebug() << "App font familly: " + app.font().family();
     } else {
-    	qWarning() << "Font not found";
+        qWarning() << "Unable to load the font: Ubuntu-R.ttf";
+    }
+
+    if (QFontDatabase::addApplicationFont(":/resources/fonts/UbuntuMono-R.ttf") == -1) {
+        qDebug() << "Unable to load font: UbuntuMono-R.ttf";
+    }
+
+    if (QFontDatabase::addApplicationFont(":/resources/fonts/UbuntuMono-R.ttf") == -1) {
+        qDebug() << "Unable to load font: UbuntuMono-R.ttf";
     }
 
 //    QTranslator qtTranslator;font.defaultFamily()

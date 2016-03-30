@@ -34,7 +34,10 @@ HEADERS += UI/MainWindow.h \
            UI/Explorer/Tabs/TabView.h \
            UI/Explorer/Tabs/TabBar.h \
            UI/Explorer/Tabs/Table/TableTab.h \
-    UI/Explorer/ServerAction/NewDatabaseWindow.h
+    UI/Explorer/ServerAction/NewDatabaseWindow.h \
+    UI/Explorer/TableAction/TableDetailsWindow.h \
+    UI/Explorer/TableAction/TableDetailsModel.h \
+    UI/Explorer/TableAction/TableDetailsItemDelegate.h
 SOURCES += main.cpp \
 		Util/DataBase.cpp \
            UI/MainWindow.cpp \
@@ -58,7 +61,10 @@ SOURCES += main.cpp \
            UI/Explorer/Tabs/Table/TableFilterTextEdit.cpp \
            UI/Explorer/Tabs/Table/TableModel.cpp \
            UI/Explorer/Tabs/Table/TableTab.cpp \
-    UI/Explorer/ServerAction/NewDatabaseWindow.cpp
+    UI/Explorer/ServerAction/NewDatabaseWindow.cpp \
+    UI/Explorer/TableAction/TableDetailsWindow.cpp \
+    UI/Explorer/TableAction/TableDetailsModel.cpp \
+    UI/Explorer/TableAction/TableDetailsItemDelegate.cpp
 TRANSLATIONS += mysqlclient_en.ts
 
 win32:debug {

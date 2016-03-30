@@ -1,10 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/fonts/DejaVuSans.ttf</file>
         <file>resources/fonts/Ubuntu-R.ttf</file>
-        <file>resources/fonts/cour.pfa</file>
-        <file>resources/fonts/courb.pfa</file>
-        <file>resources/fonts/couri.pfa</file>
         <file>resources/icons/plus.png</file>
         <file>resources/icons/connect.png</file>
         <file>resources/icons/disconnect.png</file>
@@ -25,5 +21,8 @@
         <file>resources/icons/database-server-icon.png</file>
         <file>resources/icons/database-add-icon.png</file>
         <file>resources/icons/database-process-icon.png</file>
+        <file>resources/fonts/UbuntuMono-R.ttf</file>
+        <file>resources/fonts/Ubuntu-RI.ttf</file>
+        <file>resources/fonts/Ubuntu-B.ttf</file>
     </qresource>
 </RCC>

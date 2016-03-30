@@ -23,9 +23,9 @@ namespace Query {
 
 QueryTextEdit::QueryTextEdit(QWidget *parent) : QTextEdit(parent) {
 
-	QFont font = QFont("Courier");
-	font.setPointSize(12);
-	this->setFont(font);
+    QFont font = QFont("Ubuntu Monospace");
+    font.setPointSize(12);
+    this->setFont(font);
 
 	SQLSyntaxHighlighter *highlighter  = new SQLSyntaxHighlighter(this->document());
 	this->tableList = this->getTableList();

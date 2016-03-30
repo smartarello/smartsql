@@ -15,7 +15,6 @@
 
 
 #include "Session/SessionWindow.h"
-#include "ToolBar.h"
 #include "Util/DataBase.h"
 
 namespace UI {
@@ -37,7 +36,8 @@ void MainWindow::handleOpenConnection(QJsonObject sessionConfiguration)
 
 			qDebug() << "Open explorer";
 			this->showMaximized();
-			this->addToolBar(new ToolBar(this));
+            this->toolbar = new ToolBar(this);
+            this->addToolBar(this->toolbar);
 
 			this->explorer = new Explorer::Explorer(this, sessionConfiguration);
 			this->setCentralWidget(explorer);
@@ -93,10 +93,14 @@ void MainWindow::openSessionManager()
 
 void MainWindow::closeExplorer()
 {
+
 	qDebug() << "Close Explorer";
+    this->removeToolBar(this->toolbar);
 	Session::SessionWindow *sessionList = new Session::SessionWindow(this);
 	this->setCentralWidget(sessionList);
 	this->showNormal();
+
+    this->explorer = 0;
 
 	connect(sessionList, SIGNAL(openConnection(QJsonObject)), this, SLOT(handleOpenConnection(QJsonObject)));
 }

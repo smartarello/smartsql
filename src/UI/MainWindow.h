@@ -16,6 +16,7 @@
 #include <QMetaType>
 
 #include "Explorer/Explorer.h"
+#include "ToolBar.h"
 
 namespace UI {
 
@@ -30,6 +31,7 @@ public:
 private:
 	QMainWindow *sessionManager;
 	Explorer::Explorer *explorer;
+    ToolBar *toolbar;
 
 public slots:
 	void handleOpenConnection(QJsonObject sessionConfiguration);

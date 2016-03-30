@@ -14,9 +14,11 @@
 #include <QShortcut>
 #include <QMessageBox>
 #include <QMenu>
+#include <QUuid>
 #include "Explorer.h"
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
 #include "ServerAction/NewDatabaseWindow.h"
+#include "TableAction/TableDetailsWindow.h"
 
 namespace UI {
 namespace Explorer {
@@ -121,6 +123,7 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 
 		menu->addAction(refreshAction);
 	} else {
+        // Table node
 		QAction *dropDatabaseAction = new QAction(tr("Drop..."), this);
 		dropDatabaseAction->setShortcut(QKeySequence(Qt::Key_Delete));
 		dropDatabaseAction->setIcon(QIcon(":/resources/icons/delete-icon.png"));
@@ -133,6 +136,13 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 		menu->addAction(truncateAction);
 
 		menu->addSeparator();
+
+        QAction *showDetailsAction = new QAction(tr("Details..."), this);
+        connect(showDetailsAction, SIGNAL(triggered(bool)), SLOT(handleShowDetailsTable()));
+        menu->addAction(showDetailsAction);
+
+
+        menu->addSeparator();
 
 		QAction *refreshAction = new QAction(tr("Refresh"), this);
 		refreshAction->setShortcut(QKeySequence(Qt::Key_F5));
@@ -154,6 +164,20 @@ void DataBaseTree::handleCreateDatabase()
 
     connect(newDatabaseWindow, SIGNAL(createDatabase(QString, QString)), SLOT(createDatabase(QString, QString)));
     newDatabaseWindow->show();
+}
+
+void DataBaseTree::handleShowDetailsTable()
+{
+    QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
+    QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.parent().parent().row(), 0);
+    QStandardItem *dbItem = serverItem->child(index.parent().row());
+    QStandardItem *tableItem = dbItem->child(index.row());
+
+    QSqlDatabase currentDb = QSqlDatabase::database();
+    QSqlDatabase db = QSqlDatabase::cloneDatabase(currentDb, QUuid::createUuid().toString());
+    db.setDatabaseName(dbItem->text());
+    TableDetailsWindow *tableDetails = new TableDetailsWindow(db, tableItem->text(), this);
+    tableDetails->show();
 }
 
 /**
