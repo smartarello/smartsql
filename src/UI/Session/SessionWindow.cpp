@@ -64,7 +64,7 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 for (int i = 0; i < this->sessionStore.count(); i++){
 		 QJsonObject session = this->sessionStore.at(i).toObject();
 		 QStandardItem *item = new QStandardItem(session.value("name").toString());
-		 item->setData(QIcon("resources/icons/mysql_logo.png"),Qt::DecorationRole);
+         item->setData(QIcon(":/resources/icons/database-server-icon.png"),Qt::DecorationRole);
 		 rootItem->appendRow(item);
 	 }
 
@@ -145,7 +145,7 @@ void SessionWindow::handleNewConnection()
 
 	QStandardItem *rootItem = this->model->invisibleRootItem();
 	QStandardItem *item = new QStandardItem("Unamed");
-	item->setData(QIcon(":/resources/icons/mysql_logo.png"),Qt::DecorationRole);
+    item->setData(QIcon(":/resources/icons/database-server-icon.png"),Qt::DecorationRole);
 	rootItem->appendRow(item);
 	this->sessionList->setCurrentIndex(this->model->index(this->sessionStore.count() - 1, 0));
 

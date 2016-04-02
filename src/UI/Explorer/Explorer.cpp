@@ -194,6 +194,7 @@ void Explorer::dataBaseTreeItemChanged()
 		tableName = tableItem->text();
 	}
 	else{
+        // Click on a database
 		dbItem = root->child(dbIndex.parent().row())->child(dbIndex.row());
 		dataBaseName = dbItem->text();
 	}
@@ -212,8 +213,6 @@ void Explorer::dataBaseTreeItemChanged()
 		return;
 	}
 
-	this->refreshDatabase();
-
 
 	if (!tableName.isNull()){
 		this->tableTab->setTable(tableName);
@@ -227,15 +226,25 @@ void Explorer::dataBaseTreeItemChanged()
 		this->explorerTabs->removeTab(tableTabIndex);
 	}
 
+    this->databaseTab->refresh();
+    this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
+
 
 	emit databaseChanged();
 }
 
 void Explorer::refreshDatabase()
 {
+    int tableTabIndex = this->explorerTabs->indexOf(this->tableTab) ;
+    if (tableTabIndex != -1){
+        this->explorerTabs->removeTab(tableTabIndex);
+    }
+
 	QSqlDatabase db = QSqlDatabase::database();
 	this->databaseTab->refresh();
 	this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(db.databaseName()));
+
+    this->explorerTabs->setCurrentWidget(this->databaseTab);
 }
 
 void Explorer::addDatabase(QJsonObject sessionConfiguration)
