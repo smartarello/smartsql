@@ -52,6 +52,8 @@ DataBaseTree::DataBaseTree(QWidget *parent, QJsonObject sessionConf) : QTreeView
 	connect(deleteShortcut, SIGNAL(activated()), SLOT(handleDrop()));
 
 	connect(this->dataBaseModel, SIGNAL(queryError(QString)), SLOT(queryError(QString)));
+
+
 }
 
 Model::DataBaseModel * DataBaseTree::getDataBaseModel()

@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
 #include <QUuid>
+#include <QLocale>
 #include "QueryModel.h"
 
 namespace UI {
@@ -140,7 +141,10 @@ void QueryTab::handleQueryResultReady()
 			tableData->setModel(model);
 
 			model->setQuery(result.query);
-			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(result.query.size()).arg(seconds);
+
+            QString rowCount = QLocale(QLocale::English).toString(result.query.size());
+
+            QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(rowCount).arg(seconds);
 			this->queryTabs->addTab(tableData, headerText);
 
             // Defines the initial column width

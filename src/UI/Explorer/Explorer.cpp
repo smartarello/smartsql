@@ -118,13 +118,17 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	connect(this->tableFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterTable(QString)));
 	connect(this->databaseFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterDatabase(QString)));
 
-	connect(this->dataBaseTree, SIGNAL (clicked(QModelIndex)), this, SLOT (dataBaseTreeClicked(QModelIndex)));
 	connect(this->dataBaseTree, SIGNAL (closeExplorer()), this, SLOT (handleCloseExplorer()));
 	connect(this->dataBaseTree, SIGNAL (doubleClicked(QModelIndex)), this, SLOT (dataBaseTreeDoubleClicked(QModelIndex)));
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
 	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
 	connect(this->explorerTabs->tabBar(), SIGNAL(newTabRequested()), this, SLOT(addQueryTab()));
 	connect(model, SIGNAL(databaseChanged()), this, SLOT(refreshDatabase()));
+
+
+    connect(this->dataBaseTree->selectionModel(),
+          SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+          this, SLOT(dataBaseTreeItemChanged()));
 }
 
 void Explorer::addQueryTab(){
@@ -156,9 +160,10 @@ void Explorer::dataBaseTreeDoubleClicked(QModelIndex index)
 	}
 }
 
-void Explorer::dataBaseTreeClicked(QModelIndex index)
+void Explorer::dataBaseTreeItemChanged()
 {
 	int tableTabIndex = this->explorerTabs->indexOf(this->tableTab) ;
+    QModelIndex index = this->dataBaseTree->currentIndex();
 	if (!index.parent().isValid()){
 		// click on the server host
 		if (tableTabIndex != -1){
@@ -168,7 +173,7 @@ void Explorer::dataBaseTreeClicked(QModelIndex index)
 	}
 
 	QSortFilterProxyModel *model = (QSortFilterProxyModel *)this->dataBaseTree->model();
-	index = model->mapToSource(index);
+    index = model->mapToSource(index);
 	QStandardItem *root = this->dataBaseTree->getDataBaseModel()->invisibleRootItem();
 
 

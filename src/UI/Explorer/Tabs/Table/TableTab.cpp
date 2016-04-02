@@ -112,10 +112,11 @@ void TableTab::setTable(QString tableName) {
 	} else {
 		if (query.next()){
 			int rows = query.value(4).toInt();
+            QString rowCount = QLocale(QLocale::English).toString(rows);
 			if (rows > 1000){
-				this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(db.databaseName()).arg(tableName).arg(rows));
+                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(db.databaseName()).arg(tableName).arg(rowCount));
 			} else {
-				this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(db.databaseName()).arg(tableName).arg(rows));
+                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(db.databaseName()).arg(tableName).arg(rowCount));
 			}
 		} else {
 			this->tableInfoLabel->setText("");

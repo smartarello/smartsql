@@ -12,6 +12,8 @@
 #include <QWidget>
 #include <QLineEdit>
 #include <QModelIndex>
+#include <QStandardItem>
+#include <QItemSelection>
 #include <QTabWidget>
 #include "DataBaseTree.h"
 #include "Tabs/Database/DataBaseTab.h"
@@ -33,7 +35,7 @@ signals:
 	void closeExplorer();
 
 public slots:
-	void dataBaseTreeClicked(QModelIndex index);
+    void dataBaseTreeItemChanged();
 	void dataBaseTreeDoubleClicked(QModelIndex index);
 	void addQueryTab();
 	void closeQueryTab(int index);
