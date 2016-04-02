@@ -142,6 +142,17 @@ void QueryTab::handleQueryResultReady()
 			model->setQuery(result.query);
 			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(result.query.size()).arg(seconds);
 			this->queryTabs->addTab(tableData, headerText);
+
+            // Defines the initial column width
+            int colCount = model->columnCount();
+            for (int i = 0; i < colCount; i++) {
+                QVariant header = model->headerData(i, Qt::Horizontal, Qt::DisplayRole);
+                int size = header.toString().size() * 15;
+                if (size < 100) {
+                    size = 100;
+                }
+                tableData->setColumnWidth(i, size);
+            }
 		}
 		else {
 			QTextEdit *resultText = new QTextEdit();

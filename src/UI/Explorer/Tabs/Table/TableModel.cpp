@@ -73,9 +73,6 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
         QFont font;
         font.setBold(false);
         return font;
-    } else if (role == Qt::SizeHintRole) {
-        QString col = this->columns.at(section);
-        return QSize(col.size() * 30, 20);
     }
 
     return QVariant();

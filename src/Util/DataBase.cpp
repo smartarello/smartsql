@@ -28,7 +28,7 @@ bool DataBase::open(QJsonObject sessionConfiguration, QString database)
 	QString userName = sessionConfiguration.value("user").toString();
 	int port = sessionConfiguration.value("port").toInt();
 
-	if (!defaultConnection.isOpen() || hostName != defaultConnection.hostName() || defaultConnection.userName() != userName || port != defaultConnection.port() || database != defaultConnection.databaseName()) {
+    if (!defaultConnection.isOpen() || hostName != defaultConnection.hostName() || defaultConnection.userName() != userName || port != defaultConnection.port() || (database != "" && database != defaultConnection.databaseName())) {
 
 		if (defaultConnection.isOpen()) {
 			defaultConnection.close();

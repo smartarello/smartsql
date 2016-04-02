@@ -91,6 +91,15 @@ void TableTab::setTable(QString tableName) {
 	TableModel *queryModel = (TableModel *)this->tableData->model();
 	queryModel->setTable(tableName);
 
+    int i = 0;
+    foreach(QString col, queryModel->getColumns()) {
+        int size = col.size() * 15;
+        if (size < 100) {
+            size = 100;
+        }
+        this->tableData->setColumnWidth(i++, size);
+    }
+
 	QSqlDatabase db = QSqlDatabase::database();
 	QSqlQuery query;
 	query.prepare("SHOW TABLE STATUS WHERE Name LIKE :table");
