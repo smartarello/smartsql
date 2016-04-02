@@ -38,7 +38,6 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData->setSortingEnabled(true);
 	this->tableData->verticalHeader()->hide();
 	this->tableData->setEditTriggers(QAbstractItemView::DoubleClicked);
-
 	this->tableData->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this->tableData, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
 

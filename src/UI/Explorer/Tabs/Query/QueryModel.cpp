@@ -33,7 +33,7 @@ QVariant QueryModel::data(const QModelIndex &index, int role) const
 
         QVariant data = QSqlQueryModel::data(index, Qt::DisplayRole);
         if (data.isNull()) {
-            QFont font("Courier");
+            QFont font("DejaVue Sans Mono");
             font.setItalic(true);
             return QVariant(font);
         }

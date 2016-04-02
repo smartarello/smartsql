@@ -145,10 +145,7 @@ void QueryTab::handleQueryResultReady()
 		}
 		else {
 			QTextEdit *resultText = new QTextEdit();
-			QFont font = QFont("Courier");
-			font.setPointSize(12);
-			font.setItalic(true);
-			resultText->setFont(font);
+            resultText->setFontFamily("DejaVue Sans Mono Oblique");
 			resultText->setReadOnly(true);
 
 

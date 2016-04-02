@@ -14,23 +14,23 @@ int main(int argc, char *argv[])
 
 
     int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/Lato-Regular.ttf");
-    QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-B.ttf");
-    QFontDatabase::addApplicationFont(":/resources/fonts/Ubuntu-RI.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/Lato-Light.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/Lato-Bold.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/Lato-Italic.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/Lato-BoldItalic.ttf");
+
+    QFontDatabase::addApplicationFont(":/resources/fonts/DejaVuSansMono.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/DejaVuSansMono-Bold.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/DejaVuSansMono-Oblique.ttf");
+    QFontDatabase::addApplicationFont(":/resources/fonts/DejaVuSansMono-BoldOblique.ttf");
     if (fontId != -1)
     {
         QFont font("Lato Regular");
         app.setFont(font);
     } else {
-        qWarning() << "Unable to load the font: Ubuntu-R.ttf";
+        qWarning() << "Unable to load the font: Lato-Regular.ttf";
     }
 
-    if (QFontDatabase::addApplicationFont(":/resources/fonts/UbuntuMono-R.ttf") == -1) {
-        qDebug() << "Unable to load font: UbuntuMono-R.ttf";
-    }
-
-    if (QFontDatabase::addApplicationFont(":/resources/fonts/UbuntuMono-R.ttf") == -1) {
-        qDebug() << "Unable to load font: UbuntuMono-R.ttf";
-    }
 
 //    QTranslator qtTranslator;font.defaultFamily()
 //    qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));

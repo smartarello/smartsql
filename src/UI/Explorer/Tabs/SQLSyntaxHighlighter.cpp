@@ -16,8 +16,9 @@ SQLSyntaxHighlighter::SQLSyntaxHighlighter(QTextDocument *parent) : QSyntaxHighl
 	HighlightingRule rule;
 
 	QTextCharFormat keywordFormat;
-	keywordFormat.setForeground(Qt::darkBlue);
+    keywordFormat.setForeground(Qt::blue);
 	keywordFormat.setFontWeight(QFont::Bold);
+    keywordFormat.setFontFamily("DejaVu Sans Mono");
 
 	QStringList keywordPatterns;
 	keywordPatterns << "\\bselect\\b"
@@ -66,6 +67,18 @@ SQLSyntaxHighlighter::SQLSyntaxHighlighter(QTextDocument *parent) : QSyntaxHighl
 		highlightingRules.append(rule);
 	}
 
+    // Comments
+    HighlightingRule commentRule;
+
+    QTextCharFormat commentFormat;
+    commentFormat.setForeground(Qt::lightGray);
+    commentFormat.setFontItalic(true);
+    commentFormat.setFontFamily("DejaVu Sans Mono");
+
+    commentRule.format = commentFormat;
+    commentRule.pattern = QRegExp("-- .*");
+
+    highlightingRules.append(commentRule);
 }
 
 void SQLSyntaxHighlighter::highlightBlock(const QString &text)

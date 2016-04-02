@@ -11,6 +11,7 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QFont>
+#include <QSize>
 
 namespace UI {
 namespace Explorer {
@@ -68,9 +69,16 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
 {
 	if (section < this->columns.count() && role == Qt::DisplayRole && orientation == Qt::Horizontal) {
 		return QVariant(this->columns.at(section));
-	}
+    } else if (role == Qt::FontRole) {
+        QFont font;
+        font.setBold(false);
+        return font;
+    } else if (role == Qt::SizeHintRole) {
+        QString col = this->columns.at(section);
+        return QSize(col.size() * 30, 20);
+    }
 
-	return QVariant();
+    return QVariant();
 }
 
 QList<QString> TableModel::getColumns(){
@@ -179,7 +187,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
 
             return value;
         } else if (value.isNull()) { // Qt::FontRole
-            QFont font("Courier");
+            QFont font("DejaVue Sans Mono");
             font.setItalic(true);
             return QVariant(font);
         }

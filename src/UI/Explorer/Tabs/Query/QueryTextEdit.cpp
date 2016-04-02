@@ -23,11 +23,11 @@ namespace Query {
 
 QueryTextEdit::QueryTextEdit(QWidget *parent) : QTextEdit(parent) {
 
-    QFont font = QFont("Ubuntu Monospace");
-    font.setPointSize(12);
-    this->setFont(font);
+    this->setFontFamily("DejaVu Sans Mono");
+    this->setAcceptRichText(false);
 
-	SQLSyntaxHighlighter *highlighter  = new SQLSyntaxHighlighter(this->document());
+
+    SQLSyntaxHighlighter *highlighter  = new SQLSyntaxHighlighter(this->document());
 	this->tableList = this->getTableList();
 
 	this->autocomplete = new QCompleter(this);
@@ -151,6 +151,7 @@ QStringList QueryTextEdit::getTableList()
 
 void QueryTextEdit::loadTableFields()
 {
+    qDebug() << "QueryTextEdit::loadTableFields";
 	QTextCursor tc = textCursor();
 	tc.movePosition(QTextCursor::PreviousWord);
 	tc.movePosition(QTextCursor::PreviousWord);

@@ -22,9 +22,7 @@ namespace Table {
 
 TableFilterTextEdit::TableFilterTextEdit(QWidget *parent) : QTextEdit(parent) {
 
-    QFont font = QFont("Courier");
-    font.setPointSize(12);
-    this->setFont(font);
+    this->setFontFamily("DejaVue Sans Mono");
 
 	this->setPlaceholderText("id = 10 OR name=\"John\"");
 
