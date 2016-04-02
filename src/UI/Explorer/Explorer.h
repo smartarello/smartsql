@@ -17,6 +17,7 @@
 #include <QTabWidget>
 #include "DataBaseTree.h"
 #include "Tabs/Database/DataBaseTab.h"
+#include "Tabs/Server/ServerTab.h"
 
 namespace UI {
 namespace Explorer {
@@ -49,6 +50,8 @@ private:
 	QTabWidget *explorerTabs;
 	Tabs::Database::DataBaseTab *databaseTab;
 	Tabs::Table::TableTab *tableTab;
+    ServerTab *serverTab;
+
 };
 
 } /* namespace Explorer */

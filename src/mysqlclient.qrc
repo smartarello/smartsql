@@ -29,5 +29,6 @@
         <file>resources/fonts/DejaVuSansMono-Oblique.ttf</file>
         <file>resources/fonts/DejaVuSansMono-Bold.ttf</file>
         <file>resources/fonts/DejaVuSansMono.ttf</file>
+        <file>resources/icons/key-icon.png</file>
     </qresource>
 </RCC>

@@ -26,6 +26,7 @@
 #include "Tabs/TabView.h"
 #include "../../Util/DataBase.h"
 
+
 namespace UI {
 namespace Explorer {
 
@@ -87,19 +88,14 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	QShortcut * addTabShortCut = new QShortcut(QKeySequence("Ctrl+N"), this->explorerTabs);
 	splitter->addWidget(this->explorerTabs);
 
-	Model::DataBaseModel *model = this->dataBaseTree->getDataBaseModel();
-	QStandardItem *rootItem = model->invisibleRootItem();
-	QStandardItem *firstDataBase = rootItem->child(0)->child(0);
-
-	Util::DataBase::open(sessionConf, firstDataBase->text());
-
-	// Select the first DataBase
 	QSortFilterProxyModel *filterModel = (QSortFilterProxyModel *)this->dataBaseTree->model();
-	QModelIndex	index = filterModel->mapFromSource(firstDataBase->index());
+    QModelIndex	index = filterModel->index(0, 0);
+
 	this->dataBaseTree->selectionModel()->setCurrentIndex(index, (QItemSelectionModel::Select | QItemSelectionModel::Rows));
 
 	this->databaseTab = new Tabs::Database::DataBaseTab();
-	this->explorerTabs->addTab(this->databaseTab, QString(tr("Database: %1")).arg(firstDataBase->text()));
+    this->serverTab = new ServerTab(this);
+    this->explorerTabs->addTab(this->serverTab, tr("Host"));
 
 	Tabs::Query::QueryTab *queryTab = new Tabs::Query::QueryTab(this);
 	this->explorerTabs->addTab(queryTab, tr("Query"));
@@ -123,7 +119,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
 	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
 	connect(this->explorerTabs->tabBar(), SIGNAL(newTabRequested()), this, SLOT(addQueryTab()));
-	connect(model, SIGNAL(databaseChanged()), this, SLOT(refreshDatabase()));
+    connect(this->dataBaseTree->getDataBaseModel(), SIGNAL(databaseChanged()), this, SLOT(refreshDatabase()));
 
 
     connect(this->dataBaseTree->selectionModel(),
@@ -163,14 +159,29 @@ void Explorer::dataBaseTreeDoubleClicked(QModelIndex index)
 void Explorer::dataBaseTreeItemChanged()
 {
 	int tableTabIndex = this->explorerTabs->indexOf(this->tableTab) ;
+    int dataBaseTabIndex = this->explorerTabs->indexOf(this->databaseTab) ;
+    int serverTabIndex = this->explorerTabs->indexOf(this->serverTab) ;
     QModelIndex index = this->dataBaseTree->currentIndex();
 	if (!index.parent().isValid()){
 		// click on the server host
 		if (tableTabIndex != -1){
 			this->explorerTabs->removeTab(tableTabIndex);
 		}
+
+        if (dataBaseTabIndex != -1) {
+            this->explorerTabs->removeTab(dataBaseTabIndex);
+        }
+
+        if (serverTabIndex == -1) {
+            this->explorerTabs->insertTab(0, this->serverTab, tr("Host"));
+             this->explorerTabs->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
+        }
 		return ;
-	}
+    } else if (serverTabIndex != -1) {
+        this->explorerTabs->removeTab(serverTabIndex);
+        this->explorerTabs->insertTab(0, this->databaseTab, "");
+        this->explorerTabs->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
+    }
 
 	QSortFilterProxyModel *model = (QSortFilterProxyModel *)this->dataBaseTree->model();
     index = model->mapToSource(index);

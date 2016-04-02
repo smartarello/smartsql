@@ -22,6 +22,7 @@ TableDetailsWindow::TableDetailsWindow(QSqlDatabase database, QString tableName,
         QVBoxLayout *containerLayout = new QVBoxLayout(container);
 
         this->tableColumns = new QTableView(this);
+        this->tableColumns->resizeColumnsToContents();
         QString createString = "";
 
         database.open();

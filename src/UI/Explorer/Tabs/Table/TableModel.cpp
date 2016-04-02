@@ -101,9 +101,7 @@ void TableModel::sort(int column, Qt::SortOrder order){
 
 void TableModel::refreshWithFilter(QString filter)
 {
-	QString oldFilter = this->filter;
 	this->filter = filter;
-	QString queryText = this->buildQuery();
 	this->reload();
 }
 

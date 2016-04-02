@@ -30,6 +30,7 @@ private:
 
     QList<ColumnDefinition> columns;
     QStringList headers;
+    QStringList primaryKey;
 };
 
 #endif // TABLEDETAILSMODEL_H
