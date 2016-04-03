@@ -112,7 +112,7 @@ QString TableFilterTextEdit::textUnderCursor() const
 }
 
 TableFilterTextEdit::~TableFilterTextEdit() {
-
+    delete this->autocomplete;
 }
 
 } /* namespace Table */

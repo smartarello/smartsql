@@ -26,7 +26,7 @@ class TableTab: public QSplitter {
 public:
 	TableTab(QWidget *parent = 0);
 	virtual ~TableTab();
-	void setTable(QString tableName);
+    void setTable(QSqlDatabase database, QString tableName);
 
 public slots:
 	void queryError(QString query, QString error);

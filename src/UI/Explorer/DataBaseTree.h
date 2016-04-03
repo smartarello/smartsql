@@ -21,7 +21,7 @@ class DataBaseTree: public QTreeView {
 	Q_OBJECT
 
 public:
-	DataBaseTree(QWidget *parent, QJsonObject sessionUuid);
+    DataBaseTree(QWidget *parent, QJsonObject sessionUuid);
 	virtual ~DataBaseTree();
 	Model::DataBaseModel * getDataBaseModel();
 
@@ -38,10 +38,13 @@ public slots:
     void handleCreateDatabase();
     void createDatabase(QString databaseName, QString collation);
     void handleShowDetailsTable();
+    void handleOpenTableInTab();
+
 
 
 signals:
 	void closeExplorer();
+    void openTableInNewTab();
 
 private:
 	Model::DataBaseModel *dataBaseModel;

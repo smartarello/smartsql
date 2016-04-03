@@ -139,6 +139,10 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 
 		menu->addSeparator();
 
+        QAction *openInTabAction = new QAction(tr("Open in new tab"), this);
+        connect(openInTabAction, SIGNAL(triggered(bool)), SLOT(handleOpenTableInTab()));
+        menu->addAction(openInTabAction);
+
         QAction *showDetailsAction = new QAction(tr("Details..."), this);
         connect(showDetailsAction, SIGNAL(triggered(bool)), SLOT(handleShowDetailsTable()));
         menu->addAction(showDetailsAction);
@@ -154,6 +158,11 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 	}
 
 	menu->popup(this->viewport()->mapToGlobal(point));
+}
+
+void DataBaseTree::handleOpenTableInTab()
+{
+    emit openTableInNewTab();
 }
 
 /**
@@ -181,6 +190,7 @@ void DataBaseTree::handleShowDetailsTable()
     TableDetailsWindow *tableDetails = new TableDetailsWindow(db, tableItem->text(), this);
     tableDetails->show();
 }
+
 
 /**
  * Called when the user has specified the database name et the collation

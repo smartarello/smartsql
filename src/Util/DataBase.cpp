@@ -8,6 +8,7 @@
 #include <Util/DataBase.h>
 #include <QSqlError>
 #include <QDebug>
+#include <QUuid>
 
 namespace Util {
 
@@ -49,6 +50,16 @@ bool DataBase::open(QJsonObject sessionConfiguration, QString database)
 	}
 
 	return true;
+}
+
+QSqlDatabase DataBase::cloneCurrentConnection()
+{
+    QSqlDatabase db;
+    if (defaultConnection.isValid()) {
+        db = QSqlDatabase::cloneDatabase(defaultConnection, QUuid::createUuid().toString());
+    }
+
+    return db;
 }
 
 DataBase::~DataBase() {

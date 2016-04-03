@@ -42,6 +42,7 @@ public slots:
 	void closeQueryTab(int index);
 	void refreshDatabase();
 	void handleCloseExplorer();
+    void handleOpenTableInTab();
 
 private:
 	DataBaseTree *dataBaseTree;

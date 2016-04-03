@@ -19,6 +19,7 @@ public:
 	virtual ~DataBase();
 
 	static bool open(QJsonObject sessionConfiguration, QString database = "");
+    static QSqlDatabase cloneCurrentConnection();
 
 private:
 	static QSqlDatabase defaultConnection;

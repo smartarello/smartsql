@@ -22,6 +22,7 @@
 #include <QSqlError>
 #include <QPixmap>
 #include "Model/DataBaseModel.h"
+#include "Model/TableFilterProxyModel.h"
 #include "Tabs/Query/QueryTab.h"
 #include "Tabs/TabView.h"
 #include "../../Util/DataBase.h"
@@ -115,6 +116,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	connect(this->databaseFilterLineEdit, SIGNAL (textEdited(QString)), this->dataBaseTree, SLOT (filterDatabase(QString)));
 
 	connect(this->dataBaseTree, SIGNAL (closeExplorer()), this, SLOT (handleCloseExplorer()));
+    connect(this->dataBaseTree, SIGNAL (openTableInNewTab()), this, SLOT (handleOpenTableInTab()));
 	connect(this->dataBaseTree, SIGNAL (doubleClicked(QModelIndex)), this, SLOT (dataBaseTreeDoubleClicked(QModelIndex)));
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
 	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
@@ -127,6 +129,25 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
           this, SLOT(dataBaseTreeItemChanged()));
 }
 
+/**
+ * Open the selected table in a new tab
+ *
+ */
+void Explorer::handleOpenTableInTab()
+{
+    QModelIndex index = ((Model::TableFilterProxyModel *)this->dataBaseTree->model())->mapToSource(this->dataBaseTree->currentIndex());
+    QStandardItem *serverItem = this->dataBaseTree->getDataBaseModel()->invisibleRootItem()->child(index.parent().parent().row(), 0);
+    QStandardItem *dbItem = serverItem->child(index.parent().row());
+    QStandardItem *tableItem = dbItem->child(index.row());
+
+    QJsonObject connectionConf = serverItem->data().toJsonObject();
+    if (Util::DataBase::open(connectionConf, dbItem->text())) {
+        Tabs::Table::TableTab *tableTab = new Tabs::Table::TableTab(this);
+        tableTab->setTable(Util::DataBase::cloneCurrentConnection(), tableItem->text());
+        this->explorerTabs->addTab(tableTab, dbItem->text()+"."+tableItem->text());
+    }
+}
+
 void Explorer::addQueryTab(){
 	Tabs::Query::QueryTab *queryTab = new Tabs::Query::QueryTab(this);
 	this->explorerTabs->addTab(queryTab, tr("Query"));
@@ -137,7 +158,9 @@ void Explorer::addQueryTab(){
 void Explorer::closeQueryTab(int index)
 {
 	if (index > 1){
+        QWidget *w = this->explorerTabs->widget(index);
 		this->explorerTabs->removeTab(index);
+        delete w;
 	}
 }
 
@@ -226,7 +249,7 @@ void Explorer::dataBaseTreeItemChanged()
 
 
 	if (!tableName.isNull()){
-		this->tableTab->setTable(tableName);
+        this->tableTab->setTable(Util::DataBase::cloneCurrentConnection(), tableName);
 		if (this->explorerTabs->indexOf(this->tableTab) == -1){
 			this->tableTab->show();
 			this->explorerTabs->insertTab(1, this->tableTab, tr("Data"));

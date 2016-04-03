@@ -30,7 +30,7 @@ class TableModel: public QAbstractTableModel {
 public:
 	TableModel(QObject * parent = 0);
 	virtual ~TableModel();
-	void setTable(QString table);
+    void setTable(QSqlDatabase database, QString table);
 	QList<QString> getColumns();
 	Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
 	bool setData(const QModelIndex &index, const QVariant &value, int role) Q_DECL_OVERRIDE;
@@ -55,8 +55,8 @@ private:
 	void sort(int column, Qt::SortOrder order);
 	QString buildQuery();
 	void reload();
-	QSqlQuery query;
 	QList<QSqlRecord> results;
+    QSqlDatabase database;
 };
 
 } /* namespace Table */

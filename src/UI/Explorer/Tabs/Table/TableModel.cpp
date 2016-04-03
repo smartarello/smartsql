@@ -23,21 +23,35 @@ TableModel::TableModel(QObject * parent) : QAbstractTableModel(parent) {
 
 }
 
-void TableModel::setTable(QString table){
+void TableModel::setTable(QSqlDatabase database, QString table){
+
+    if (this->database.isValid() && this->database.isOpen()) {
+        this->database.close();
+    }
+
+    this->database = database;
 	this->table = table;
 	this->sortOrder = "";
 	this->filter = "";
+    this->columns = QList<QString>();
+    this->primaryKey = QStringList();
 
-	QSqlQuery query;
+
+    if (!this->database.open()) {
+        qWarning() << "TableModel::setTable - Unable to open the connection - " + this->database.lastError().text();
+        return ;
+    }
+
+    QSqlQuery query(this->database);
 	if (query.exec(QString("SHOW COLUMNS FROM %1").arg(this->table))) {
-		this->columns = QList<QString>();
+
 		while(query.next()){
 			this->columns.append(query.value("Field").toString());
 		}
 
-		QSqlQuery queryIndex;
+        QSqlQuery queryIndex(this->database);
 		if (queryIndex.exec(QString("SHOW INDEX FROM %1 WHERE Key_name LIKE 'PRIMARY'").arg(this->table))) {
-			this->primaryKey = QStringList();
+
 			while(queryIndex.next()){
 				this->primaryKey << queryIndex.value("Column_name").toString();
 			}
@@ -146,7 +160,7 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
     	updateQuery += where.join(" AND ");
 
-    	QSqlQuery query ;
+        QSqlQuery query(this->database) ;
     	query.prepare(updateQuery);
     	query.bindValue(":"+columnName, value);
 
@@ -221,7 +235,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 
 	deleteQuery += "(" + orStatement.join(") OR (") + ")";
 
-	QSqlQuery query ;
+    QSqlQuery query(this->database) ;
 	query.exec(deleteQuery);
 
 	if (query.lastError().isValid()){
@@ -243,26 +257,32 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 
 void TableModel::reload()
 {
-	QString sql = this->buildQuery();
-	this->query.exec(sql);
+    if (!this->database.open()) {
+        return;
+    }
 
-	if (this->query.lastError().isValid()){
+	QString sql = this->buildQuery();
+    QSqlQuery query(this->database);
+    query.exec(sql);
+
+    if (query.lastError().isValid()){
 		this->filter = "";
-		qDebug() << "TableModel::reload - " + this->query.lastError().text();
-		QString lastError =  this->query.lastError().text();
+        qDebug() << "TableModel::reload - " + query.lastError().text();
+        QString lastError =  query.lastError().text();
 		emit queryError("", lastError);
 	} else {
 		this->results = QList<QSqlRecord>();
-		while (this->query.next()) {
-			this->results << this->query.record();
+        while (query.next()) {
+            this->results << query.record();
 		}
 
+        this->database.close();
 		emit layoutChanged();
 	}
 }
 
 TableModel::~TableModel() {
-
+    this->database.close();
 }
 
 } /* namespace Model */

@@ -34,7 +34,7 @@ namespace Table {
 TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 
 	this->setOrientation(Qt::Vertical);
-	this->tableData = new QTableView();
+    this->tableData = new QTableView(this);
 	this->tableData->setSortingEnabled(true);
 	this->tableData->verticalHeader()->hide();
 	this->tableData->setEditTriggers(QAbstractItemView::DoubleClicked);
@@ -86,10 +86,10 @@ void TableTab::applyFilterClicked(bool checked)
 	((TableModel *)this->tableData->model())->refreshWithFilter(this->whereConditionText->toPlainText());
 }
 
-void TableTab::setTable(QString tableName) {
+void TableTab::setTable(QSqlDatabase database, QString tableName) {
 
 	TableModel *queryModel = (TableModel *)this->tableData->model();
-	queryModel->setTable(tableName);
+    queryModel->setTable(database, tableName);
 
     int i = 0;
     foreach(QString col, queryModel->getColumns()) {
@@ -100,8 +100,7 @@ void TableTab::setTable(QString tableName) {
         this->tableData->setColumnWidth(i++, size);
     }
 
-	QSqlDatabase db = QSqlDatabase::database();
-	QSqlQuery query;
+    QSqlQuery query(database);
 	query.prepare("SHOW TABLE STATUS WHERE Name LIKE :table");
 	query.bindValue(":table", tableName);
 	query.exec();
@@ -114,9 +113,9 @@ void TableTab::setTable(QString tableName) {
 			int rows = query.value(4).toInt();
             QString rowCount = QLocale(QLocale::English).toString(rows);
 			if (rows > 1000){
-                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(db.databaseName()).arg(tableName).arg(rowCount));
+                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(database.databaseName()).arg(tableName).arg(rowCount));
 			} else {
-                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(db.databaseName()).arg(tableName).arg(rowCount));
+                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(database.databaseName()).arg(tableName).arg(rowCount));
 			}
 		} else {
 			this->tableInfoLabel->setText("");
@@ -284,7 +283,9 @@ void TableTab::queryError(QString query, QString error)
 }
 
 TableTab::~TableTab() {
-
+    delete this->tableData->model();
+    delete this->tableData;
+    delete this->whereConditionText;
 }
 
 } /* namespace Table */
