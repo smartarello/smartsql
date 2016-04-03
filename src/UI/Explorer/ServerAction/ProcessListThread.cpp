@@ -24,16 +24,13 @@ void ProcessListThread::run()
 	if (this->database.open()) {
 		this->query = QSqlQuery(this->database);
 
-		while(true) {
-			if (this->query.exec("SELECT * FROM `information_schema`.`PROCESSLIST`")) {
-				emit processListReady();
-			} else {
-				qWarning() << "ProcessListThread::run - " + this->query.lastError().text();
-				return; // Stop the thread execution
-			}
+        if (this->query.exec("SELECT * FROM `information_schema`.`PROCESSLIST`")) {
+            emit processListReady();
+        } else {
+            qWarning() << "ProcessListThread::run - " + this->query.lastError().text();
+        }
 
-			this->sleep(3);
-		}
+
 	} else {
 		qDebug() << "Unable to open the database for the process list thread";
 	}

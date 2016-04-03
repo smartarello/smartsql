@@ -80,12 +80,12 @@ TableDetailsModel::TableDetailsModel(QString createString, QObject *parent) : QA
 
 int TableDetailsModel::rowCount(const QModelIndex & parent) const
 {
-    return this->columns.size() + 1; // +1 for the first column with the primary key indicator
+    return this->columns.size() ;
 }
 
 int TableDetailsModel::columnCount(const QModelIndex & parent) const
 {
-    return this->headers.size();
+    return this->headers.size() + 1; // +1 for the first column with the primary key indicator
 }
 
 QVariant TableDetailsModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -139,8 +139,8 @@ QVariant TableDetailsModel::data(const QModelIndex &index, int role) const
                 }
 
             }
-        } else if (role == Qt::FontRole && index.column() == 5 && col.defaultValue.isNull()) {
-            QFont font("Ubuntu Regular");
+        } else if (role == Qt::FontRole && index.column() == 6 && col.defaultValue.isNull()) {
+            QFont font("DejaVu Sans Mono");
             font.setItalic(true);
             return QVariant(font);
         } else if (role == Qt::DecorationRole && index.column() == 0 && this->primaryKey.contains(col.name, Qt::CaseInsensitive)) {

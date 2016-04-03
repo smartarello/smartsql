@@ -10,6 +10,7 @@
 
 #include <qmainwindow.h>
 #include <QTableView>
+#include <QSqlDatabase>
 #include <QJsonObject>
 #include "ProcessListThread.h"
 
@@ -27,10 +28,13 @@ public:
 
 public slots:
 	void processListReady();
+    void killProcess();
+    void refreshProcess();
 
 private:
 	QTableView *processListTable;
 	ProcessListThread *worker;
+    QSqlDatabase database;
 };
 
 } /* namespace ServerAction */
