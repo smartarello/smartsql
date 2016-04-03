@@ -199,6 +199,8 @@ void Explorer::dataBaseTreeItemChanged()
             this->explorerTabs->insertTab(0, this->serverTab, tr("Host"));
              this->explorerTabs->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
         }
+
+        this->explorerTabs->setCurrentIndex(0);
 		return ;
     } else if (serverTabIndex != -1) {
         this->explorerTabs->removeTab(serverTabIndex);
@@ -231,11 +233,11 @@ void Explorer::dataBaseTreeItemChanged()
         // Click on a database
 		dbItem = root->child(dbIndex.parent().row())->child(dbIndex.row());
 		dataBaseName = dbItem->text();
+         this->explorerTabs->setCurrentIndex(0);
 	}
 
 	QJsonObject sessionConf = dbItem->parent()->data().toJsonObject();
 	if (!Util::DataBase::open(sessionConf, dataBaseName)){
-
 
 		QMessageBox *message = new QMessageBox();
 		message->setWindowTitle(tr("Connection error"));

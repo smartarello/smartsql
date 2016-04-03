@@ -10,6 +10,8 @@
 #include <QSqlQuery>
 #include <QDebug>
 #include <QHeaderView>
+#include <QSortFilterProxyModel>
+#include "DatabaseModel.h"
 
 namespace UI {
 namespace Explorer {
@@ -18,24 +20,39 @@ namespace Database {
 
 DataBaseTab::DataBaseTab(QWidget * parent) : QTableView(parent) {
 
-	QSqlQueryModel *model = new QSqlQueryModel();
-	model->setQuery("SHOW TABLE STATUS");
+    DatabaseModel *model = new DatabaseModel();
+    QSortFilterProxyModel *sortModel = new QSortFilterProxyModel();
+    sortModel->setSourceModel(model);
+    sortModel->setSortRole(Qt::UserRole+1);
 
-	this->setModel(model);
-	this->resizeColumnsToContents();
+    this->setModel(sortModel);
 	this->verticalHeader()->hide();
+    this->setSortingEnabled(true);
+    this->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    connect(this, SIGNAL(doubleClicked(QModelIndex)), SLOT(handleDoubleClicked(QModelIndex)));
+}
+
+void DataBaseTab::handleDoubleClicked(QModelIndex index)
+{
+    QSortFilterProxyModel *sortModel = (QSortFilterProxyModel *) this->model();
+    QModelIndex sourceIndex = sortModel->mapToSource(index);
+    qDebug() << sourceIndex.data();
+    //TODO display the table
+    qDebug() << "table selected";
 }
 
 void DataBaseTab::refresh()
 {
-	QSqlQueryModel *model = new QSqlQueryModel();
-	model->setQuery("SHOW TABLE STATUS");
-
-	this->setModel(model);
+    QSortFilterProxyModel *sortModel = (QSortFilterProxyModel *) this->model();
+    ((DatabaseModel *)sortModel->sourceModel())->reload();
+    //sortModel->sort(0);
+    this->sortByColumn(0, Qt::AscendingOrder);
+    this->resizeColumnsToContents();
 }
 
 DataBaseTab::~DataBaseTab() {
-	// TODO Auto-generated destructor stub
+    delete this->model();
 }
 
 } /* namespace Database */

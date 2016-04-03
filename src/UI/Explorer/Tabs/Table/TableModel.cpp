@@ -101,9 +101,9 @@ void TableModel::sort(int column, Qt::SortOrder order){
 		return ;
 	}
 
-	QString sortOrder = QString("ASC");
+    QString sortOrder = QString("DESC");
 	if (order == Qt::AscendingOrder){
-		sortOrder = QString("DESC");
+        sortOrder = QString("ASC");
 	}
 
 	QString col = this->columns.at(column);

@@ -36,7 +36,8 @@ HEADERS += UI/MainWindow.h \
     UI/Explorer/ServerAction/NewDatabaseWindow.h \
     UI/Explorer/TableAction/TableDetailsWindow.h \
     UI/Explorer/TableAction/TableDetailsModel.h \
-    UI/Explorer/Tabs/Server/ServerTab.h
+    UI/Explorer/Tabs/Server/ServerTab.h \
+    UI/Explorer/Tabs/Database/DatabaseModel.h
 SOURCES += main.cpp \
 		Util/DataBase.cpp \
            UI/MainWindow.cpp \
@@ -63,7 +64,8 @@ SOURCES += main.cpp \
     UI/Explorer/ServerAction/NewDatabaseWindow.cpp \
     UI/Explorer/TableAction/TableDetailsWindow.cpp \
     UI/Explorer/TableAction/TableDetailsModel.cpp \
-    UI/Explorer/Tabs/Server/ServerTab.cpp
+    UI/Explorer/Tabs/Server/ServerTab.cpp \
+    UI/Explorer/Tabs/Database/DatabaseModel.cpp
 TRANSLATIONS += mysqlclient_en.ts
 
 win32:debug {

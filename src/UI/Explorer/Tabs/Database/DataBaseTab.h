@@ -10,6 +10,7 @@
 
 #include <QTableView>
 #include <QSqlDatabase>
+#include <QModelIndex>
 
 namespace UI {
 namespace Explorer {
@@ -24,6 +25,9 @@ public:
 	DataBaseTab(QWidget * parent = 0);
 	virtual ~DataBaseTab();
 	void refresh();
+
+public slots:
+    void handleDoubleClicked(QModelIndex index);
 };
 
 } /* namespace Database */
