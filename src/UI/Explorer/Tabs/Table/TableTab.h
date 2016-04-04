@@ -38,6 +38,7 @@ public slots:
 	void handleDeleteAction();
 	void handleFilterColumnLikeAction();
 	void handleFilterColumnEqualAction();
+    void refreshData();
 
 private:
 	QTableView *tableData;

@@ -5,7 +5,7 @@
 CONFIG += qt debug
 QT += widgets sql
 TEMPLATE = app
-TARGET = mysqlclient
+TARGET = SmartSQL
 INCLUDEPATH += .
 DESTDIR = ../dist
 RESOURCES     = mysqlclient.qrc

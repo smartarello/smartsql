@@ -28,6 +28,7 @@ namespace ServerAction {
 
 ShowProcessesWindow::ShowProcessesWindow(QJsonObject sessionConf, QWidget * parent) : QMainWindow(parent) {
 
+    this->setAttribute(Qt::WA_DeleteOnClose);
     this->database = QSqlDatabase::addDatabase("QMYSQL", QUuid::createUuid().toString());
 
     this->database.setHostName(sessionConf.value("hostname").toString());
@@ -114,7 +115,9 @@ void ShowProcessesWindow::processListReady()
 }
 
 ShowProcessesWindow::~ShowProcessesWindow() {
-	// TODO Auto-generated destructor stub
+    this->database.close();
+    delete this->worker;
+    delete this->processListTable;
 }
 
 } /* namespace ServerAction */

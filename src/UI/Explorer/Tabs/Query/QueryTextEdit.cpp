@@ -136,15 +136,21 @@ QString QueryTextEdit::textUnderCursor() const
 
 QStringList QueryTextEdit::getTableList()
 {
+    QSqlDatabase db = QSqlDatabase::database();
+
 	QStringList tables;
-	QSqlQuery query;
-	if (query.exec("show table status")) {
-		while (query.next()){
-				tables << query.value("Name").toString();
-			}
-	} else {
-		qDebug() << "QueryTextEdit::getTableList - " + query.lastError().text();
-	}
+
+    if (db.isValid() && db.isOpen() && db.databaseName() != "") {
+        QSqlQuery query;
+        if (query.exec("show table status")) {
+            while (query.next()){
+                    tables << query.value("Name").toString();
+                }
+        } else {
+            qDebug() << "QueryTextEdit::getTableList - " + query.lastError().text();
+        }
+    }
+
 
 	return tables;
 }

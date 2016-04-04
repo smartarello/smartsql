@@ -24,6 +24,7 @@
 #include <QClipboard>
 #include <QApplication>
 #include <QInputDialog>
+#include <QShortcut>
 #include "TableModel.h"
 
 namespace UI {
@@ -76,9 +77,18 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData->setModel(queryModel);
 	this->tableData->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+    QShortcut* refreshShortcut = new QShortcut(QKeySequence(Qt::Key_F5), this->tableData);
+    refreshShortcut->setContext(Qt::WidgetShortcut);
+    connect(refreshShortcut, SIGNAL(activated()), SLOT(refreshData()));
+
 	connect(this->whereConditionText, SIGNAL(filterChanged(QString)), queryModel, SLOT(refreshWithFilter(QString)));
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
 	connect(filterButton, SIGNAL(clicked(bool)), this, SLOT(applyFilterClicked(bool)));
+}
+
+void TableTab::refreshData()
+{
+    ((TableModel *)this->tableData->model())->reload();
 }
 
 void TableTab::applyFilterClicked(bool checked)
@@ -100,28 +110,31 @@ void TableTab::setTable(QSqlDatabase database, QString tableName) {
         this->tableData->setColumnWidth(i++, size);
     }
 
-    QSqlQuery query(database);
-	query.prepare("SHOW TABLE STATUS WHERE Name LIKE :table");
-	query.bindValue(":table", tableName);
-	query.exec();
+    if (database.open()) {
+        QSqlQuery query(database);
+        query.prepare("SHOW TABLE STATUS WHERE Name LIKE :table");
+        query.bindValue(":table", tableName);
+        query.exec();
 
-	if (query.lastError().isValid()) {
-		qDebug() << "TableTab::setTable - " + query.lastError().text();
-		this->tableInfoLabel->setText("");
-	} else {
-		if (query.next()){
-			int rows = query.value(4).toInt();
-            QString rowCount = QLocale(QLocale::English).toString(rows);
-			if (rows > 1000){
-                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(database.databaseName()).arg(tableName).arg(rowCount));
-			} else {
-                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(database.databaseName()).arg(tableName).arg(rowCount));
-			}
-		} else {
-			this->tableInfoLabel->setText("");
-		}
-	}
-
+        if (query.lastError().isValid()) {
+            qDebug() << "TableTab::setTable - " + query.lastError().text();
+            this->tableInfoLabel->setText("");
+        } else {
+            if (query.next()){
+                int rows = query.value(4).toInt();
+                QString rowCount = QLocale(QLocale::English).toString(rows);
+                if (rows > 1000){
+                    this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(database.databaseName()).arg(tableName).arg(rowCount));
+                } else {
+                    this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(database.databaseName()).arg(tableName).arg(rowCount));
+                }
+            } else {
+                this->tableInfoLabel->setText("");
+            }
+        }
+    } else {
+        qWarning() << "TableTab::setTable - " + database.lastError().text();
+    }
 
 	QCompleter *completer = this->whereConditionText->getAutocomplete();
 

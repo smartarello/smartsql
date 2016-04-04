@@ -22,7 +22,7 @@ namespace UI {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), sessionManager(0), explorer(0) {
 
 	// Init MySQL Driver
-	this->setWindowTitle(tr("MySQL explorer"));
+    this->setWindowTitle(tr("SmartSQL"));
 	Session::SessionWindow *sessionList = new Session::SessionWindow(this);
 	this->setCentralWidget(sessionList);
 

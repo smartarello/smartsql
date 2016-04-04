@@ -160,6 +160,10 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
     	updateQuery += where.join(" AND ");
 
+        if (!this->database.open()) {
+            return false;
+        }
+
         QSqlQuery query(this->database) ;
     	query.prepare(updateQuery);
     	query.bindValue(":"+columnName, value);
@@ -171,6 +175,7 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
     	if (query.exec()){
     		record.setValue(index.column(), value);
     		this->results.replace(index.row(), record);
+            this->database.close();
     		emit dataChanged(index, index);
     		return true;
     	} else {
@@ -235,6 +240,10 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 
 	deleteQuery += "(" + orStatement.join(") OR (") + ")";
 
+    if (!this->database.open()) {
+        return false;
+    }
+
     QSqlQuery query(this->database) ;
 	query.exec(deleteQuery);
 
@@ -243,6 +252,8 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 		emit queryError("", query.lastError().text());
 		return false;
 	}
+
+    this->database.close();
 
 
 	beginRemoveRows(parent, row, lastRow);

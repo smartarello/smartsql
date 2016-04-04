@@ -39,6 +39,7 @@ public:
 	int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
 	int columnCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+    void reload();
 
 public slots:
 	void refreshWithFilter(QString filter);
@@ -54,7 +55,6 @@ private:
 	QStringList primaryKey;
 	void sort(int column, Qt::SortOrder order);
 	QString buildQuery();
-	void reload();
 	QList<QSqlRecord> results;
     QSqlDatabase database;
 };
