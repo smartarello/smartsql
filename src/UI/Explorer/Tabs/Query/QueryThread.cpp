@@ -10,6 +10,7 @@
 #include <QSqlError>
 #include <QSqlResult>
 #include <QDateTime>
+#include <QUuid>
 
 
 namespace UI {
@@ -17,8 +18,8 @@ namespace Explorer {
 namespace Tabs {
 namespace Query {
 
-QueryThread::QueryThread(QSqlDatabase database, QStringList queryList, QObject * parent ) : QThread(parent) {
-	this->database = database;
+QueryThread::QueryThread(QStringList queryList, QObject * parent ) : QThread(parent) {
+
 	this->queries = queryList;
 }
 
@@ -26,9 +27,20 @@ void QueryThread::run()
 {
 	qDebug() << "Start thread execution";
 
+    QSqlDatabase db = QSqlDatabase::database();
+    this->database = QSqlDatabase::cloneDatabase(db, QUuid::createUuid().toString());
+
 	QList<QSqlQuery> results;
 
 	if (this->database.open()) {
+
+        QSqlQuery query(this->database);
+        if (query.exec("SELECT CONNECTION_ID()")) {
+            query.next();
+            this->connectionId = query.value(0).toString();
+        }
+
+
 		foreach(QString sql, this->queries) {
 
 			QSqlQuery query(this->database);
@@ -57,6 +69,14 @@ void QueryThread::run()
 	}
 
 	qDebug() << "End of thread execution";
+}
+
+void QueryThread::killQuery()
+{
+    if (!this->connectionId.isEmpty()) {
+        QSqlQuery killQuery;
+        killQuery.exec("KILL "+this->connectionId);
+    }
 }
 
 QList<QueryExecutionResult> QueryThread::getQueryResult()

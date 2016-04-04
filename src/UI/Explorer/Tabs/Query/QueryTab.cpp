@@ -80,8 +80,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 
 void QueryTab::stopQueries()
 {
-	this->queryWorker->terminate();
-	this->queryWorker->deleteLater();
+    this->queryWorker->killQuery();
 	this->executeButton->setEnabled(true);
 	this->stopButton->setEnabled(false);
 }
@@ -103,9 +102,7 @@ void QueryTab::queryChanged()
 	if (!filteredQueries.isEmpty()) {
 		this->executeButton->setEnabled(false);
 		this->stopButton->setEnabled(true);
-		QSqlDatabase db = QSqlDatabase::database();
-		QSqlDatabase threadDB = QSqlDatabase::cloneDatabase(db, QUuid::createUuid().toString());
-		this->queryWorker = new QueryThread(threadDB, filteredQueries);
+        this->queryWorker = new QueryThread(filteredQueries);
 		connect(this->queryWorker, SIGNAL(queryResultReady()), this, SLOT(handleQueryResultReady()));
 		this->queryWorker->start();
 	}

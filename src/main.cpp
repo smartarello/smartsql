@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     if (fontId != -1)
     {
         QFont font("Lato Regular");
+        font.setPointSize(10);
         app.setFont(font);
     } else {
         qWarning() << "Unable to load the font: Lato-Regular.ttf";

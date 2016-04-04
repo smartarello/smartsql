@@ -28,15 +28,17 @@ class QueryThread: public QThread {
 	Q_OBJECT
 
 public:
-	QueryThread(QSqlDatabase database, QStringList queryList, QObject * parent = 0);
+    QueryThread(QStringList queryList, QObject * parent = 0);
 	virtual ~QueryThread();
 	virtual void run();
 	QList<QueryExecutionResult> getQueryResult();
+    void killQuery();
 
 private:
 	QStringList queries;
 	QList<QueryExecutionResult> queryResult;
 	QSqlDatabase database;
+    QString connectionId;
 
 signals:
 	void queryResultReady();
