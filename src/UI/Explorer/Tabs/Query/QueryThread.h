@@ -8,14 +8,23 @@
 #ifndef UI_EXPLORER_TABS_QUERY_QUERYTHREAD_H_
 #define UI_EXPLORER_TABS_QUERY_QUERYTHREAD_H_
 
-#include <qthread.h>
+#include <QThread>
 #include <QSqlQuery>
 #include <QSqlDatabase>
 #include <QSqlResult>
+#include <QJsonObject>
+#include <QSqlRecord>
+#include "Util/DataBase.h"
 
 struct QueryExecutionResult {
-	QSqlQuery query;
-	qint64 msec; // millisecond
+    QList<QSqlRecord> data;
+    qint64 msec; // millisecond
+    bool isSelect;
+    int affectedRows;
+    int rows;
+    QString error;
+    QString query;
+    bool limitedResult;
 } ;
 
 namespace UI {
@@ -28,20 +37,20 @@ class QueryThread: public QThread {
 	Q_OBJECT
 
 public:
-    QueryThread(QStringList queryList, QObject * parent = 0);
+
+
+    QueryThread(ConnectionConfiguration connection, QStringList queryList, QObject * parent = 0);
 	virtual ~QueryThread();
 	virtual void run();
-	QList<QueryExecutionResult> getQueryResult();
     void killQuery();
 
 private:
 	QStringList queries;
-	QList<QueryExecutionResult> queryResult;
-	QSqlDatabase database;
     QString connectionId;
+    ConnectionConfiguration connection;
 
 signals:
-	void queryResultReady();
+    void queryResultReady(QList<QueryExecutionResult>);
 };
 
 } /* namespace Query */

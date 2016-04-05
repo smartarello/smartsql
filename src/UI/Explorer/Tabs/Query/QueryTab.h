@@ -10,9 +10,11 @@
 
 #include <qsplitter.h>
 #include <QTabWidget>
+#include <QSqlRecord>
 #include <QPushButton>
 #include "QueryTextEdit.h"
 #include "QueryThread.h"
+
 
 namespace UI {
 namespace Explorer {
@@ -23,6 +25,7 @@ class QueryTab: public QSplitter {
 
 	Q_OBJECT
 public:
+
 	QueryTab(QWidget *parent = 0);
 	virtual ~QueryTab();
 	void focus();
@@ -30,7 +33,7 @@ public:
 public slots:
 	void queryChanged();
 	void stopQueries();
-	void handleQueryResultReady();
+    void handleQueryResultReady(QList<QueryExecutionResult> results);
 
 private:
 	QueryTextEdit *queryTextEdit;

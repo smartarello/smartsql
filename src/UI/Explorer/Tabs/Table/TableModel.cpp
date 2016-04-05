@@ -25,10 +25,6 @@ TableModel::TableModel(QObject * parent) : QAbstractTableModel(parent) {
 
 void TableModel::setTable(QSqlDatabase database, QString table){
 
-    if (this->database.isValid() && this->database.isOpen()) {
-        this->database.close();
-    }
-
     this->database = database;
 	this->table = table;
 	this->sortOrder = "";
@@ -37,7 +33,7 @@ void TableModel::setTable(QSqlDatabase database, QString table){
     this->primaryKey = QStringList();
 
 
-    if (!this->database.open()) {
+    if (!this->database.isOpen() && !this->database.open()) {
         qWarning() << "TableModel::setTable - Unable to open the connection - " + this->database.lastError().text();
         return ;
     }
@@ -160,7 +156,7 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
     	updateQuery += where.join(" AND ");
 
-        if (!this->database.open()) {
+        if (!this->database.isOpen() && !this->database.open()) {
             return false;
         }
 
@@ -175,7 +171,7 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
     	if (query.exec()){
     		record.setValue(index.column(), value);
     		this->results.replace(index.row(), record);
-            this->database.close();
+            //this->database.close();
     		emit dataChanged(index, index);
     		return true;
     	} else {
@@ -240,7 +236,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 
 	deleteQuery += "(" + orStatement.join(") OR (") + ")";
 
-    if (!this->database.open()) {
+    if (!this->database.isOpen() && !this->database.open()) {
         return false;
     }
 
@@ -253,7 +249,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 		return false;
 	}
 
-    this->database.close();
+    //this->database.close();
 
 
 	beginRemoveRows(parent, row, lastRow);
@@ -268,7 +264,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 
 void TableModel::reload()
 {
-    if (!this->database.open()) {
+    if (!this->database.isOpen() && !this->database.open()) {
         return;
     }
 
@@ -287,7 +283,7 @@ void TableModel::reload()
             this->results << query.record();
 		}
 
-        this->database.close();
+        //this->database.close();
 		emit layoutChanged();
 	}
 }

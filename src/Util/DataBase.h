@@ -11,6 +11,14 @@
 #include <QJsonObject>
 #include <QSqlDatabase>
 
+struct ConnectionConfiguration {
+    QString hostname;
+    QString username;
+    QString password;
+    QString databaseName;
+    int port;
+};
+
 namespace Util {
 
 class DataBase {
@@ -20,6 +28,8 @@ public:
 
 	static bool open(QJsonObject sessionConfiguration, QString database = "");
     static QSqlDatabase cloneCurrentConnection();
+    static QSqlDatabase createFromConfig(ConnectionConfiguration config);
+    static ConnectionConfiguration dumpConfiguration();
 
 private:
 	static QSqlDatabase defaultConnection;

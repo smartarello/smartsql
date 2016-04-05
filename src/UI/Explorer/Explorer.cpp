@@ -251,7 +251,7 @@ void Explorer::dataBaseTreeItemChanged()
 
 
 	if (!tableName.isNull()){
-        this->tableTab->setTable(Util::DataBase::cloneCurrentConnection(), tableName);
+        this->tableTab->setTable(QSqlDatabase::database(), tableName);
 		if (this->explorerTabs->indexOf(this->tableTab) == -1){
 			this->tableTab->show();
 			this->explorerTabs->insertTab(1, this->tableTab, tr("Data"));

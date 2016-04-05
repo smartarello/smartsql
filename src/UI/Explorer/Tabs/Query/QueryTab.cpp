@@ -18,6 +18,8 @@
 #include <QSortFilterProxyModel>
 #include <QUuid>
 #include <QLocale>
+#include <QJsonObject>
+#include <QSqlRecord>
 #include "QueryModel.h"
 
 namespace UI {
@@ -27,21 +29,26 @@ namespace Query {
 
 QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 
-	this->setOrientation(Qt::Vertical);
+    // Defines a new type for the SIGNAL
+    qRegisterMetaType< QList<QueryExecutionResult> >("QList<QueryExecutionResult>");
 
+    // Horizontal split
+	this->setOrientation(Qt::Vertical);
 
 	QWidget *topPart = new QWidget(this);
 
 	QVBoxLayout *topLayout = new QVBoxLayout();
 	topPart->setLayout(topLayout);
 
+    // Query editor
+    this->queryTextEdit = new QueryTextEdit();
+    topLayout->addWidget(this->queryTextEdit);
+
+    // Actions
 	QWidget *buttonContainer = new QWidget(this);
 	QHBoxLayout *buttonLayout = new QHBoxLayout();
 	buttonContainer->setLayout(buttonLayout);
-	buttonLayout->setAlignment(Qt::AlignLeft);
-
-	this->queryTextEdit = new QueryTextEdit();
-	topLayout->addWidget(this->queryTextEdit);
+	buttonLayout->setAlignment(Qt::AlignLeft);	
 
 	this->executeButton = new QPushButton();
 	this->executeButton->setIcon(QIcon(":/resources/icons/play.png"));
@@ -62,16 +69,20 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 
 	topLayout->addWidget(buttonContainer);
 
+    // Tabs container to display the query results
+    // Several queries can be played with the same editor
 	this->queryTabs = new QTabWidget(this);
 
 	this->addWidget(topPart);
 	this->addWidget(this->queryTabs);
 
+    // Proportion between the query editor and the tabs for the results
 	QList<int> sizes;
 	sizes << 80;
 	sizes << 300;
 	this->setSizes(sizes);
 
+    // Events
 	connect(parent, SIGNAL (databaseChanged()), this->queryTextEdit, SLOT (databaseChanged()));
 	connect(this->queryTextEdit, SIGNAL (queryChanged()), this, SLOT (queryChanged()));
 	connect(this->executeButton, SIGNAL (clicked(bool)), this, SLOT (queryChanged()));
@@ -87,7 +98,10 @@ void QueryTab::stopQueries()
 
 void QueryTab::queryChanged()
 {
+    // Split the queries from the editor text with the separator ";"
 	QStringList queries = this->queryTextEdit->toPlainText().split(";");
+
+    // The list of queries to play
 	QStringList filteredQueries;
 
 	foreach (QString sql, queries) {
@@ -100,48 +114,55 @@ void QueryTab::queryChanged()
 	}
 
 	if (!filteredQueries.isEmpty()) {
+
 		this->executeButton->setEnabled(false);
 		this->stopButton->setEnabled(true);
-        this->queryWorker = new QueryThread(filteredQueries);
-		connect(this->queryWorker, SIGNAL(queryResultReady()), this, SLOT(handleQueryResultReady()));
-		this->queryWorker->start();
+
+        // Creates the thread that will play the queries
+        this->queryWorker = new QueryThread(Util::DataBase::dumpConfiguration(), filteredQueries);
+        // Event fire when the execution is terminated
+        connect(this->queryWorker, SIGNAL(queryResultReady(QList<QueryExecutionResult>)), this, SLOT(handleQueryResultReady(QList<QueryExecutionResult>)));
+
+        this->queryWorker->start();
 	}
 
 }
 
-void QueryTab::handleQueryResultReady()
+void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
 {
 	qDebug() << "Queries result ready";
 
 	this->executeButton->setEnabled(true);
 	this->stopButton->setEnabled(false);
-	QList<QueryExecutionResult> results = this->queryWorker->getQueryResult();
-
 
 	this->queryTabs->clear();
-	foreach(QueryExecutionResult result, results) {
+    foreach(QueryExecutionResult result, results) {
 
-		double seconds = result.msec / 1000.0;
-		if (result.query.lastError().isValid()) {
+
+        if (!result.error.isEmpty()) {
 			QMessageBox *message = new QMessageBox(this);
-			message->setText(result.query.lastError().databaseText());
+            message->setText(result.error);
 			message->setIcon(QMessageBox::Critical);
 			message->show();
 			return ;
 		}
 
-		if (result.query.isSelect()) {
+        double seconds = result.msec / 1000.0;
+
+        if (result.isSelect) {
 			QTableView *tableData = new QTableView();
 			tableData->verticalHeader()->hide();
-			QueryModel *model = new QueryModel();
+            QueryModel *model = new QueryModel(result.data);
 
 			tableData->setModel(model);
 
-			model->setQuery(result.query);
-
-            QString rowCount = QLocale(QLocale::English).toString(result.query.size());
+            QString rowCount = QLocale(QLocale::English).toString(result.rows);
 
             QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(rowCount).arg(seconds);
+            if (result.limitedResult) {
+                headerText += " " + tr("Limited to 100,000");
+            }
+
 			this->queryTabs->addTab(tableData, headerText);
 
             // Defines the initial column width
@@ -160,14 +181,15 @@ void QueryTab::handleQueryResultReady()
             resultText->setFontFamily("DejaVue Sans Mono Oblique");
 			resultText->setReadOnly(true);
 
+            QString rowCount = QLocale(QLocale::English).toString(result.affectedRows);
+            QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(rowCount).arg(seconds);
+            QString affectedRows = QString(tr("Affected rows: %1")).arg(rowCount);
 
-			QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(result.query.numRowsAffected()).arg(seconds);
-			QString affectedRows = QString(tr("Affected rows: %1")).arg(result.query.numRowsAffected());
-
-			resultText->setPlainText(affectedRows + "\n\n" + result.query.lastQuery());
+            resultText->setPlainText(affectedRows + "\n\n" + result.query);
 			this->queryTabs->addTab(resultText, headerText);
 		}
 	}
+
 }
 
 void QueryTab::focus()

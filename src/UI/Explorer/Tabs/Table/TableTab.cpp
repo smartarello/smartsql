@@ -110,30 +110,26 @@ void TableTab::setTable(QSqlDatabase database, QString tableName) {
         this->tableData->setColumnWidth(i++, size);
     }
 
-    if (database.open()) {
-        QSqlQuery query(database);
-        query.prepare("SHOW TABLE STATUS WHERE Name LIKE :table");
-        query.bindValue(":table", tableName);
-        query.exec();
+    QSqlQuery query(database);
+    query.prepare("SHOW TABLE STATUS WHERE Name LIKE :table");
+    query.bindValue(":table", tableName);
+    query.exec();
 
-        if (query.lastError().isValid()) {
-            qDebug() << "TableTab::setTable - " + query.lastError().text();
-            this->tableInfoLabel->setText("");
-        } else {
-            if (query.next()){
-                int rows = query.value(4).toInt();
-                QString rowCount = QLocale(QLocale::English).toString(rows);
-                if (rows > 1000){
-                    this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(database.databaseName()).arg(tableName).arg(rowCount));
-                } else {
-                    this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(database.databaseName()).arg(tableName).arg(rowCount));
-                }
-            } else {
-                this->tableInfoLabel->setText("");
-            }
-        }
+    if (query.lastError().isValid()) {
+        qDebug() << "TableTab::setTable - " + query.lastError().text();
+        this->tableInfoLabel->setText("");
     } else {
-        qWarning() << "TableTab::setTable - " + database.lastError().text();
+        if (query.next()){
+            int rows = query.value(4).toInt();
+            QString rowCount = QLocale(QLocale::English).toString(rows);
+            if (rows > 1000){
+                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(database.databaseName()).arg(tableName).arg(rowCount));
+            } else {
+                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(database.databaseName()).arg(tableName).arg(rowCount));
+            }
+        } else {
+            this->tableInfoLabel->setText("");
+        }
     }
 
 	QCompleter *completer = this->whereConditionText->getAutocomplete();

@@ -18,29 +18,56 @@ namespace Explorer {
 namespace Tabs {
 namespace Query {
 
-QueryModel::QueryModel(QObject * parent) : QSqlQueryModel(parent) {
-
-
+QueryModel::QueryModel(QList<QSqlRecord> data, QObject * parent) : QAbstractTableModel(parent) {
+    this->records = data;
 }
 
 
 QVariant QueryModel::data(const QModelIndex &index, int role) const
 {
-    QVariant value = QSqlQueryModel::data(index, role);
-    if (value.isNull() && role == Qt::DisplayRole) {
-            return QVariant("(NULL)");
-    } else if (role == Qt::FontRole) {
+    if (index.row() < this->records.size()) {
+        QSqlRecord record = this->records.at(index.row());
+        QVariant value = record.value(index.column());
 
-        QVariant data = QSqlQueryModel::data(index, Qt::DisplayRole);
-        if (data.isNull()) {
+        if (value.isNull() && role == Qt::DisplayRole) {
+                return QVariant("(NULL)");
+        }
+        else if (role == Qt::DisplayRole) {
+            return value;
+        }
+        else if (role == Qt::FontRole && value.isNull()) {
+
             QFont font("DejaVue Sans Mono");
             font.setItalic(true);
             return QVariant(font);
         }
     }
 
+    return QVariant();
+}
 
-    return value;
+int QueryModel::rowCount(const QModelIndex & parent) const
+{
+    return this->records.size();
+}
+
+int QueryModel::columnCount(const QModelIndex & parent) const
+{
+    if (this->records.isEmpty()) {
+        return 0;
+    } else {
+        return this->records.at(0).count();
+    }
+}
+
+QVariant QueryModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole && !this->records.isEmpty()) {
+        QSqlRecord r = this->records.at(0);
+        return r.fieldName(section);
+    }
+
+    return QVariant();
 }
 
 QueryModel::~QueryModel() {

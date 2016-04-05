@@ -18,76 +18,94 @@ namespace Explorer {
 namespace Tabs {
 namespace Query {
 
-QueryThread::QueryThread(QStringList queryList, QObject * parent ) : QThread(parent) {
+QueryThread::QueryThread(ConnectionConfiguration connection, QStringList queryList, QObject * parent ) :
+    QThread(parent),
+    connection(connection),
+    queries(queryList)
+{
 
-	this->queries = queryList;
 }
 
 void QueryThread::run()
 {
-	qDebug() << "Start thread execution";
+    qDebug() << "QueryThread::run - Start thread execution";
 
-    QSqlDatabase db = QSqlDatabase::database();
-    this->database = QSqlDatabase::cloneDatabase(db, QUuid::createUuid().toString());
+    QSqlDatabase database = Util::DataBase::createFromConfig(this->connection);
 
-	QList<QSqlQuery> results;
+    QList<QueryExecutionResult>  results;
+    if (database.open()) {
 
-	if (this->database.open()) {
-
-        QSqlQuery query(this->database);
+        QSqlQuery query(database);
         if (query.exec("SELECT CONNECTION_ID()")) {
             query.next();
             this->connectionId = query.value(0).toString();
+
+            foreach(QString sql, this->queries) {
+
+                QSqlQuery query(database);
+
+                QDateTime mStartTime = QDateTime::currentDateTime();
+                if (query.exec(sql)) {
+
+                    QueryExecutionResult result;
+                    result.msec = mStartTime.msecsTo(QDateTime::currentDateTime());
+                    result.rows = query.size();
+                    if (query.isSelect()) {
+                        result.isSelect = true;
+                        QList<QSqlRecord> data;
+                        if (query.size() > 100000) {
+                            result.limitedResult = true;
+                        } else {
+                            result.limitedResult = false;
+                        }
+
+                        int i = 0;
+                        while (query.next() && i++ < 100000) {
+                            data << query.record();
+                        }
+
+                        result.data = data;
+                    } else {
+                        result.query = sql;
+                        result.isSelect = false;
+                        result.affectedRows = query.numRowsAffected();
+                    }
+
+
+                    results << result;
+                } else {
+                    qDebug() << "QueryThread::run - " + query.lastError().text();
+                    QueryExecutionResult result;
+                    result.error = query.lastError().text();
+                    results << result;
+                    break;
+                }
+            }
         }
 
+        database.close();
+        emit queryResultReady(results);
 
-		foreach(QString sql, this->queries) {
-
-			QSqlQuery query(this->database);
-
-			QDateTime mStartTime = QDateTime::currentDateTime();
-			if (query.exec(sql)) {
-
-				QueryExecutionResult result;
-				result.msec = mStartTime.msecsTo(QDateTime::currentDateTime());
-				result.query = query;
-
-				this->queryResult << result;
-			} else {
-				qDebug() << "QueryThread::run - " + query.lastError().text();
-				QueryExecutionResult result;
-				result.msec = 0;
-				result.query = query;
-				this->queryResult << result;
-				break;
-			}
-		}
-
-		emit queryResultReady();
 	} else {
-		qWarning() << this->database.lastError();
+        qWarning() << database.lastError();
 	}
 
-	qDebug() << "End of thread execution";
+    qDebug() << "QueryThread::run - End of thread execution";
 }
 
 void QueryThread::killQuery()
 {
     if (!this->connectionId.isEmpty()) {
-        QSqlQuery killQuery;
-        killQuery.exec("KILL "+this->connectionId);
-    }
-}
+        QSqlDatabase database = Util::DataBase::createFromConfig(this->connection);
 
-QList<QueryExecutionResult> QueryThread::getQueryResult()
-{
-	return this->queryResult;
+        QSqlQuery killQuery(database);
+        killQuery.exec("KILL "+this->connectionId);
+        database.close();
+    }
 }
 
 
 QueryThread::~QueryThread() {
-
-
 }
 
 } /* namespace Query */

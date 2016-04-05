@@ -62,6 +62,30 @@ QSqlDatabase DataBase::cloneCurrentConnection()
     return db;
 }
 
+QSqlDatabase DataBase::createFromConfig(ConnectionConfiguration config) {
+    QSqlDatabase database = QSqlDatabase::addDatabase("QMYSQL", QUuid::createUuid().toString());
+    database.setHostName(config.hostname);
+    database.setUserName(config.username);
+    database.setPassword(config.password);
+    database.setDatabaseName(config.databaseName);
+    database.setPort(config.port);
+
+    return database;
+}
+
+ConnectionConfiguration DataBase::dumpConfiguration()
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    ConnectionConfiguration conf;
+    conf.hostname = db.hostName();
+    conf.username = db.userName();
+    conf.password = db.password();
+    conf.databaseName = db.databaseName();
+    conf.port = db.port();
+
+    return conf;
+}
+
 DataBase::~DataBase() {
 }
 
