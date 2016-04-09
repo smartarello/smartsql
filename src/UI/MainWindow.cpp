@@ -31,7 +31,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), sessionManager(0)
 
 void MainWindow::handleOpenConnection(QJsonObject sessionConfiguration)
 {
-	if (Util::DataBase::open(sessionConfiguration)){
+    if (Util::DataBase::open(sessionConfiguration)){
+
 		if (this->explorer == 0) {
 
 			qDebug() << "Open explorer";

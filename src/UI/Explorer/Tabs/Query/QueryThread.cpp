@@ -47,20 +47,21 @@ void QueryThread::run()
                 QDateTime mStartTime = QDateTime::currentDateTime();
                 if (query.exec(sql)) {
 
+
                     QueryExecutionResult result;
                     result.msec = mStartTime.msecsTo(QDateTime::currentDateTime());
                     result.rows = query.size();
                     if (query.isSelect()) {
                         result.isSelect = true;
                         QList<QSqlRecord> data;
-                        if (query.size() > 100000) {
+                        if (query.size() > 1000) {
                             result.limitedResult = true;
                         } else {
                             result.limitedResult = false;
                         }
 
                         int i = 0;
-                        while (query.next() && i++ < 100000) {
+                        while (query.next() && i++ < 1000) {
                             data << query.record();
                         }
 
@@ -85,6 +86,7 @@ void QueryThread::run()
 
         database.close();
         emit queryResultReady(results);
+        results.clear();
 
 	} else {
         qWarning() << database.lastError();

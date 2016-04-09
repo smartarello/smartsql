@@ -72,6 +72,7 @@ QVariant QueryModel::headerData(int section, Qt::Orientation orientation, int ro
 
 QueryModel::~QueryModel() {
 
+    this->records.clear();
 }
 
 } /* namespace Query */

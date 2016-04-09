@@ -119,7 +119,7 @@ void QueryTab::queryChanged()
 		this->stopButton->setEnabled(true);
 
         // Creates the thread that will play the queries
-        this->queryWorker = new QueryThread(Util::DataBase::dumpConfiguration(), filteredQueries);
+        this->queryWorker = new QueryThread(Util::DataBase::dumpConfiguration(), filteredQueries, this);
         // Event fire when the execution is terminated
         connect(this->queryWorker, SIGNAL(queryResultReady(QList<QueryExecutionResult>)), this, SLOT(handleQueryResultReady(QList<QueryExecutionResult>)));
 
@@ -131,9 +131,10 @@ void QueryTab::queryChanged()
 void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
 {
 	qDebug() << "Queries result ready";
+    delete  this->queryWorker;
 
 	this->executeButton->setEnabled(true);
-	this->stopButton->setEnabled(false);
+    this->stopButton->setEnabled(false);
 
 	this->queryTabs->clear();
     foreach(QueryExecutionResult result, results) {
@@ -150,20 +151,20 @@ void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
         double seconds = result.msec / 1000.0;
 
         if (result.isSelect) {
-			QTableView *tableData = new QTableView();
-			tableData->verticalHeader()->hide();
-            QueryModel *model = new QueryModel(result.data);
+            QTableView *tableData = new QTableView(this->queryTabs);
+            tableData->verticalHeader()->hide();
+            QueryModel *model = new QueryModel(result.data, this);
 
-			tableData->setModel(model);
+            tableData->setModel(model);
 
             QString rowCount = QLocale(QLocale::English).toString(result.rows);
 
             QString headerText = QString(tr("Result (%1 rows, %2 sec)")).arg(rowCount).arg(seconds);
             if (result.limitedResult) {
-                headerText += " " + tr("Limited to 100,000");
+                headerText += " " + tr("Limited to 1,000");
             }
 
-			this->queryTabs->addTab(tableData, headerText);
+            this->queryTabs->addTab(tableData, headerText);
 
             // Defines the initial column width
             int colCount = model->columnCount();
@@ -189,6 +190,9 @@ void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
 			this->queryTabs->addTab(resultText, headerText);
 		}
 	}
+
+
+    results.clear();
 
 }
 

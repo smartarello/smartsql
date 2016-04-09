@@ -1,8 +1,10 @@
+SmartSQL
 /Debug/
 *.o
 .project
 .cproject
 moc_*.cpp
 mysqlclient
+SmartSQL
 Makefile
 mysqlclient.pro.user

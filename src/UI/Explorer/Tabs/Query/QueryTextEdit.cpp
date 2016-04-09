@@ -195,7 +195,6 @@ void QueryTextEdit::loadTableFields()
 }
 
 QueryTextEdit::~QueryTextEdit() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace Query */
