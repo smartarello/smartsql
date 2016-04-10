@@ -15,7 +15,6 @@
 #include <QPushButton>
 #include <qsqlerror.h>
 #include <QMessageBox>
-#include <QSortFilterProxyModel>
 #include <QUuid>
 #include <QLocale>
 #include <QJsonObject>

@@ -20,14 +20,9 @@ namespace Database {
 
 DataBaseTab::DataBaseTab(QWidget * parent) : QTableView(parent) {
 
-    DatabaseModel *model = new DatabaseModel();
-    QSortFilterProxyModel *sortModel = new QSortFilterProxyModel();
-    sortModel->setSourceModel(model);
-    sortModel->setSortRole(Qt::UserRole+1);
-
-    this->setModel(sortModel);
+    DatabaseModel *model = new DatabaseModel(this);
+    this->setModel(model);
 	this->verticalHeader()->hide();
-    this->setSortingEnabled(true);
     this->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     connect(this, SIGNAL(doubleClicked(QModelIndex)), SLOT(handleDoubleClicked(QModelIndex)));
@@ -35,24 +30,19 @@ DataBaseTab::DataBaseTab(QWidget * parent) : QTableView(parent) {
 
 void DataBaseTab::handleDoubleClicked(QModelIndex index)
 {
-    QSortFilterProxyModel *sortModel = (QSortFilterProxyModel *) this->model();
-    QModelIndex sourceIndex = sortModel->mapToSource(index);
-    qDebug() << sourceIndex.data();
+
+    qDebug() << index.data();
     //TODO display the table
     qDebug() << "table selected";
 }
 
 void DataBaseTab::refresh()
 {
-    QSortFilterProxyModel *sortModel = (QSortFilterProxyModel *) this->model();
-    ((DatabaseModel *)sortModel->sourceModel())->reload();
-    //sortModel->sort(0);
-    this->sortByColumn(0, Qt::AscendingOrder);
+    ((DatabaseModel *)this->model())->reload();
     this->resizeColumnsToContents();
 }
 
 DataBaseTab::~DataBaseTab() {
-    delete this->model();
 }
 
 } /* namespace Database */

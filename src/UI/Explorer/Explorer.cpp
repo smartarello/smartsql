@@ -237,6 +237,8 @@ void Explorer::dataBaseTreeItemChanged()
 	}
 
 	QJsonObject sessionConf = dbItem->parent()->data().toJsonObject();
+    QSqlDatabase currentDatabase = QSqlDatabase::database();
+    QString previousDatabase = currentDatabase.databaseName();
 	if (!Util::DataBase::open(sessionConf, dataBaseName)){
 
 		QMessageBox *message = new QMessageBox();
@@ -262,11 +264,11 @@ void Explorer::dataBaseTreeItemChanged()
 		this->explorerTabs->removeTab(tableTabIndex);
 	}
 
-    this->databaseTab->refresh();
-    this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
-
-
-	emit databaseChanged();
+    if (dataBaseName != previousDatabase) {
+        this->databaseTab->refresh();
+        this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
+        emit databaseChanged();
+    }
 }
 
 void Explorer::refreshDatabase()
