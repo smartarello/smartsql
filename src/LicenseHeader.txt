@@ -14,35 +14,3 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-
-#ifndef UI_EXPLORER_TABS_DATABASETAB_H_
-#define UI_EXPLORER_TABS_DATABASETAB_H_
-
-#include <QTableView>
-#include <QSqlDatabase>
-#include <QModelIndex>
-
-namespace UI {
-namespace Explorer {
-namespace Tabs {
-namespace Database {
-
-class DataBaseTab: public QTableView {
-
-	Q_OBJECT
-
-public:
-	DataBaseTab(QWidget * parent = 0);
-	virtual ~DataBaseTab();
-	void refresh();
-
-public slots:
-    void handleDoubleClicked(QModelIndex index);
-};
-
-} /* namespace Database */
-} /* namespace Tabs */
-} /* namespace Explorer */
-} /* namespace UI */
-
-#endif /* UI_EXPLORER_TABS_DATABASETAB_H_ */
