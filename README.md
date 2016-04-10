@@ -6,14 +6,20 @@ SmartSQL is a useful and reliable tool designed for web developers using the pop
 ### Prerequisites
 
 * [Qt 5.6](http://www.qt.io/download/)
+  * Install Qt sources
 * g++ 4.8 or later
 * Debian/Ubuntu (apt-get)
-  * `sudo apt-get install build-essential libgl1-mesa-dev`
-* Fedora/RHEL/CentOS (yum)
-  * `sudo yum groupinstall "C Development Tools and Libraries"`
-  * `sudo yum install mesa-libGL-devel`
-* openSUSE (zypper)
-  * `sudo zypper install -t pattern devel_basis`
+  * `sudo apt-get install build-essential libgl1-mesa-dev libmysqlclient-dev libssl-dev libfontconfig1-dev libfreetype6-dev`
+
+### Build the MySQL plugin
+```
+$ cd $QTSOURCEDIR/qtbase/src/plugins/sqldrivers/mysql
+$ qmake "INCLUDEPATH+=/usr/local/include" "LIBS+=-L/usr/local/lib -lmysqlclient_r" mysql.pro
+$ make
+$ make install
+```
+
+### Build SmartSQL
 
 You can build SmartSQL with
 ```
