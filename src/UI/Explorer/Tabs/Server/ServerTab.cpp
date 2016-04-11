@@ -21,14 +21,22 @@
 
 ServerTab::ServerTab(QWidget *parent) : QTableView(parent)
 {
-    QSqlQueryModel *model = new QSqlQueryModel();
+    QSqlQueryModel *model = new QSqlQueryModel(this);
     model->setQuery("SHOW DATABASES");
 
     this->setModel(model);
     this->resizeColumnsToContents();
     this->verticalHeader()->hide();
+
+    connect(this, SIGNAL(doubleClicked(QModelIndex)), SLOT(handleDoubleClicked(QModelIndex)));
+}
+
+void ServerTab::handleDoubleClicked(QModelIndex index)
+{
+    QVariant databaseName = this->model()->data(index);
+    emit showDatabase(databaseName.toString());
 }
 
 ServerTab::~ServerTab() {
-    // TODO Auto-generated destructor stub
+
 }

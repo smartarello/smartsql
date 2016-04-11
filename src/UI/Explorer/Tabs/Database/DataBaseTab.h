@@ -38,6 +38,9 @@ public:
 
 public slots:
     void handleDoubleClicked(QModelIndex index);
+
+signals:
+    void showTable(QString tableName);
 };
 
 } /* namespace Database */

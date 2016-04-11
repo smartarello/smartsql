@@ -104,7 +104,8 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 
 	this->dataBaseTree->selectionModel()->setCurrentIndex(index, (QItemSelectionModel::Select | QItemSelectionModel::Rows));
 
-	this->databaseTab = new Tabs::Database::DataBaseTab();
+    this->databaseTab = new Tabs::Database::DataBaseTab(this);
+    this->databaseTab->hide();
     this->serverTab = new ServerTab(this);
     this->explorerTabs->addTab(this->serverTab, tr("Host"));
 
@@ -137,6 +138,9 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
     connect(this->dataBaseTree->selectionModel(),
           SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
           this, SLOT(dataBaseTreeItemChanged()));
+
+    connect(this->databaseTab, SIGNAL(showTable(QString)), SLOT(handleShowTable(QString)));
+    connect(this->serverTab, SIGNAL(showDatabase(QString)), SLOT(handleShowDatabase(QString)));
 }
 
 /**
@@ -214,6 +218,7 @@ void Explorer::dataBaseTreeItemChanged()
 		return ;
     } else if (serverTabIndex != -1) {
         this->explorerTabs->removeTab(serverTabIndex);
+        this->databaseTab->show();
         this->explorerTabs->insertTab(0, this->databaseTab, "");
         this->explorerTabs->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
     }
@@ -309,6 +314,64 @@ void Explorer::handleCloseExplorer()
 	}
 
 	emit closeExplorer();
+}
+
+/**
+ * Shows the table tab with the selected table
+ *
+ * @param tableName the table name
+ */
+void Explorer::handleShowTable(QString tableName)
+{
+    // Removes filter on table name
+    this->tableFilterLineEdit->clear();
+    this->dataBaseTree->filterTable("");
+
+    QModelIndex index = this->dataBaseTree->selectionModel()->currentIndex();
+    this->dataBaseTree->expand(index);
+
+    // Search the index for the table name in the tree view
+    QModelIndexList items = this->dataBaseTree->model()->match(
+                index,
+                Qt::DisplayRole,
+                QVariant::fromValue(tableName),
+                1,
+                Qt::MatchRecursive);
+
+    if (!items.isEmpty()) {
+
+        this->dataBaseTree->selectionModel()->setCurrentIndex(items.first(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+        this->explorerTabs->setCurrentWidget(this->tableTab);
+    }
+}
+
+/**
+ * Shows the database tab with the selected database
+ *
+ * @param databaseName
+ */
+void Explorer::handleShowDatabase(QString databaseName)
+{
+    // Removes filter on database
+    this->databaseFilterLineEdit->clear();
+    this->dataBaseTree->filterDatabase("");
+
+    QModelIndex index = this->dataBaseTree->selectionModel()->currentIndex();
+
+    // Search the index for the database name in the tree view
+    QModelIndexList items = this->dataBaseTree->model()->match(
+                index,
+                Qt::DisplayRole,
+                QVariant::fromValue(databaseName),
+                1,
+                Qt::MatchRecursive);
+
+    if (!items.isEmpty()) {
+
+        this->dataBaseTree->selectionModel()->setCurrentIndex(items.first(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+
+        this->explorerTabs->setCurrentWidget(this->databaseTab);
+    }
 }
 
 Explorer::~Explorer() {

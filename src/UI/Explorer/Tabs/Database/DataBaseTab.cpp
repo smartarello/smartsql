@@ -39,10 +39,8 @@ DataBaseTab::DataBaseTab(QWidget * parent) : QTableView(parent) {
 
 void DataBaseTab::handleDoubleClicked(QModelIndex index)
 {
-
-    qDebug() << index.data();
-    //TODO display the table
-    qDebug() << "table selected";
+    QString tableName =  ((DatabaseModel *)this->model())->getTableName(index.row());
+    emit showTable(tableName);
 }
 
 void DataBaseTab::refresh()

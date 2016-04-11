@@ -35,7 +35,7 @@ public:
     int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
-
+    QString getTableName(int row);
     void reload();
 
 private:

@@ -87,6 +87,15 @@ QVariant DatabaseModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+QString  DatabaseModel::getTableName(int row)
+{
+    if (row >= this->tableList.size()) {
+        return QString();
+    }
+
+    return this->tableList.at(row).name;
+}
+
 
 void DatabaseModel::reload()
 {

@@ -53,6 +53,8 @@ public slots:
 	void refreshDatabase();
 	void handleCloseExplorer();
     void handleOpenTableInTab();
+    void handleShowTable(QString tableName);
+    void handleShowDatabase(QString databaseName);
 
 private:
 	DataBaseTree *dataBaseTree;

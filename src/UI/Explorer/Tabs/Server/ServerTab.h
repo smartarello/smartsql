@@ -28,6 +28,12 @@ class ServerTab : public QTableView
 public:
     ServerTab(QWidget *parent = 0);
     virtual ~ServerTab();
+
+public slots:
+    void handleDoubleClicked(QModelIndex index);
+
+signals:
+    void showDatabase(QString databaseName);
 };
 
 #endif // SERVERTAB_H
