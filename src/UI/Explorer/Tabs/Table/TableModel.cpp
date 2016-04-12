@@ -158,11 +158,19 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
     	QString columnName = record.fieldName(index.column());
 
-    	QString updateQuery = QString("UPDATE %1 SET %2=:%3 WHERE ").arg(this->table).arg(columnName).arg(columnName);
+        QString updateQuery = QString("UPDATE %1 SET %2=:new_%3 WHERE ").arg(this->table).arg(columnName).arg(columnName);
     	QStringList where;
-    	foreach(QString primaryKeyIndex, this->primaryKey) {
-    		where << QString("%1=:%2").arg(primaryKeyIndex).arg(primaryKeyIndex);
-    	}
+
+        if (!this->primaryKey.isEmpty()) {
+            foreach(QString primaryKeyIndex, this->primaryKey) {
+                where << QString("%1=:%2").arg(primaryKeyIndex).arg(primaryKeyIndex);
+            }
+        } else {
+            // There is no primary key for this table
+            for (int i = 0; i < record.count(); i++) {
+                where << QString("%1=:%2").arg(record.fieldName(i)).arg(record.fieldName(i));
+            }
+        }
 
     	updateQuery += where.join(" AND ");
 
@@ -171,17 +179,23 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
         }
 
         QSqlQuery query(this->database) ;
-    	query.prepare(updateQuery);
-    	query.bindValue(":"+columnName, value);
+        query.prepare(updateQuery);
+        query.bindValue(":new_"+columnName, value);
 
-    	foreach(QString primaryKeyIndex, this->primaryKey) {
-    		query.bindValue(":"+primaryKeyIndex, record.value(primaryKeyIndex));
-    	}
+        if (!this->primaryKey.isEmpty()) {
+            foreach(QString primaryKeyIndex, this->primaryKey) {
+                query.bindValue(":"+primaryKeyIndex, record.value(primaryKeyIndex));
+            }
+        } else {
+            // There is no primary key for this table
+            for (int i = 0; i < record.count(); i++) {
+                query.bindValue(":"+record.fieldName(i), record.value(i));
+            }
+        }
 
-    	if (query.exec()){
+        if (query.exec()){
     		record.setValue(index.column(), value);
     		this->results.replace(index.row(), record);
-            //this->database.close();
     		emit dataChanged(index, index);
     		return true;
     	} else {

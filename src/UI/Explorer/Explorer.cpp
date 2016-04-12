@@ -279,9 +279,9 @@ void Explorer::dataBaseTreeItemChanged()
 		this->explorerTabs->removeTab(tableTabIndex);
 	}
 
+    this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
     if (dataBaseName != previousDatabase) {
         this->databaseTab->refresh();
-        this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
         emit databaseChanged();
     }
 }
