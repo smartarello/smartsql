@@ -55,6 +55,7 @@ public slots:
     void handleOpenTableInTab();
     void handleShowTable(QString tableName);
     void handleShowDatabase(QString databaseName);
+    void handleCurrentTabChanged(int index);
 
 private:
 	DataBaseTree *dataBaseTree;

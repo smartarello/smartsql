@@ -37,6 +37,7 @@ public:
 	TableTab(QWidget *parent = 0);
 	virtual ~TableTab();
     void setTable(QSqlDatabase database, QString tableName);
+    void loadData();
 
 public slots:
 	void queryError(QString query, QString error);
@@ -56,6 +57,8 @@ private:
 	TableFilterTextEdit *whereConditionText;
 	QModelIndex contextMenuIndex;
     QString tableName;
+    QSqlDatabase database;
+    bool loaded;
     QMap<QString,QString> savedFilter;
 };
 

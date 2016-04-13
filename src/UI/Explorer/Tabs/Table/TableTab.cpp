@@ -93,7 +93,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 
     connect(this->whereConditionText, SIGNAL(filterChanged(QString)), SLOT(applyFilterClicked()));
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
-	connect(filterButton, SIGNAL(clicked(bool)), this, SLOT(applyFilterClicked(bool)));
+    connect(filterButton, SIGNAL(clicked(bool)), SLOT(applyFilterClicked()));
 }
 
 void TableTab::refreshData()
@@ -123,46 +123,59 @@ void TableTab::setTable(QSqlDatabase database, QString tableName) {
         this->whereConditionText->setText("");
     }
 
+    this->database = database;
     this->tableName = tableName;
+    this->loaded = false;
+}
 
-	TableModel *queryModel = (TableModel *)this->tableData->model();
-    queryModel->setTable(database, tableName, filter);
+/**
+ * Load the table data, the first 1000 lines and initializes the
+ * autocompleter for the filter part.
+ */
+void TableTab::loadData()
+{
+    if (!this->loaded) {
+        qDebug() << "Load data for the table: "+this->tableName;
+        TableModel *queryModel = (TableModel *)this->tableData->model();
+        queryModel->setTable(database, this->tableName, this->whereConditionText->toPlainText());
 
-    int i = 0;
-    foreach(QString col, queryModel->getColumns()) {
-        int size = col.size() * 15;
-        if (size < 100) {
-            size = 100;
-        }
-        this->tableData->setColumnWidth(i++, size);
-    }
-
-    QSqlQuery query(database);
-    query.prepare("SHOW TABLE STATUS WHERE Name LIKE :table");
-    query.bindValue(":table", tableName);
-    query.exec();
-
-    if (query.lastError().isValid()) {
-        qDebug() << "TableTab::setTable - " + query.lastError().text();
-        this->tableInfoLabel->setText("");
-    } else {
-        if (query.next()){
-            int rows = query.value(4).toInt();
-            QString rowCount = QLocale(QLocale::English).toString(rows);
-            if (rows > 1000){
-                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(database.databaseName()).arg(tableName).arg(rowCount));
-            } else {
-                this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(database.databaseName()).arg(tableName).arg(rowCount));
+        int i = 0;
+        foreach(QString col, queryModel->getColumns()) {
+            int size = col.size() * 15;
+            if (size < 100) {
+                size = 100;
             }
-        } else {
-            this->tableInfoLabel->setText("");
+            this->tableData->setColumnWidth(i++, size);
         }
+
+        QSqlQuery query(this->database);
+        query.prepare("SHOW TABLE STATUS WHERE Name LIKE :table");
+        query.bindValue(":table", this->tableName);
+        query.exec();
+
+        if (query.lastError().isValid()) {
+            qDebug() << "TableTab::setTable - " + query.lastError().text();
+            this->tableInfoLabel->setText("");
+        } else {
+            if (query.next()){
+                int rows = query.value(4).toInt();
+                QString rowCount = QLocale(QLocale::English).toString(rows);
+                if (rows > 1000){
+                    this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately), limited to 1000")).arg(this->database.databaseName()).arg(this->tableName).arg(rowCount));
+                } else {
+                    this->tableInfoLabel->setText(QString(tr("%1.%2: %3 rows (approximately)")).arg(this->database.databaseName()).arg(this->tableName).arg(rowCount));
+                }
+            } else {
+                this->tableInfoLabel->setText("");
+            }
+        }
+
+        QCompleter *completer = this->whereConditionText->getAutocomplete();
+
+        QStringListModel *model =  new QStringListModel(QStringList(queryModel->getColumns()), completer);
+        completer->setModel(model);
+        this->loaded = true;
     }
-
-	QCompleter *completer = this->whereConditionText->getAutocomplete();
-
-	QStringListModel *model =  new QStringListModel(QStringList(queryModel->getColumns()), completer);
-	completer->setModel(model);
 }
 
 void TableTab::customContextMenuRequested(QPoint point)
@@ -225,7 +238,7 @@ void TableTab::customContextMenuRequested(QPoint point)
 	connect(copyAction, SIGNAL(triggered(bool)), SLOT(handleCopyAction()));
 	connect(pasteAction, SIGNAL(triggered(bool)), SLOT(handlePastAction()));
 	connect(deleteAction, SIGNAL(triggered(bool)), SLOT(handleDeleteAction()));
-	connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked(bool)));
+    connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked()));
 
 	if (list.size() > 1) {
 		setNullAction->setEnabled(false);

@@ -132,6 +132,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
 	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
 	connect(this->explorerTabs->tabBar(), SIGNAL(newTabRequested()), this, SLOT(addQueryTab()));
+    connect(this->explorerTabs->tabBar(), SIGNAL(currentChanged(int)), SLOT(handleCurrentTabChanged(int)));
     connect(this->dataBaseTree->getDataBaseModel(), SIGNAL(databaseChanged()), this, SLOT(refreshDatabase()));
 
 
@@ -158,7 +159,9 @@ void Explorer::handleOpenTableInTab()
     if (Util::DataBase::open(connectionConf, dbItem->text())) {
         Tabs::Table::TableTab *tableTab = new Tabs::Table::TableTab(this);
         tableTab->setTable(Util::DataBase::cloneCurrentConnection(), tableItem->text());
-        this->explorerTabs->addTab(tableTab, dbItem->text()+"."+tableItem->text());
+        tableTab->loadData();
+        int tabIndex = this->explorerTabs->addTab(tableTab, dbItem->text()+"."+tableItem->text());
+        this->explorerTabs->setCurrentIndex(tabIndex);
     }
 }
 
@@ -268,13 +271,21 @@ void Explorer::dataBaseTreeItemChanged()
 
 
 	if (!tableName.isNull()){
+        // Set the current table
         this->tableTab->setTable(QSqlDatabase::database(), tableName);
-		if (this->explorerTabs->indexOf(this->tableTab) == -1){
+
+        // If the table tab is not visible, do not load the data
+        // We use lazy loading, the data will be loaded when the tab will be activated.
+        int tableTabIndex = this->explorerTabs->indexOf(this->tableTab);
+        if (tableTabIndex == -1){
 			this->tableTab->show();
 			this->explorerTabs->insertTab(1, this->tableTab, tr("Data"));
             this->explorerTabs->setCurrentIndex(1);
 			this->explorerTabs->tabBar()->tabButton(1, QTabBar::RightSide)->hide();
-		}
+            this->tableTab->loadData();
+        } else if (tableTabIndex == this->explorerTabs->currentIndex()) {
+            this->tableTab->loadData();
+        }
 	}
 	else if (tableTabIndex != -1){
 		this->explorerTabs->removeTab(tableTabIndex);
@@ -372,6 +383,14 @@ void Explorer::handleShowDatabase(QString databaseName)
         this->dataBaseTree->selectionModel()->setCurrentIndex(items.first(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 
         this->explorerTabs->setCurrentWidget(this->databaseTab);
+    }
+}
+
+void Explorer::handleCurrentTabChanged(int index)
+{
+    // The following code is used for the lazy loading of the table tab.
+    if (this->explorerTabs->indexOf(this->tableTab) == index) {
+        this->tableTab->loadData();
     }
 }
 
