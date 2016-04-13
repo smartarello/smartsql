@@ -40,7 +40,7 @@ public:
 
 public slots:
 	void queryError(QString query, QString error);
-	void applyFilterClicked(bool checked);
+    void applyFilterClicked();
 	void customContextMenuRequested(QPoint point);
 	void handleSetNullAction();
 	void handleCopyAction();
@@ -55,6 +55,8 @@ private:
 	QLabel *tableInfoLabel;
 	TableFilterTextEdit *whereConditionText;
 	QModelIndex contextMenuIndex;
+    QString tableName;
+    QMap<QString,QString> savedFilter;
 };
 
 } /* namespace Table */

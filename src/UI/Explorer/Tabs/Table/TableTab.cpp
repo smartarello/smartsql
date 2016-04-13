@@ -91,7 +91,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
     refreshShortcut->setContext(Qt::WidgetShortcut);
     connect(refreshShortcut, SIGNAL(activated()), SLOT(refreshData()));
 
-	connect(this->whereConditionText, SIGNAL(filterChanged(QString)), queryModel, SLOT(refreshWithFilter(QString)));
+    connect(this->whereConditionText, SIGNAL(filterChanged(QString)), SLOT(applyFilterClicked()));
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
 	connect(filterButton, SIGNAL(clicked(bool)), this, SLOT(applyFilterClicked(bool)));
 }
@@ -101,15 +101,32 @@ void TableTab::refreshData()
     ((TableModel *)this->tableData->model())->reload();
 }
 
-void TableTab::applyFilterClicked(bool checked)
+void TableTab::applyFilterClicked()
 {
+    QSqlDatabase database = QSqlDatabase::database();
+
+    QString key = database.hostName() + ":" + database.databaseName() + ":" + this->tableName;
+    this->savedFilter.insert(key, this->whereConditionText->toPlainText());
+
 	((TableModel *)this->tableData->model())->refreshWithFilter(this->whereConditionText->toPlainText());
 }
 
 void TableTab::setTable(QSqlDatabase database, QString tableName) {
 
+    QString key = database.hostName() + ":" + database.databaseName() + ":" + tableName;
+    QString filter = "";
+    // Restore the previous filter for this table
+    if (this->savedFilter.contains(key)) {
+        filter = this->savedFilter.value(key);
+        this->whereConditionText->setText(filter);
+    } else {
+        this->whereConditionText->setText("");
+    }
+
+    this->tableName = tableName;
+
 	TableModel *queryModel = (TableModel *)this->tableData->model();
-    queryModel->setTable(database, tableName);
+    queryModel->setTable(database, tableName, filter);
 
     int i = 0;
     foreach(QString col, queryModel->getColumns()) {
@@ -234,7 +251,7 @@ void TableTab::handleFilterColumnLikeAction()
 
 	if (ok && !text.isEmpty()) {
 		this->whereConditionText->setText(QString(tr("`%1` LIKE \"%%2%\"")).arg(colTitle).arg(text));
-		this->applyFilterClicked(true);
+        this->applyFilterClicked();
 	}
 }
 
@@ -253,7 +270,7 @@ void TableTab::handleFilterColumnEqualAction()
 
 	if (ok && !text.isEmpty()) {
 		this->whereConditionText->setText(QString(tr("`%1` LIKE \"%2\"")).arg(colTitle).arg(text));
-		this->applyFilterClicked(true);
+        this->applyFilterClicked();
 	}
 }
 

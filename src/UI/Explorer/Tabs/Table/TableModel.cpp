@@ -33,12 +33,12 @@ TableModel::TableModel(QObject * parent) : QAbstractTableModel(parent) {
 
 }
 
-void TableModel::setTable(QSqlDatabase database, QString table){
+void TableModel::setTable(QSqlDatabase database, QString table, QString filter){
 
     this->database = database;
 	this->table = table;
 	this->sortOrder = "";
-	this->filter = "";
+    this->filter = filter;
     this->columns = QList<QString>();
     this->primaryKey = QStringList();
 
@@ -307,7 +307,6 @@ void TableModel::reload()
             this->results << query.record();
 		}
 
-        //this->database.close();
 		emit layoutChanged();
 	}
 }

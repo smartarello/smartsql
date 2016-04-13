@@ -40,7 +40,7 @@ class TableModel: public QAbstractTableModel {
 public:
 	TableModel(QObject * parent = 0);
 	virtual ~TableModel();
-    void setTable(QSqlDatabase database, QString table);
+    void setTable(QSqlDatabase database, QString table, QString filter = "");
 	QList<QString> getColumns();
 	Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
 	bool setData(const QModelIndex &index, const QVariant &value, int role) Q_DECL_OVERRIDE;

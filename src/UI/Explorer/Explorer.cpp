@@ -272,6 +272,7 @@ void Explorer::dataBaseTreeItemChanged()
 		if (this->explorerTabs->indexOf(this->tableTab) == -1){
 			this->tableTab->show();
 			this->explorerTabs->insertTab(1, this->tableTab, tr("Data"));
+            this->explorerTabs->setCurrentIndex(1);
 			this->explorerTabs->tabBar()->tabButton(1, QTabBar::RightSide)->hide();
 		}
 	}
