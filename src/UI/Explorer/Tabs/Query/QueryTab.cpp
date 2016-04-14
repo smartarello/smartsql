@@ -107,28 +107,15 @@ void QueryTab::stopQueries()
 
 void QueryTab::queryChanged()
 {
-    // Split the queries from the editor text with the separator ";"
-	QStringList queries = this->queryTextEdit->toPlainText().split(";");
+    QString query = this->queryTextEdit->toPlainText();
 
-    // The list of queries to play
-	QStringList filteredQueries;
-
-	foreach (QString sql, queries) {
-
-		if (sql.trimmed().isEmpty()) {
-			continue;
-		}
-
-		filteredQueries << sql;
-	}
-
-	if (!filteredQueries.isEmpty()) {
+    if (!query.trimmed().isEmpty()) {
 
 		this->executeButton->setEnabled(false);
 		this->stopButton->setEnabled(true);
 
         // Creates the thread that will play the queries
-        this->queryWorker = new QueryThread(Util::DataBase::dumpConfiguration(), filteredQueries, this);
+        this->queryWorker = new QueryThread(Util::DataBase::dumpConfiguration(), query, this);
         // Event fire when the execution is terminated
         connect(this->queryWorker, SIGNAL(queryResultReady(QList<QueryExecutionResult>)), this, SLOT(handleQueryResultReady(QList<QueryExecutionResult>)));
 

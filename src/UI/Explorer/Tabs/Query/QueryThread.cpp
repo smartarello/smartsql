@@ -28,10 +28,10 @@ namespace Explorer {
 namespace Tabs {
 namespace Query {
 
-QueryThread::QueryThread(ConnectionConfiguration connection, QStringList queryList, QObject * parent ) :
+QueryThread::QueryThread(ConnectionConfiguration connection, QString query, QObject * parent ) :
     QThread(parent),
     connection(connection),
-    queries(queryList)
+    query(query)
 {
 
 }
@@ -50,16 +50,19 @@ void QueryThread::run()
             query.next();
             this->connectionId = query.value(0).toString();
 
-            foreach(QString sql, this->queries) {
 
-                QSqlQuery query(database);
 
-                QDateTime mStartTime = QDateTime::currentDateTime();
-                if (query.exec(sql)) {
+            QSqlQuery query(database);
 
+            QDateTime mStartTime = QDateTime::currentDateTime();
+            if (query.exec(this->query)) {
+
+                qint64 msec = mStartTime.msecsTo(QDateTime::currentDateTime());
+
+                do {
 
                     QueryExecutionResult result;
-                    result.msec = mStartTime.msecsTo(QDateTime::currentDateTime());
+                    result.msec = msec;
                     result.rows = query.size();
                     if (query.isSelect()) {
                         result.isSelect = true;
@@ -77,21 +80,21 @@ void QueryThread::run()
 
                         result.data = data;
                     } else {
-                        result.query = sql;
+                        result.query = query.executedQuery();
                         result.isSelect = false;
                         result.affectedRows = query.numRowsAffected();
                     }
 
 
                     results << result;
-                } else {
-                    qDebug() << "QueryThread::run - " + query.lastError().text();
-                    QueryExecutionResult result;
-                    result.error = query.lastError().text();
-                    results << result;
-                    break;
-                }
+                } while (query.nextResult());
+            } else {
+                qDebug() << "QueryThread::run - " + query.lastError().text();
+                QueryExecutionResult result;
+                result.error = query.lastError().text();
+                results << result;
             }
+
         }
 
         database.close();

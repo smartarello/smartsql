@@ -49,13 +49,13 @@ class QueryThread: public QThread {
 public:
 
 
-    QueryThread(ConnectionConfiguration connection, QStringList queryList, QObject * parent = 0);
+    QueryThread(ConnectionConfiguration connection, QString query, QObject * parent = 0);
 	virtual ~QueryThread();
 	virtual void run();
     void killQuery();
 
 private:
-	QStringList queries;
+    QString query;
     QString connectionId;
     ConnectionConfiguration connection;
 
