@@ -2,6 +2,14 @@
 
 SmartSQL is a useful and reliable tool designed for web developers using the popular MySQL server. It enables you to browse and edit data.
 
+## Install SmartSQL on Ubuntu
+
+```
+$ sudo add-apt-repository ppa:stephane-martarello/smartsql
+$ sudo apt-get update
+$ sudo apt-get install smartsql
+```
+
 ## Compiling SmartSQL on Unix
 ### Prerequisites
 
