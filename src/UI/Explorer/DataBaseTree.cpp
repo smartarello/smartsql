@@ -29,6 +29,7 @@
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
 #include "ServerAction/NewDatabaseWindow.h"
 #include "TableAction/TableDetailsWindow.h"
+#include "Util/DataBase.h"
 
 namespace UI {
 namespace Explorer {
@@ -133,6 +134,12 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 		connect(refreshAction, SIGNAL(triggered(bool)), SLOT(handleRefreshDatabase()));
 		connect(dropDatabaseAction, SIGNAL(triggered(bool)), SLOT(handleDrop()));
 
+        menu->addSeparator();
+
+        QAction *exportAction = new QAction(tr("Export database as SQL"), this);
+        connect(exportAction, SIGNAL(triggered(bool)), SLOT(handleExportTableAsSql()));
+        menu->addAction(exportAction);
+
 		menu->addAction(refreshAction);
 	} else {
         // Table node
@@ -156,6 +163,12 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
         QAction *showDetailsAction = new QAction(tr("Details..."), this);
         connect(showDetailsAction, SIGNAL(triggered(bool)), SLOT(handleShowDetailsTable()));
         menu->addAction(showDetailsAction);
+
+        menu->addSeparator();
+
+        QAction *exportAction = new QAction(tr("Export database as SQL"), this);
+        connect(exportAction, SIGNAL(triggered(bool)), SLOT(handleExportTableAsSql()));
+        menu->addAction(exportAction);
 
 
         menu->addSeparator();
@@ -324,6 +337,28 @@ void DataBaseTree::handleDisconnect()
 	} else {
 		emit closeExplorer();
 	}
+}
+
+void DataBaseTree::handleExportTableAsSql()
+{
+    QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
+    QString tableName;
+
+
+    if (!index.isValid() || !index.parent().isValid()) {
+        return;
+    } else if (!index.parent().parent().parent().isValid()) {
+        // Action on the table
+        QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.parent().parent().row(), 0);
+        QStandardItem *dbItem = serverItem->child(index.parent().row());
+        QStandardItem *tableItem = dbItem->child(index.row());
+        tableName = tableItem->data();
+    }
+
+
+    ConnectionConfiguration conf = Util::DataBase::dumpConfiguration();
+    Export::ExportWindow *exportWindow = new Export::ExportWindow(this, conf, tableName);
+    exportWindow->show();
 }
 
 DataBaseTree::~DataBaseTree() {

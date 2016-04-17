@@ -22,6 +22,7 @@
 #include <QJsonObject>
 #include "Model/DataBaseModel.h"
 #include "ServerAction/ShowProcessesWindow.h"
+#include "Export/ExportWindow.h"
 
 namespace UI {
 namespace Explorer {
@@ -49,6 +50,7 @@ public slots:
     void createDatabase(QString databaseName, QString collation);
     void handleShowDetailsTable();
     void handleOpenTableInTab();
+    void handleExportTableAsSql();
 
 
 
