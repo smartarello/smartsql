@@ -33,6 +33,7 @@ namespace Table {
 TableFilterTextEdit::TableFilterTextEdit(QWidget *parent) : QTextEdit(parent) {
 
     this->setFontFamily("DejaVue Sans Mono");
+    this->setAcceptRichText(false);
 
 	this->setPlaceholderText("id = 10 OR name=\"John\"");
 
