@@ -18,17 +18,16 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QCheckBox>
-#include <QRadioButton>
 #include <QFileDialog>
+#include "Util/MySQLDump.h"
 
 namespace UI {
     namespace Explorer {
         namespace Export {
-            ExportWindow::ExportWindow(QWidget *parent, ConnectionConfiguration conf, QString tableName) :
+            ExportWindow::ExportWindow(QWidget *parent, ConnectionConfiguration conf, QString table) :
                 QMainWindow(parent),
                 connectionConf(conf),
-                tableName(tableName)
+                tableName(table)
             {
                 setWindowTitle(tr("Export database as SQL"));
                 setMinimumSize(600, 300);
@@ -49,10 +48,10 @@ namespace UI {
                 QHBoxLayout *databaseCheckboxLayout = new QHBoxLayout(databaseCheckboxContainer);
                 databaseCheckboxLayout->setContentsMargins(30, 5, 0, 10);
                 databaseCheckboxLayout->setAlignment(Qt::AlignLeft);
-                QCheckBox *createCheckbox = new QCheckBox(tr("Create"), databaseCheckboxContainer);
-                QCheckBox *dropCheckbox = new QCheckBox(tr("Drop"), databaseCheckboxContainer);
-                databaseCheckboxLayout->addWidget(dropCheckbox);
-                databaseCheckboxLayout->addWidget(createCheckbox);
+                databaseCreateCheckbox = new QCheckBox(tr("Create"), databaseCheckboxContainer);
+                databaseDropCheckbox = new QCheckBox(tr("Drop"), databaseCheckboxContainer);
+                databaseCheckboxLayout->addWidget(databaseDropCheckbox);
+                databaseCheckboxLayout->addWidget(databaseCreateCheckbox);
 
                 mainLayout->addWidget(databaseCheckboxContainer);
 
@@ -66,8 +65,8 @@ namespace UI {
                 QHBoxLayout *tableCheckboxLayout = new QHBoxLayout(tableCheckboxContainer);
                 tableCheckboxLayout->setContentsMargins(30, 5, 0, 10);
                 tableCheckboxLayout->setAlignment(Qt::AlignLeft);
-                QCheckBox *tableCreateCheckbox = new QCheckBox(tr("Create"), tableCheckboxContainer);
-                QCheckBox *tableDropCheckbox = new QCheckBox(tr("Drop"), tableCheckboxContainer);
+                tableCreateCheckbox = new QCheckBox(tr("Create"), tableCheckboxContainer);
+                tableDropCheckbox = new QCheckBox(tr("Drop"), tableCheckboxContainer);
                 tableCheckboxLayout->addWidget(tableDropCheckbox);
                 tableCheckboxLayout->addWidget(tableCreateCheckbox);
 
@@ -83,10 +82,10 @@ namespace UI {
                 radioButtonLayout->setContentsMargins(30, 0, 0, 10);
                 radioButtonLayout->setSpacing(0);
 
-                QRadioButton *deleteAndInsert = new QRadioButton("DELETE + INSERT (truncate existing data)", this);
-                QRadioButton *insert = new QRadioButton("INSERT", this);
-                QRadioButton *insertIgnore = new QRadioButton("INSERT IGNORE (do not update existing)", this);
-                QRadioButton *replace = new QRadioButton("REPLACE existing data", this);
+                deleteAndInsert = new QRadioButton("DELETE + INSERT (truncate existing data)", this);
+                insert = new QRadioButton("INSERT", this);
+                insertIgnore = new QRadioButton("INSERT IGNORE (do not update existing)", this);
+                replace = new QRadioButton("REPLACE existing data", this);
 
                 deleteAndInsert->setChecked(true);
                 radioButtonLayout->addWidget(deleteAndInsert);
@@ -162,11 +161,46 @@ namespace UI {
             void ExportWindow::handleExport()
             {
                 QString filename = this->filePath->text().trimmed();
-                if (this->filePath->text().isEmpty()) {
+                if (filename.isEmpty()) {
                     return;
                 }
 
-                //TODO export data
+                this->exportButton->setEnabled(false);
+
+                Util::MySQLDump *dump = new Util::MySQLDump(this->connectionConf, filename);
+                dump->setCreateDatabase(databaseCreateCheckbox->isChecked());
+                dump->setDropDatabase(databaseDropCheckbox->isChecked());
+                dump->setCreateTable(tableCreateCheckbox->isChecked());
+                dump->setDropTable(tableDropCheckbox->isChecked());
+                dump->setTable(this->tableName);
+
+                if (insert->isChecked()) {
+                    dump->setFormat(Util::MySQLDump::INSERT);
+                } else if (deleteAndInsert->isChecked()) {
+                    dump->setFormat(Util::MySQLDump::DELETE_AND_INSERT);
+                } else if (insertIgnore->isChecked()) {
+                    dump->setFormat(Util::MySQLDump::INSERT_IGNORE);
+                } else {
+                    dump->setFormat(Util::MySQLDump::REPLACE);
+                }
+
+
+                 this->workerThread = new QThread(this);
+                 dump->moveToThread(workerThread);
+
+                 connect(workerThread, &QThread::finished, dump, &QObject::deleteLater);
+                 connect(this, SIGNAL(startDump()), dump, SLOT(dump()));
+                 connect(dump, SIGNAL(dumpFinished()), this, SLOT(handleDumpFinished()));
+
+                 workerThread->start();
+
+                 emit startDump();
+            }
+
+            void ExportWindow::handleDumpFinished()
+            {
+                this->workerThread->quit();
+                this->exportButton->setEnabled(true);
             }
         }
     }

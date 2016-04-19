@@ -352,7 +352,7 @@ void DataBaseTree::handleExportTableAsSql()
         QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.parent().parent().row(), 0);
         QStandardItem *dbItem = serverItem->child(index.parent().row());
         QStandardItem *tableItem = dbItem->child(index.row());
-        tableName = tableItem->data();
+        tableName = tableItem->text();
     }
 
 

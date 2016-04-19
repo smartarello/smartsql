@@ -20,6 +20,9 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QThread>
 #include "Util/DataBase.h"
 namespace UI {
     namespace Explorer {
@@ -28,21 +31,26 @@ namespace UI {
             {
                 Q_OBJECT
             public:
-                explicit ExportWindow(QWidget *parent = 0, ConnectionConfiguration conf, QString tableName);
+                explicit ExportWindow(QWidget *parent, ConnectionConfiguration conf, QString tableName);
 
             private:
+                QThread *workerThread;
                 QPushButton *exportButton;
                 QLineEdit *filePath;
                 ConnectionConfiguration connectionConf;
                 QString tableName;
+                QCheckBox *databaseCreateCheckbox, *databaseDropCheckbox, *tableCreateCheckbox, *tableDropCheckbox;
+                QRadioButton *deleteAndInsert, *insert, *insertIgnore, *replace;
 
             signals:
+                void startDump();
 
             public slots:
                 void handleBrowseFile();
                 void handleExport();
                 void handleClose();
                 void handleFilePathEdit(QString value);
+                void handleDumpFinished();
             };
         }
     }
