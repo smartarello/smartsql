@@ -23,7 +23,11 @@
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QThread>
+#include <QProgressBar>
+#include <QTimer>
+#include <QLabel>
 #include "Util/DataBase.h"
+#include "Util/MySQLDump.h"
 namespace UI {
     namespace Explorer {
         namespace Export {
@@ -32,15 +36,21 @@ namespace UI {
                 Q_OBJECT
             public:
                 explicit ExportWindow(QWidget *parent, ConnectionConfiguration conf, QString tableName);
+                virtual ~ExportWindow();
 
             private:
                 QThread *workerThread;
                 QPushButton *exportButton;
+                QPushButton *stopButton;
                 QLineEdit *filePath;
+                QLabel *progressLabel;
                 ConnectionConfiguration connectionConf;
                 QString tableName;
                 QCheckBox *databaseCreateCheckbox, *databaseDropCheckbox, *tableCreateCheckbox, *tableDropCheckbox;
                 QRadioButton *deleteAndInsert, *insert, *insertIgnore, *replace;
+                QProgressBar *progressbar;
+                QTimer *timer;
+                Util::MySQLDump *dumpWorker;
 
             signals:
                 void startDump();
@@ -48,9 +58,11 @@ namespace UI {
             public slots:
                 void handleBrowseFile();
                 void handleExport();
+                void handleStop();
                 void handleClose();
                 void handleFilePathEdit(QString value);
                 void handleDumpFinished();
+                void handleTimer();
             };
         }
     }

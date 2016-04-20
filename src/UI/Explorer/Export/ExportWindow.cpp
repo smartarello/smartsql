@@ -19,6 +19,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QFileDialog>
+#include <QDebug>
 #include "Util/MySQLDump.h"
 
 namespace UI {
@@ -117,13 +118,24 @@ namespace UI {
                 QWidget *buttonContainer = new QWidget(this);
                 QHBoxLayout *buttonLayout = new QHBoxLayout(buttonContainer);
                 this->exportButton = new QPushButton(tr("Export"), this);
+                this->stopButton = new QPushButton(tr("Stop"), this);
                 QPushButton *closeButton = new QPushButton(tr("Close"), this);
                 buttonLayout->addWidget(this->exportButton, 0, Qt::AlignRight);
+                buttonLayout->addWidget(this->stopButton, 0, Qt::AlignRight);
                 buttonLayout->addWidget(closeButton, 0, Qt::AlignRight);
                 buttonLayout->setAlignment(Qt::AlignRight);
                 buttonLayout->setContentsMargins(0, 30, 0, 0);
+                this->stopButton->hide();
 
                 mainLayout->addWidget(buttonContainer);
+
+                progressLabel = new QLabel(this);
+                progressLabel->hide();
+                progressbar = new QProgressBar(this);
+                progressbar->setMinimumWidth(200);
+                progressbar->hide();
+                mainLayout->addWidget(progressLabel, 0, Qt::AlignCenter);
+                mainLayout->addWidget(progressbar, 0, Qt::AlignCenter);
 
                 this->setCentralWidget(mainContainer);
 
@@ -131,6 +143,7 @@ namespace UI {
                 connect(browseButton, SIGNAL(released()), SLOT(handleBrowseFile()));
                 connect(closeButton, SIGNAL(released()), SLOT(handleClose()));
                 connect(this->exportButton, SIGNAL(released()), SLOT(handleExport()));
+                connect(this->stopButton, SIGNAL(released()), SLOT(handleStop()));
                 connect(this->filePath, SIGNAL (textEdited(QString)), SLOT (handleFilePathEdit(QString)));
             }
 
@@ -165,42 +178,83 @@ namespace UI {
                     return;
                 }
 
-                this->exportButton->setEnabled(false);
+                this->exportButton->hide();
+                this->stopButton->show();
 
-                Util::MySQLDump *dump = new Util::MySQLDump(this->connectionConf, filename);
-                dump->setCreateDatabase(databaseCreateCheckbox->isChecked());
-                dump->setDropDatabase(databaseDropCheckbox->isChecked());
-                dump->setCreateTable(tableCreateCheckbox->isChecked());
-                dump->setDropTable(tableDropCheckbox->isChecked());
-                dump->setTable(this->tableName);
+                dumpWorker = new Util::MySQLDump(this->connectionConf, filename);
+                dumpWorker->setCreateDatabase(databaseCreateCheckbox->isChecked());
+                dumpWorker->setDropDatabase(databaseDropCheckbox->isChecked());
+                dumpWorker->setCreateTable(tableCreateCheckbox->isChecked());
+                dumpWorker->setDropTable(tableDropCheckbox->isChecked());
+                dumpWorker->setTable(this->tableName);
 
                 if (insert->isChecked()) {
-                    dump->setFormat(Util::MySQLDump::INSERT);
+                    dumpWorker->setFormat(Util::MySQLDump::INSERT);
                 } else if (deleteAndInsert->isChecked()) {
-                    dump->setFormat(Util::MySQLDump::DELETE_AND_INSERT);
+                    dumpWorker->setFormat(Util::MySQLDump::DELETE_AND_INSERT);
                 } else if (insertIgnore->isChecked()) {
-                    dump->setFormat(Util::MySQLDump::INSERT_IGNORE);
+                    dumpWorker->setFormat(Util::MySQLDump::INSERT_IGNORE);
                 } else {
-                    dump->setFormat(Util::MySQLDump::REPLACE);
+                    dumpWorker->setFormat(Util::MySQLDump::REPLACE);
                 }
 
 
-                 this->workerThread = new QThread(this);
-                 dump->moveToThread(workerThread);
+                this->timer = new QTimer(this);
+                this->workerThread = new QThread(this);
+                dumpWorker->moveToThread(workerThread);
 
-                 connect(workerThread, &QThread::finished, dump, &QObject::deleteLater);
-                 connect(this, SIGNAL(startDump()), dump, SLOT(dump()));
-                 connect(dump, SIGNAL(dumpFinished()), this, SLOT(handleDumpFinished()));
+                connect(workerThread, &QThread::finished, dumpWorker, &QObject::deleteLater);
+                connect(this, SIGNAL(startDump()), dumpWorker, SLOT(dump()));
+                connect(dumpWorker, SIGNAL(dumpFinished()), SLOT(handleDumpFinished()));
+                connect(this->timer, SIGNAL(timeout()), SLOT(handleTimer()));
 
-                 workerThread->start();
+                workerThread->start();
 
-                 emit startDump();
+                this->progressbar->setMinimum(0);
+                this->progressbar->reset();
+                this->progressbar->show();
+                this->progressLabel->setText("");
+                this->progressLabel->show();
+
+                this->timer->start(200);
+                emit startDump();
+            }
+
+            void ExportWindow::handleTimer()
+            {
+                QString table = this->dumpWorker->getCurrentTable();
+                int total = this->dumpWorker->getTableCount();
+                int progress = this->dumpWorker->getProgress();
+                if (!table.isEmpty()) {
+                    int totalLine = this->dumpWorker->getTotalLine();
+                    int tableProgress = this->dumpWorker->getProgressCurrentTable();
+                    this->progressLabel->setText(table+": "+QString::number(tableProgress)+"/"+QString::number(totalLine));
+                }
+
+                this->progressbar->setMaximum(total);
+                this->progressbar->setValue(progress);
             }
 
             void ExportWindow::handleDumpFinished()
             {
+                this->progressLabel->hide();
+                this->progressbar->hide();
                 this->workerThread->quit();
-                this->exportButton->setEnabled(true);
+                this->exportButton->show();
+                this->stopButton->hide();
+                this->timer->stop();
+                delete this->timer;
+            }
+
+            void ExportWindow::handleStop()
+            {
+                this->dumpWorker->stopRequired();
+            }
+
+
+            ExportWindow::~ExportWindow()
+            {
+                this->workerThread->quit();
             }
         }
     }

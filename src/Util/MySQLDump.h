@@ -46,6 +46,13 @@ namespace Util {
         void setFormat(MySQLDumpFormat format);
         void setTable(QString tablename);
 
+        int getProgress();
+        int getProgressCurrentTable();
+        int getTotalLine();
+        int getTableCount();
+        QString getCurrentTable();
+        void stopRequired();
+
     public slots:
         void dump();
 
@@ -61,6 +68,12 @@ namespace Util {
         MySQLDumpFormat format;
         QString tablename;
         QString filename;
+        int progressCurrentTable;
+        int totalCurrentTable;
+        int progress;
+        int tableCount;
+        QString currentTable;
+        bool stop;
 
         void dumpTable(QSqlDatabase database, QString table, QFile *stream);
     };

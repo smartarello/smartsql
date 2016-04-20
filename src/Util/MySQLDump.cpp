@@ -30,7 +30,12 @@ namespace Util {
         configuration(conf),
         filename(filename)
     {
-
+        this->tableCount = 0;
+        this->progress = 0;
+        this->currentTable = "";
+        this->progressCurrentTable = 0;
+        this->totalCurrentTable = 0;
+        this->stop = false;
     }
 
 
@@ -98,9 +103,19 @@ namespace Util {
                 }
             }
 
-            if (this->tablename.isEmpty()) {
+            stream <<  endl;
 
+            if (this->tablename.isEmpty()) {
+                QStringList tableList = database.tables();
+                this->tableCount = tableList.size();
+                foreach(QString table, tableList) {
+                    if (this->stop) {
+                        break;
+                    }
+                    this->dumpTable(database, table, file);
+                }
             } else {
+                this->tableCount = 1;
                 this->dumpTable(database, this->tablename, file);
             }
 
@@ -118,6 +133,8 @@ namespace Util {
 
     void MySQLDump::dumpTable(QSqlDatabase database, QString table, QFile *file)
     {
+        this->currentTable = table;
+        this->progressCurrentTable = 0;
         QTextStream stream(file);
         if (this->dropTable) {
             stream << "DROP TABLE `"+ database.databaseName() +"`;" << endl;
@@ -133,6 +150,8 @@ namespace Util {
         QSqlQuery tableQuery(database);
         if (tableQuery.exec("SELECT * FROM "+table)){
 
+            this->totalCurrentTable = tableQuery.size();
+
             if (tableQuery.next()) {
 
                 stream << "INSERT INTO "+table+" (";
@@ -143,8 +162,6 @@ namespace Util {
                     fields << "`"+row.fieldName(i)+"`";
                 }
 
-
-
                 stream << fields.join(",")  << ") VALUES " << endl << "(";
 
                 QStringList values;
@@ -154,7 +171,9 @@ namespace Util {
 
                 stream << values.join(",") << ")" ;
 
-                while(tableQuery.next()) {
+
+                this->progressCurrentTable++;
+                while(tableQuery.next() && !this->stop) {
                     stream << "," << endl << "(";
                     row = tableQuery.record();
 
@@ -164,13 +183,46 @@ namespace Util {
                     }
 
                     stream << values.join(",") << ")";
-
+                    this->progressCurrentTable++;
                 } ;
 
                 stream << ";" << endl;
             }
-
         }
+
+        this->progress++;
+
+        stream << endl;
+    }
+
+    int MySQLDump::getProgressCurrentTable()
+    {
+        return this->progressCurrentTable;
+    }
+
+    int MySQLDump::getProgress()
+    {
+        return this->progress;
+    }
+
+    int MySQLDump::getTotalLine()
+    {
+        return this->totalCurrentTable;
+    }
+
+    QString MySQLDump::getCurrentTable()
+    {
+        return this->currentTable;
+    }
+
+    int MySQLDump::getTableCount()
+    {
+        return tableCount;
+    }
+
+    void MySQLDump::stopRequired()
+    {
+        this->stop = true;
     }
 }
 

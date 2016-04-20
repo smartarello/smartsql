@@ -347,7 +347,7 @@ void DataBaseTree::handleExportTableAsSql()
 
     if (!index.isValid() || !index.parent().isValid()) {
         return;
-    } else if (!index.parent().parent().parent().isValid()) {
+    } else if (index.parent().parent().isValid()) {
         // Action on the table
         QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.parent().parent().row(), 0);
         QStandardItem *dbItem = serverItem->child(index.parent().row());
