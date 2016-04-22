@@ -47,13 +47,13 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 QVBoxLayout *vlayout = new QVBoxLayout;
 	 this->setLayout(vlayout);
 
-	 QWidget *header = new QWidget;
+     QWidget *header = new QWidget(this);
 	 vlayout->addWidget(header);
 
 	 QHBoxLayout *hlayout = new QHBoxLayout;
 	 header->setLayout(hlayout);
 
-	 this->sessionList = new QListView;
+     this->sessionList = new QListView(this);
 	 this->sessionList->setFixedWidth(250);
 	 this->sessionList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 

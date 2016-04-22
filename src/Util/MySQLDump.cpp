@@ -64,9 +64,9 @@ namespace Util {
         this->format = format;
     }
 
-    void MySQLDump::setTable(QString table)
+    void MySQLDump::setTables(QStringList tableList)
     {
-        this->tablename = table;
+        this->tables = tableList;
     }
 
     void MySQLDump::dump()
@@ -76,7 +76,7 @@ namespace Util {
         QSqlDatabase database = DataBase::createFromConfig(this->configuration);
         if (!database.open()) {
             qDebug() << database.lastError().text();
-            emit dumpFinished();
+            emit dumpFinished(true);
             return ;
         }
 
@@ -105,18 +105,16 @@ namespace Util {
 
             stream <<  endl;
 
-            if (this->tablename.isEmpty()) {
-                QStringList tableList = database.tables();
-                this->tableCount = tableList.size();
-                foreach(QString table, tableList) {
-                    if (this->stop) {
-                        break;
-                    }
-                    this->dumpTable(database, table, file);
+            if (this->tables.isEmpty()) {
+                this->tables = database.tables();
+            }
+
+            this->tableCount = this->tables.size();
+            foreach(QString table, this->tables) {
+                if (this->stop) {
+                    break;
                 }
-            } else {
-                this->tableCount = 1;
-                this->dumpTable(database, this->tablename, file);
+                this->dumpTable(database, table, file);
             }
 
             stream << endl;
@@ -128,7 +126,8 @@ namespace Util {
 
         qDebug() << "End thread";
         database.close();
-        emit dumpFinished();
+
+        emit dumpFinished(this->stop);
     }
 
     void MySQLDump::dumpTable(QSqlDatabase database, QString table, QFile *file)

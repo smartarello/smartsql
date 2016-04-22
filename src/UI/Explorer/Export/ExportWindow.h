@@ -26,6 +26,8 @@
 #include <QProgressBar>
 #include <QTimer>
 #include <QLabel>
+#include <QModelIndex>
+#include <QStandardItemModel>
 #include "Util/DataBase.h"
 #include "Util/MySQLDump.h"
 namespace UI {
@@ -39,7 +41,7 @@ namespace UI {
                 virtual ~ExportWindow();
 
             private:
-                QThread *workerThread;
+                QThread *workerThread = nullptr;
                 QPushButton *exportButton;
                 QPushButton *stopButton;
                 QLineEdit *filePath;
@@ -51,6 +53,10 @@ namespace UI {
                 QProgressBar *progressbar;
                 QTimer *timer;
                 Util::MySQLDump *dumpWorker;
+                QStandardItemModel *model;
+                QWidget *progressbarContainer;
+
+                QStringList getSelectedTables();
 
             signals:
                 void startDump();
@@ -61,8 +67,9 @@ namespace UI {
                 void handleStop();
                 void handleClose();
                 void handleFilePathEdit(QString value);
-                void handleDumpFinished();
+                void handleDumpFinished(bool stopped);
                 void handleTimer();
+                void databaseTreeClicked(QModelIndex index);
             };
         }
     }

@@ -44,7 +44,7 @@ namespace Util {
         void setCreateDatabase(bool createDatabase);
         void setCreateTable(bool createTable);
         void setFormat(MySQLDumpFormat format);
-        void setTable(QString tablename);
+        void setTables(QStringList tableList);
 
         int getProgress();
         int getProgressCurrentTable();
@@ -57,7 +57,7 @@ namespace Util {
         void dump();
 
     signals:
-        void dumpFinished();
+        void dumpFinished(bool stopped);
 
     private:
         ConnectionConfiguration configuration;
@@ -66,7 +66,7 @@ namespace Util {
         bool createTable;
         bool createDatabase;
         MySQLDumpFormat format;
-        QString tablename;
+        QStringList tables;
         QString filename;
         int progressCurrentTable;
         int totalCurrentTable;

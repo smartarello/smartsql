@@ -20,6 +20,9 @@
 #include <QLabel>
 #include <QFileDialog>
 #include <QDebug>
+#include <QTreeView>
+#include <QMessageBox>
+
 #include "Util/MySQLDump.h"
 
 namespace UI {
@@ -31,21 +34,68 @@ namespace UI {
                 tableName(table)
             {
                 setWindowTitle(tr("Export database as SQL"));
-                setMinimumSize(600, 300);
+                setMinimumSize(800, 300);
 
                 QWidget *mainContainer = new QWidget(this);
-                QVBoxLayout *mainLayout = new QVBoxLayout(mainContainer);
-                mainLayout->setContentsMargins(20, 20, 20, 20);
-                mainLayout->setSpacing(0);
+                QHBoxLayout *mainContainerLayout = new QHBoxLayout(mainContainer);
+                mainContainerLayout->setContentsMargins(20, 20, 20, 20);
+                mainContainerLayout->setSpacing(0);
+
+
+                // LEFT PART: the table list with checkbox
+                QTreeView *tableList = new QTreeView(this);
+                tableList->setMinimumWidth(250);
+                tableList->setHeaderHidden(true);
+                tableList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+                // Create model
+                this->model = new QStandardItemModel(this);
+                QSqlDatabase db = Util::DataBase::createFromConfig(conf);
+                if (db.open()) {
+
+                    QStringList tables = db.tables();
+                    QStandardItem *rootItem = this->model->invisibleRootItem();
+
+                    QStandardItem *dbItem = new QStandardItem(db.databaseName());
+                    dbItem->setCheckable(true);
+                    if (table.isEmpty()) {
+                        dbItem->setCheckState(Qt::Checked);
+                    }
+
+                    rootItem->appendRow(dbItem);
+
+                    foreach (QString tableName, tables) {
+                        QStandardItem *item = new QStandardItem(tableName);
+                        item->setCheckable(true);
+                        if (table.isEmpty() || table == tableName) {
+                            item->setCheckState(Qt::Checked);
+                        }
+
+                        dbItem->appendRow(item);
+                    }
+
+                    db.close();
+                }
+
+                tableList->setModel(this->model);
+                tableList->expandAll();
+                mainContainerLayout->addWidget(tableList);
+
+                // RIGHT PART: the configuration
+                QWidget *rightPartContainer = new QWidget(this);
+                QVBoxLayout *rightPartLayout = new QVBoxLayout(rightPartContainer);
+                rightPartLayout->setContentsMargins(20, 0, 0, 0);
+                rightPartLayout->setSpacing(0);
 
                 // Database options
-                QLabel *labelDatabase = new QLabel(tr("Database"), mainContainer);
+                QLabel *labelDatabase = new QLabel(tr("Database"), rightPartContainer);
                 QFont font;
                 font.setBold(true);
                 labelDatabase->setFont(font);
-                mainLayout->addWidget(labelDatabase);
+                rightPartLayout->addWidget(labelDatabase);
 
-                QWidget *databaseCheckboxContainer = new QWidget(mainContainer);
+                QWidget *databaseCheckboxContainer = new QWidget(rightPartContainer);
                 QHBoxLayout *databaseCheckboxLayout = new QHBoxLayout(databaseCheckboxContainer);
                 databaseCheckboxLayout->setContentsMargins(30, 5, 0, 10);
                 databaseCheckboxLayout->setAlignment(Qt::AlignLeft);
@@ -54,15 +104,15 @@ namespace UI {
                 databaseCheckboxLayout->addWidget(databaseDropCheckbox);
                 databaseCheckboxLayout->addWidget(databaseCreateCheckbox);
 
-                mainLayout->addWidget(databaseCheckboxContainer);
+                rightPartLayout->addWidget(databaseCheckboxContainer);
 
 
                 // Table options
-                QLabel *labelTable = new QLabel(tr("Table(s)"), mainContainer);
+                QLabel *labelTable = new QLabel(tr("Table(s)"), rightPartContainer);
                 labelTable->setFont(font);
-                mainLayout->addWidget(labelTable);
+                rightPartLayout->addWidget(labelTable);
 
-                QWidget *tableCheckboxContainer = new QWidget(mainContainer);
+                QWidget *tableCheckboxContainer = new QWidget(rightPartContainer);
                 QHBoxLayout *tableCheckboxLayout = new QHBoxLayout(tableCheckboxContainer);
                 tableCheckboxLayout->setContentsMargins(30, 5, 0, 10);
                 tableCheckboxLayout->setAlignment(Qt::AlignLeft);
@@ -71,12 +121,12 @@ namespace UI {
                 tableCheckboxLayout->addWidget(tableDropCheckbox);
                 tableCheckboxLayout->addWidget(tableCreateCheckbox);
 
-                mainLayout->addWidget(tableCheckboxContainer);
+                rightPartLayout->addWidget(tableCheckboxContainer);
 
                 // Export format
-                QLabel *labelData = new QLabel(tr("Data"), mainContainer);
+                QLabel *labelData = new QLabel(tr("Data"), rightPartContainer);
                 labelData->setFont(font);
-                mainLayout->addWidget(labelData);
+                rightPartLayout->addWidget(labelData);
 
                 QWidget *radioButtonContainer = new QWidget(this);
                 QVBoxLayout *radioButtonLayout = new QVBoxLayout(radioButtonContainer);
@@ -93,12 +143,12 @@ namespace UI {
                 radioButtonLayout->addWidget(insert);
                 radioButtonLayout->addWidget(insertIgnore);
                 radioButtonLayout->addWidget(replace);
-                mainLayout->addWidget(radioButtonContainer);
+                rightPartLayout->addWidget(radioButtonContainer);
 
                 // File selection
                 QLabel *fileSelectionLabel = new QLabel(tr("Filename"), this);
                 fileSelectionLabel->setFont(font);
-                mainLayout->addWidget(fileSelectionLabel);
+                rightPartLayout->addWidget(fileSelectionLabel);
 
                 QWidget *fileSelectionContainer = new QWidget(this);
                 QHBoxLayout *fileSelectionLayout = new QHBoxLayout(fileSelectionContainer);
@@ -112,7 +162,7 @@ namespace UI {
                 fileSelectionLayout->addWidget(filePath);
                 fileSelectionLayout->addWidget(browseButton);
 
-                mainLayout->addWidget(fileSelectionContainer);
+                rightPartLayout->addWidget(fileSelectionContainer);
 
 
                 QWidget *buttonContainer = new QWidget(this);
@@ -127,16 +177,22 @@ namespace UI {
                 buttonLayout->setContentsMargins(0, 30, 0, 0);
                 this->stopButton->hide();
 
-                mainLayout->addWidget(buttonContainer);
+                rightPartLayout->addWidget(buttonContainer);
 
+                progressbarContainer = new QWidget(this);
+                QVBoxLayout *progressbarLayout = new QVBoxLayout(progressbarContainer);
+                progressbarLayout->setContentsMargins(0, 30, 0, 0);
                 progressLabel = new QLabel(this);
-                progressLabel->hide();
                 progressbar = new QProgressBar(this);
-                progressbar->setMinimumWidth(200);
-                progressbar->hide();
-                mainLayout->addWidget(progressLabel, 0, Qt::AlignCenter);
-                mainLayout->addWidget(progressbar, 0, Qt::AlignCenter);
+                progressbar->setMinimumWidth(300);
+                progressbarLayout->addWidget(progressLabel, 0, Qt::AlignCenter);
+                progressbarLayout->addWidget(progressbar, 0, Qt::AlignCenter);
+                rightPartLayout->addWidget(progressbarContainer);
+                progressbarContainer->hide();
 
+
+
+                mainContainerLayout->addWidget(rightPartContainer);
                 this->setCentralWidget(mainContainer);
 
                 // Events
@@ -145,6 +201,7 @@ namespace UI {
                 connect(this->exportButton, SIGNAL(released()), SLOT(handleExport()));
                 connect(this->stopButton, SIGNAL(released()), SLOT(handleStop()));
                 connect(this->filePath, SIGNAL (textEdited(QString)), SLOT (handleFilePathEdit(QString)));
+                connect(tableList, SIGNAL(clicked(QModelIndex)), SLOT(databaseTreeClicked(QModelIndex)));
             }
 
             void ExportWindow::handleBrowseFile()
@@ -167,7 +224,8 @@ namespace UI {
 
             void ExportWindow::handleClose()
             {
-               this->close();
+                this->handleStop();
+                this->close();
                 this->deleteLater();
             }
 
@@ -186,7 +244,11 @@ namespace UI {
                 dumpWorker->setDropDatabase(databaseDropCheckbox->isChecked());
                 dumpWorker->setCreateTable(tableCreateCheckbox->isChecked());
                 dumpWorker->setDropTable(tableDropCheckbox->isChecked());
-                dumpWorker->setTable(this->tableName);
+
+                QStandardItem *databaseItem = this->model->invisibleRootItem()->child(0);
+                if (databaseItem->checkState() != Qt::Checked) {
+                    dumpWorker->setTables(this->getSelectedTables());
+                }
 
                 if (insert->isChecked()) {
                     dumpWorker->setFormat(Util::MySQLDump::INSERT);
@@ -205,16 +267,15 @@ namespace UI {
 
                 connect(workerThread, &QThread::finished, dumpWorker, &QObject::deleteLater);
                 connect(this, SIGNAL(startDump()), dumpWorker, SLOT(dump()));
-                connect(dumpWorker, SIGNAL(dumpFinished()), SLOT(handleDumpFinished()));
+                connect(dumpWorker, SIGNAL(dumpFinished(bool)), SLOT(handleDumpFinished(bool)));
                 connect(this->timer, SIGNAL(timeout()), SLOT(handleTimer()));
 
                 workerThread->start();
 
                 this->progressbar->setMinimum(0);
-                this->progressbar->reset();
-                this->progressbar->show();
+                this->progressbar->reset();                
                 this->progressLabel->setText("");
-                this->progressLabel->show();
+                this->progressbarContainer->show();
 
                 this->timer->start(200);
                 emit startDump();
@@ -228,17 +289,25 @@ namespace UI {
                 if (!table.isEmpty()) {
                     int totalLine = this->dumpWorker->getTotalLine();
                     int tableProgress = this->dumpWorker->getProgressCurrentTable();
-                    this->progressLabel->setText(table+": "+QString::number(tableProgress)+"/"+QString::number(totalLine));
-                }
+                    QString label = table;
+                    if (totalLine > 0) {
+                        label += ": "+QLocale(QLocale::English).toString(tableProgress)+"/"+QLocale(QLocale::English).toString(totalLine);
+                    }
 
-                this->progressbar->setMaximum(total);
-                this->progressbar->setValue(progress);
+                    this->progressLabel->setText(label);
+
+                    this->progressbar->setMaximum(totalLine);
+                    this->progressbar->setValue(tableProgress);
+                }               
             }
 
-            void ExportWindow::handleDumpFinished()
+            void ExportWindow::handleDumpFinished(bool stopped)
             {
-                this->progressLabel->hide();
-                this->progressbar->hide();
+                if (!stopped) {
+                    QMessageBox::information(this, "", tr("Export completed successfully"));
+                }
+
+                this->progressbarContainer->hide();
                 this->workerThread->quit();
                 this->exportButton->show();
                 this->stopButton->hide();
@@ -254,7 +323,46 @@ namespace UI {
 
             ExportWindow::~ExportWindow()
             {
-                this->workerThread->quit();
+                if (this->workerThread != nullptr) {
+                    this->workerThread->quit();
+                }
+            }
+
+            void ExportWindow::databaseTreeClicked(QModelIndex index)
+            {
+                if (!index.parent().isValid()) {
+                    // Click on the database
+                    QStandardItem *databaseItem = this->model->itemFromIndex(index);
+
+                    for (int i = 0 ; i < databaseItem->rowCount() ; ++i) {
+                        QStandardItem* child = databaseItem->child(i);
+                        child->setCheckState(databaseItem->checkState());
+                    }
+                } else {
+                    // Click on a table
+                    QStandardItem *tableItem = this->model->itemFromIndex(index);
+                    if (tableItem->checkState() != Qt::Checked) {
+                        // The table is not checked, the database should not be checked
+                        QStandardItem *databaseItem = this->model->invisibleRootItem()->child(0);
+                        databaseItem->setCheckState(Qt::Unchecked);
+                    }
+                }
+            }
+
+            QStringList ExportWindow::getSelectedTables()
+            {
+                QStringList tables;
+                QStandardItem *databaseItem = this->model->invisibleRootItem()->child(0);
+
+                for (int i = 0 ; i < databaseItem->rowCount() ; ++i) {
+                    QStandardItem* child = databaseItem->child(i);
+
+                    if (child->checkState() == Qt::Checked) {
+                        tables << child->text();
+                    }
+                }
+
+                return tables;
             }
         }
     }
