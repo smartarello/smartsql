@@ -52,7 +52,7 @@ namespace UI {
                 QRadioButton *deleteAndInsert, *insert, *insertIgnore, *replace;
                 QProgressBar *progressbar;
                 QTimer *timer;
-                Util::MySQLDump *dumpWorker;
+                Util::MySQLDump *dumpWorker = nullptr;
                 QStandardItemModel *model;
                 QWidget *progressbarContainer;
 

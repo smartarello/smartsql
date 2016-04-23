@@ -33,8 +33,8 @@ namespace UI {
                 connectionConf(conf),
                 tableName(table)
             {
-                setWindowTitle(tr("Export database as SQL"));
-                setMinimumSize(800, 300);
+                setWindowTitle(tr("Export database as SQL"));                
+                setAttribute(Qt::WA_DeleteOnClose);
 
                 QWidget *mainContainer = new QWidget(this);
                 QHBoxLayout *mainContainerLayout = new QHBoxLayout(mainContainer);
@@ -44,7 +44,6 @@ namespace UI {
 
                 // LEFT PART: the table list with checkbox
                 QTreeView *tableList = new QTreeView(this);
-                tableList->setMinimumWidth(250);
                 tableList->setHeaderHidden(true);
                 tableList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
@@ -84,6 +83,8 @@ namespace UI {
 
                 // RIGHT PART: the configuration
                 QWidget *rightPartContainer = new QWidget(this);
+                rightPartContainer->setMinimumWidth(650);
+                rightPartContainer->setMaximumHeight(400);
                 QVBoxLayout *rightPartLayout = new QVBoxLayout(rightPartContainer);
                 rightPartLayout->setContentsMargins(20, 0, 0, 0);
                 rightPartLayout->setSpacing(0);
@@ -100,6 +101,7 @@ namespace UI {
                 databaseCheckboxLayout->setContentsMargins(30, 5, 0, 10);
                 databaseCheckboxLayout->setAlignment(Qt::AlignLeft);
                 databaseCreateCheckbox = new QCheckBox(tr("Create"), databaseCheckboxContainer);
+                databaseCreateCheckbox->setChecked(true);
                 databaseDropCheckbox = new QCheckBox(tr("Drop"), databaseCheckboxContainer);
                 databaseCheckboxLayout->addWidget(databaseDropCheckbox);
                 databaseCheckboxLayout->addWidget(databaseCreateCheckbox);
@@ -117,6 +119,7 @@ namespace UI {
                 tableCheckboxLayout->setContentsMargins(30, 5, 0, 10);
                 tableCheckboxLayout->setAlignment(Qt::AlignLeft);
                 tableCreateCheckbox = new QCheckBox(tr("Create"), tableCheckboxContainer);
+                tableCreateCheckbox->setChecked(true);
                 tableDropCheckbox = new QCheckBox(tr("Drop"), tableCheckboxContainer);
                 tableCheckboxLayout->addWidget(tableDropCheckbox);
                 tableCheckboxLayout->addWidget(tableCreateCheckbox);
@@ -165,6 +168,20 @@ namespace UI {
                 rightPartLayout->addWidget(fileSelectionContainer);
 
 
+                progressbarContainer = new QWidget(this);
+                QVBoxLayout *progressbarLayout = new QVBoxLayout(progressbarContainer);
+                progressbarLayout->setContentsMargins(0, 20, 0, 20);
+                progressLabel = new QLabel(progressbarContainer);
+                progressbar = new QProgressBar(progressbarContainer);
+                progressbar->setMinimumWidth(300);
+                progressbarLayout->addWidget(progressLabel, 0, Qt::AlignCenter);
+                progressbarLayout->addWidget(progressbar, 0, Qt::AlignCenter);
+                progressbarContainer->setMinimumHeight(100);
+                rightPartLayout->addWidget(progressbarContainer);
+                progressLabel->hide();
+                progressbar->hide();
+
+
                 QWidget *buttonContainer = new QWidget(this);
                 QHBoxLayout *buttonLayout = new QHBoxLayout(buttonContainer);
                 this->exportButton = new QPushButton(tr("Export"), this);
@@ -174,23 +191,10 @@ namespace UI {
                 buttonLayout->addWidget(this->stopButton, 0, Qt::AlignRight);
                 buttonLayout->addWidget(closeButton, 0, Qt::AlignRight);
                 buttonLayout->setAlignment(Qt::AlignRight);
-                buttonLayout->setContentsMargins(0, 30, 0, 0);
+                buttonLayout->setContentsMargins(0, 0, 0, 0);
                 this->stopButton->hide();
 
                 rightPartLayout->addWidget(buttonContainer);
-
-                progressbarContainer = new QWidget(this);
-                QVBoxLayout *progressbarLayout = new QVBoxLayout(progressbarContainer);
-                progressbarLayout->setContentsMargins(0, 30, 0, 0);
-                progressLabel = new QLabel(this);
-                progressbar = new QProgressBar(this);
-                progressbar->setMinimumWidth(300);
-                progressbarLayout->addWidget(progressLabel, 0, Qt::AlignCenter);
-                progressbarLayout->addWidget(progressbar, 0, Qt::AlignCenter);
-                rightPartLayout->addWidget(progressbarContainer);
-                progressbarContainer->hide();
-
-
 
                 mainContainerLayout->addWidget(rightPartContainer);
                 this->setCentralWidget(mainContainer);
@@ -231,20 +235,24 @@ namespace UI {
 
             void ExportWindow::handleExport()
             {
+                // The file is not specified
                 QString filename = this->filePath->text().trimmed();
                 if (filename.isEmpty()) {
                     return;
                 }
 
+                // Shows the button to stop the process
                 this->exportButton->hide();
                 this->stopButton->show();
 
+                // Configure the dump
                 dumpWorker = new Util::MySQLDump(this->connectionConf, filename);
                 dumpWorker->setCreateDatabase(databaseCreateCheckbox->isChecked());
                 dumpWorker->setDropDatabase(databaseDropCheckbox->isChecked());
                 dumpWorker->setCreateTable(tableCreateCheckbox->isChecked());
                 dumpWorker->setDropTable(tableDropCheckbox->isChecked());
 
+                // If the database is not selected, retrieves the list of tables selected
                 QStandardItem *databaseItem = this->model->invisibleRootItem()->child(0);
                 if (databaseItem->checkState() != Qt::Checked) {
                     dumpWorker->setTables(this->getSelectedTables());
@@ -261,8 +269,11 @@ namespace UI {
                 }
 
 
+                // Initializes the timer to refresh the progress bar
                 this->timer = new QTimer(this);
-                this->workerThread = new QThread(this);
+
+                // Initializes the thread to run the dump in background
+                this->workerThread = new QThread();
                 dumpWorker->moveToThread(workerThread);
 
                 connect(workerThread, &QThread::finished, dumpWorker, &QObject::deleteLater);
@@ -270,17 +281,26 @@ namespace UI {
                 connect(dumpWorker, SIGNAL(dumpFinished(bool)), SLOT(handleDumpFinished(bool)));
                 connect(this->timer, SIGNAL(timeout()), SLOT(handleTimer()));
 
+                // Starts the thread, but the thread waits a signal to start the dump
                 workerThread->start();
 
+                // Initializes the progress bar
                 this->progressbar->setMinimum(0);
                 this->progressbar->reset();                
                 this->progressLabel->setText("");
-                this->progressbarContainer->show();
+                this->progressLabel->show();
+                this->progressbar->show();
 
                 this->timer->start(200);
+
+                // This signal starts the dump process
                 emit startDump();
             }
 
+            /**
+             * Called to refresh the progress bar status
+             * @brief ExportWindow::handleTimer
+             */
             void ExportWindow::handleTimer()
             {
                 QString table = this->dumpWorker->getCurrentTable();
@@ -301,13 +321,19 @@ namespace UI {
                 }               
             }
 
+            /**
+             * Called when the dump is finished
+             * @brief ExportWindow::handleDumpFinished
+             * @param stopped true when the user has cancelled the dump process
+             */
             void ExportWindow::handleDumpFinished(bool stopped)
             {
                 if (!stopped) {
                     QMessageBox::information(this, "", tr("Export completed successfully"));
                 }
 
-                this->progressbarContainer->hide();
+                this->progressLabel->hide();
+                this->progressbar->hide();
                 this->workerThread->quit();
                 this->exportButton->show();
                 this->stopButton->hide();
@@ -315,19 +341,30 @@ namespace UI {
                 delete this->timer;
             }
 
+            /**
+             * Called when the user stops the dump process
+             * @brief ExportWindow::handleStop
+             */
             void ExportWindow::handleStop()
             {
-                this->dumpWorker->stopRequired();
+                if (this->dumpWorker != nullptr) {
+                    this->dumpWorker->stopRequired();
+                }
             }
 
 
             ExportWindow::~ExportWindow()
             {
                 if (this->workerThread != nullptr) {
-                    this->workerThread->quit();
+                    dumpWorker->stopRequired();
                 }
             }
 
+            /**
+             * Called when an item is selected in the database tree
+             * @brief ExportWindow::databaseTreeClicked
+             * @param index
+             */
             void ExportWindow::databaseTreeClicked(QModelIndex index)
             {
                 if (!index.parent().isValid()) {
@@ -349,6 +386,12 @@ namespace UI {
                 }
             }
 
+            /**
+             * Gets the list of tables to export, list of tables checked
+             *
+             * @brief ExportWindow::getSelectedTables
+             * @return the list of tables to export
+             */
             QStringList ExportWindow::getSelectedTables()
             {
                 QStringList tables;

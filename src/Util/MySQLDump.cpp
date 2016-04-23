@@ -146,35 +146,53 @@ namespace Util {
             }
         }
 
+        stream << endl;
+
         QSqlQuery tableQuery(database);
-        if (tableQuery.exec("SELECT * FROM "+table)){
+        // The following query is used to compute the progress during the dump
+        if (tableQuery.exec("SELECT count(*) FROM "+table) && tableQuery.next()) {
+            this->totalCurrentTable = tableQuery.value(0).toInt();
+            int offset = 0;
+            bool isFirstLine = true;
 
-            this->totalCurrentTable = tableQuery.size();
+            // Uses a batch process to avoid memory issue
+            while (!this->stop && tableQuery.exec(QString("SELECT * FROM %1 LIMIT %2, 100000").arg(table).arg(offset)) && tableQuery.size() > 0){
 
-            if (tableQuery.next()) {
-
-                stream << "INSERT INTO "+table+" (";
-
-                QSqlRecord row = tableQuery.record();
-                QStringList fields;
-                for (int i = 0; i < row.count(); i++) {
-                    fields << "`"+row.fieldName(i)+"`";
-                }
-
-                stream << fields.join(",")  << ") VALUES " << endl << "(";
-
-                QStringList values;
-                for(int i = 0; i<row.count(); i++) {
-                    values << database.driver()->formatValue(row.field(i));
-                }
-
-                stream << values.join(",") << ")" ;
-
-
-                this->progressCurrentTable++;
                 while(tableQuery.next() && !this->stop) {
-                    stream << "," << endl << "(";
-                    row = tableQuery.record();
+
+                    QSqlRecord row = tableQuery.record();
+
+                    if (isFirstLine) {
+
+                        switch (this->format) {
+                            case DELETE_AND_INSERT:
+                                stream << "DELETE FROM "+table+";" << endl;
+                                stream << "INSERT INTO "+table+" (";
+                                break;
+
+                            case INSERT_IGNORE:
+                                stream << "INSERT IGNORE INTO "+table+" (";
+                                break;
+
+                            case REPLACE:
+                                stream << "REPLACE INTO "+table+" (";
+                                break;
+
+                            default:
+                                stream << "INSERT INTO "+table+" (";
+                        }
+
+                        QStringList fields;
+                        for (int i = 0; i < row.count(); i++) {
+                            fields << "`"+row.fieldName(i)+"`";
+                        }
+
+                        stream << fields.join(",")  << ") VALUES " << endl << "(";
+
+                        isFirstLine = false;
+                    } else {
+                        stream << "," << endl << "(";
+                    }
 
                     QStringList values;
                     for(int i = 0; i<row.count(); i++) {
@@ -183,10 +201,12 @@ namespace Util {
 
                     stream << values.join(",") << ")";
                     this->progressCurrentTable++;
-                } ;
+                }
 
-                stream << ";" << endl;
+                offset += tableQuery.size();
             }
+
+            stream << ";" << endl;
         }
 
         this->progress++;
