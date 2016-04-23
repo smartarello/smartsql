@@ -148,8 +148,6 @@ void SessionWindow::handleNewConnection()
 	newSession.insert("hostname", "localhost");
 	newSession.insert("uuid", QUuid::createUuid().toString());
 
-	qDebug() << newSession;
-
 	this->sessionStore.append(newSession);
 
 	this->persistSessionStore();

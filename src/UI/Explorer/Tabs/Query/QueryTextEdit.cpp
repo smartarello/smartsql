@@ -167,7 +167,6 @@ QStringList QueryTextEdit::getTableList()
 
 void QueryTextEdit::loadTableFields()
 {
-    qDebug() << "QueryTextEdit::loadTableFields";
 	QTextCursor tc = textCursor();
 	tc.movePosition(QTextCursor::PreviousWord);
 	tc.movePosition(QTextCursor::PreviousWord);

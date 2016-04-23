@@ -126,7 +126,6 @@ void QueryTab::queryChanged()
 
 void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
 {
-	qDebug() << "Queries result ready";
     delete  this->queryWorker;
 
 	this->executeButton->setEnabled(true);

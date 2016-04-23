@@ -135,7 +135,6 @@ void TableTab::setTable(QSqlDatabase database, QString tableName) {
 void TableTab::loadData()
 {
     if (!this->loaded) {
-        qDebug() << "Load data for the table: "+this->tableName;
         TableModel *queryModel = (TableModel *)this->tableData->model();
         queryModel->setTable(database, this->tableName, this->whereConditionText->toPlainText());
 
