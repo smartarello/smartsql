@@ -38,8 +38,6 @@ QueryThread::QueryThread(ConnectionConfiguration connection, QString query, QObj
 
 void QueryThread::run()
 {
-    qDebug() << "QueryThread::run - Start thread execution";
-
     QSqlDatabase database = Util::DataBase::createFromConfig(this->connection);
 
     QList<QueryExecutionResult>  results;
@@ -105,7 +103,6 @@ void QueryThread::run()
         qWarning() << database.lastError();
 	}
 
-    qDebug() << "QueryThread::run - End of thread execution";
 }
 
 void QueryThread::killQuery()

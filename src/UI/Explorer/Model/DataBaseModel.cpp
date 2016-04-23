@@ -303,8 +303,6 @@ void DataBaseModel::refresh(const QModelIndex & index)
 
 				// Item not found in the current model, it should be added
 				if (!bdFound) {
-					qDebug() << "New database detected : "+ db->text();
-
 					db->setData(QIcon(":/resources/icons/database-icon.png"),Qt::DecorationRole);
 					QList<QStandardItem *> cols;
 					cols << db;
@@ -330,7 +328,6 @@ void DataBaseModel::refresh(const QModelIndex & index)
 				}
 
 				if (!bdFound) {
-					qDebug() << "Remove the database: " + currentItem->text();
 					serverItem->removeRow(i); // Do not increase `i` in this case, because we are removing the current index
 				} else {
 					i++;
@@ -402,7 +399,6 @@ void DataBaseModel::refresh(const QModelIndex & index)
 				}
 
 				if (!tableFound) {
-					qDebug() << "Remove the table: " + currentItem->text();
 					dbItem->removeRow(i); // Do not increase `i` in this case, because we are removing the current index
 				} else {
 					i++;

@@ -29,6 +29,7 @@
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
 #include "ServerAction/NewDatabaseWindow.h"
 #include "TableAction/TableDetailsWindow.h"
+#include "Util/DataBase.h"
 
 namespace UI {
 namespace Explorer {
@@ -133,6 +134,12 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
 		connect(refreshAction, SIGNAL(triggered(bool)), SLOT(handleRefreshDatabase()));
 		connect(dropDatabaseAction, SIGNAL(triggered(bool)), SLOT(handleDrop()));
 
+        menu->addSeparator();
+
+        QAction *exportAction = new QAction(tr("Export database as SQL"), this);
+        connect(exportAction, SIGNAL(triggered(bool)), SLOT(handleExportTableAsSql()));
+        menu->addAction(exportAction);
+
 		menu->addAction(refreshAction);
 	} else {
         // Table node
@@ -156,6 +163,12 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
         QAction *showDetailsAction = new QAction(tr("Details..."), this);
         connect(showDetailsAction, SIGNAL(triggered(bool)), SLOT(handleShowDetailsTable()));
         menu->addAction(showDetailsAction);
+
+        menu->addSeparator();
+
+        QAction *exportAction = new QAction(tr("Export database as SQL"), this);
+        connect(exportAction, SIGNAL(triggered(bool)), SLOT(handleExportTableAsSql()));
+        menu->addAction(exportAction);
 
 
         menu->addSeparator();
@@ -219,12 +232,23 @@ void DataBaseTree::createDatabase(QString databaseName, QString collation)
  */
 void DataBaseTree::handleShowProcesses()
 {
+    if (processListWindowOpened) {
+        return ;
+    }
+
     QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
     QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.row(), 0);
 	QJsonObject sessionConf = serverItem->data().toJsonObject();
 
 	ServerAction::ShowProcessesWindow *showProcesses = new ServerAction::ShowProcessesWindow(sessionConf, this);
+    connect(showProcesses, SIGNAL(destroyed(QObject*)), SLOT(processListWindowDestroyed()));
+    processListWindowOpened = true;
 	showProcesses->show();
+}
+
+void DataBaseTree::processListWindowDestroyed()
+{
+    processListWindowOpened = false;
 }
 
 void DataBaseTree::handleRefreshDatabase()
@@ -324,6 +348,39 @@ void DataBaseTree::handleDisconnect()
 	} else {
 		emit closeExplorer();
 	}
+}
+
+void DataBaseTree::handleExportTableAsSql()
+{
+    if (exportWindowOpened) {
+        return ;
+    }
+
+    QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
+    QString tableName;
+
+
+    if (!index.isValid() || !index.parent().isValid()) {
+        return;
+    } else if (index.parent().parent().isValid()) {
+        // Action on the table
+        QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.parent().parent().row(), 0);
+        QStandardItem *dbItem = serverItem->child(index.parent().row());
+        QStandardItem *tableItem = dbItem->child(index.row());
+        tableName = tableItem->text();
+    }
+
+
+    ConnectionConfiguration conf = Util::DataBase::dumpConfiguration();
+    Export::ExportWindow *exportWindow = new Export::ExportWindow(this, conf, tableName);
+    connect(exportWindow, SIGNAL(destroyed(QObject*)), SLOT(exportWindowDestroyed()));
+    exportWindowOpened = true;
+    exportWindow->show();
+}
+
+void DataBaseTree::exportWindowDestroyed()
+{
+    exportWindowOpened = false;
 }
 
 DataBaseTree::~DataBaseTree() {

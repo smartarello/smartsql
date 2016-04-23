@@ -45,7 +45,6 @@ void MainWindow::handleOpenConnection(QJsonObject sessionConfiguration)
 
 		if (this->explorer == 0) {
 
-			qDebug() << "Open explorer";
 			this->showMaximized();
             this->toolbar = new ToolBar(this);
             this->addToolBar(this->toolbar);
@@ -58,7 +57,6 @@ void MainWindow::handleOpenConnection(QJsonObject sessionConfiguration)
 		} else {
 
 			if (this->sessionManager != 0) {
-				qDebug() << "Close session manager";
 				this->sessionManager->close();
 				this->sessionManager = 0;
 			}
@@ -88,7 +86,6 @@ void MainWindow::handleOpenConnection(QJsonObject sessionConfiguration)
 
 void MainWindow::openSessionManager()
 {
-	qDebug() << "Open session manager";
 	if (this->sessionManager == 0) {
 		this->sessionManager = new QMainWindow(this);
 		Session::SessionWindow *sessionList = new Session::SessionWindow(this->sessionManager);
@@ -105,7 +102,6 @@ void MainWindow::openSessionManager()
 void MainWindow::closeExplorer()
 {
 
-	qDebug() << "Close Explorer";
     this->removeToolBar(this->toolbar);
 	Session::SessionWindow *sessionList = new Session::SessionWindow(this);
 	this->setCentralWidget(sessionList);

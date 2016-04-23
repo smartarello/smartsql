@@ -31,6 +31,7 @@
 #include <QHeaderView>
 #include <QSqlQuery>
 #include <QSqlError>
+#include "Util/DataBase.h"
 
 namespace UI {
 namespace Explorer {
@@ -39,12 +40,7 @@ namespace ServerAction {
 ShowProcessesWindow::ShowProcessesWindow(QJsonObject sessionConf, QWidget * parent) : QMainWindow(parent) {
 
     this->setAttribute(Qt::WA_DeleteOnClose);
-    this->database = QSqlDatabase::addDatabase("QMYSQL", QUuid::createUuid().toString());
-
-    this->database.setHostName(sessionConf.value("hostname").toString());
-    this->database.setUserName(sessionConf.value("user").toString());
-    this->database.setPassword(sessionConf.value("password").toString());
-    this->database.setPort(sessionConf.value("port").toInt());
+    this->database = Util::DataBase::createFromJSON(sessionConf);
 
 	this->setMinimumSize(900, 300);	
 
@@ -57,13 +53,13 @@ ShowProcessesWindow::ShowProcessesWindow(QJsonObject sessionConf, QWidget * pare
     QHBoxLayout *buttonLayout = new QHBoxLayout(buttonContainer);
     buttonLayout->setAlignment(Qt::AlignLeft);
 
-    QPushButton *killButton = new QPushButton();
+    QPushButton *killButton = new QPushButton(this);
     killButton->setToolTip(tr("Kill process(es)"));
     killButton->setFixedSize(40, 40);
     killButton->setIcon(QIcon(":/resources/icons/stop.png"));
     killButton->setIconSize(QSize(30, 30));
 
-    QPushButton *refreshButton = new QPushButton();
+    QPushButton *refreshButton = new QPushButton(this);
     refreshButton->setToolTip(tr("Refresh (F5)"));
     refreshButton->setFixedSize(40, 40);
     refreshButton->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
@@ -79,7 +75,7 @@ ShowProcessesWindow::ShowProcessesWindow(QJsonObject sessionConf, QWidget * pare
 	this->processListTable->horizontalHeader()->stretchLastSection();
 
     this->processListTable->verticalHeader()->hide();
-	QSqlQueryModel *model = new QSqlQueryModel();
+    QSqlQueryModel *model = new QSqlQueryModel(this);
 	this->processListTable->setModel(model);
 
     containerLayout->addWidget(buttonContainer);
@@ -87,21 +83,38 @@ ShowProcessesWindow::ShowProcessesWindow(QJsonObject sessionConf, QWidget * pare
 
 	this->setCentralWidget(container);
 
-    this->worker = new ProcessListThread(this->database);
-	connect(this->worker, SIGNAL(processListReady()), SLOT(processListReady()));
-	this->worker->start();
 
     QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_F5), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(refreshProcess()));
 
+    connect(shortcut, SIGNAL(activated()), this, SLOT(refreshProcess()));
     connect(killButton, SIGNAL (released()), SLOT(killProcess()));
     connect(refreshButton, SIGNAL (released()), SLOT(refreshProcess()));
+
+    if (this->database.open()) {
+        QSqlQuery query(this->database);
+
+        if (query.exec("SELECT * FROM `information_schema`.`PROCESSLIST`")) {
+            ((QSqlQueryModel *)this->processListTable->model())->setQuery(query);
+        } else {
+            qWarning() << "ProcessListThread::run - " + query.lastError().text();
+        }
+    } else {
+        qDebug() << "Unable to open the database for the process list thread";
+    }
 }
 
 void ShowProcessesWindow::refreshProcess()
 {
-    if (!this->worker->isRunning()) {
-         this->worker->start();
+    if (this->database.isOpen()) {
+        QSqlQuery query(this->database);
+
+        if (query.exec("SELECT * FROM `information_schema`.`PROCESSLIST`")) {
+            ((QSqlQueryModel *)this->processListTable->model())->setQuery(query);
+        } else {
+            qWarning() << "ProcessListThread::run - " + query.lastError().text();
+        }
+    } else {
+        qDebug() << "Unable to open the database for the process list thread";
     }
 }
 
@@ -119,15 +132,10 @@ void ShowProcessesWindow::killProcess()
     }
 }
 
-void ShowProcessesWindow::processListReady()
-{
-	((QSqlQueryModel *)this->processListTable->model())->setQuery(this->worker->getQuery());
-}
-
 ShowProcessesWindow::~ShowProcessesWindow() {
-    this->database.close();
-    delete this->worker;
-    delete this->processListTable;
+    if (this->database.isOpen()) {
+        this->database.close();
+    }
 }
 
 } /* namespace ServerAction */

@@ -40,6 +40,7 @@ public:
     static QSqlDatabase cloneCurrentConnection();
     static QSqlDatabase createFromConfig(ConnectionConfiguration config);
     static ConnectionConfiguration dumpConfiguration();
+    static QSqlDatabase createFromJSON(QJsonObject config);
 
 private:
 	static QSqlDatabase defaultConnection;

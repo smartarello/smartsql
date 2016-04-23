@@ -55,8 +55,6 @@ bool DataBase::open(QJsonObject sessionConfiguration, QString database)
 			qDebug() << "DataBase::open - " + defaultConnection.lastError().text();
 			return false;
 		}
-
-		qInfo() << "Open database connection: " + defaultConnection.userName() + "@" + defaultConnection.hostName() + ":" + QString::number(defaultConnection.port()) + "/" + defaultConnection.databaseName();
 	}
 
 	return true;
@@ -79,6 +77,17 @@ QSqlDatabase DataBase::createFromConfig(ConnectionConfiguration config) {
     database.setPassword(config.password);
     database.setDatabaseName(config.databaseName);
     database.setPort(config.port);
+
+    return database;
+}
+
+QSqlDatabase DataBase::createFromJSON(QJsonObject config) {
+    QSqlDatabase database = QSqlDatabase::addDatabase("QMYSQL", QUuid::createUuid().toString());
+
+    database.setHostName(config.value("hostname").toString());
+    database.setUserName(config.value("user").toString());
+    database.setPassword(config.value("password").toString());
+    database.setPort(config.value("port").toInt());
 
     return database;
 }
