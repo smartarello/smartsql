@@ -16,7 +16,6 @@ HEADERS += UI/MainWindow.h \
 			Util/DataBase.h \
            UI/Explorer/DataBaseTree.h \
            UI/Explorer/ServerAction/ShowProcessesWindow.h \
-           UI/Explorer/ServerAction/ProcessListThread.h \
            UI/Explorer/Explorer.h \
            UI/Session/EditSessionWindow.h \
            UI/Session/SessionWindow.h \
@@ -47,7 +46,6 @@ SOURCES += main.cpp \
            UI/Explorer/DataBaseTree.cpp \
            UI/Explorer/Explorer.cpp \
            UI/Explorer/ServerAction/ShowProcessesWindow.cpp \
-           UI/Explorer/ServerAction/ProcessListThread.cpp \
            UI/Session/EditSessionWindow.cpp \
            UI/Session/SessionWindow.cpp \
            UI/Explorer/Model/DataBaseModel.cpp \

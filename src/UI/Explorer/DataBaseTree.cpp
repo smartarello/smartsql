@@ -232,12 +232,23 @@ void DataBaseTree::createDatabase(QString databaseName, QString collation)
  */
 void DataBaseTree::handleShowProcesses()
 {
+    if (processListWindowOpened) {
+        return ;
+    }
+
     QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
     QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.row(), 0);
 	QJsonObject sessionConf = serverItem->data().toJsonObject();
 
 	ServerAction::ShowProcessesWindow *showProcesses = new ServerAction::ShowProcessesWindow(sessionConf, this);
+    connect(showProcesses, SIGNAL(destroyed(QObject*)), SLOT(processListWindowDestroyed()));
+    processListWindowOpened = true;
 	showProcesses->show();
+}
+
+void DataBaseTree::processListWindowDestroyed()
+{
+    processListWindowOpened = false;
 }
 
 void DataBaseTree::handleRefreshDatabase()
@@ -341,6 +352,10 @@ void DataBaseTree::handleDisconnect()
 
 void DataBaseTree::handleExportTableAsSql()
 {
+    if (exportWindowOpened) {
+        return ;
+    }
+
     QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
     QString tableName;
 
@@ -358,7 +373,14 @@ void DataBaseTree::handleExportTableAsSql()
 
     ConnectionConfiguration conf = Util::DataBase::dumpConfiguration();
     Export::ExportWindow *exportWindow = new Export::ExportWindow(this, conf, tableName);
+    connect(exportWindow, SIGNAL(destroyed(QObject*)), SLOT(exportWindowDestroyed()));
+    exportWindowOpened = true;
     exportWindow->show();
+}
+
+void DataBaseTree::exportWindowDestroyed()
+{
+    exportWindowOpened = false;
 }
 
 DataBaseTree::~DataBaseTree() {

@@ -357,7 +357,7 @@ namespace UI {
             {
                 if (this->workerThread != nullptr) {
                     dumpWorker->stopRequired();
-                }
+                }                
             }
 
             /**

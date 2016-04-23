@@ -22,7 +22,6 @@
 #include <QTableView>
 #include <QSqlDatabase>
 #include <QJsonObject>
-#include "ProcessListThread.h"
 
 namespace UI {
 namespace Explorer {
@@ -36,14 +35,12 @@ public:
 	ShowProcessesWindow(QJsonObject sessionConf, QWidget * parent = 0);
 	virtual ~ShowProcessesWindow();
 
-public slots:
-	void processListReady();
+public slots:	
     void killProcess();
     void refreshProcess();
 
 private:
-	QTableView *processListTable;
-	ProcessListThread *worker;
+	QTableView *processListTable;	
     QSqlDatabase database;
 };
 

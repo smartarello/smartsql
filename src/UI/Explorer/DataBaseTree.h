@@ -51,6 +51,8 @@ public slots:
     void handleShowDetailsTable();
     void handleOpenTableInTab();
     void handleExportTableAsSql();
+    void exportWindowDestroyed();
+    void processListWindowDestroyed();
 
 
 
@@ -61,6 +63,8 @@ signals:
 private:
 	Model::DataBaseModel *dataBaseModel;
 	QModelIndex contextMenuIndex;
+    bool exportWindowOpened = false;
+    bool processListWindowOpened = false;
 };
 
 } /* namespace Explorer */

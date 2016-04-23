@@ -39,40 +39,66 @@ namespace Util {
     }
 
 
+    /**
+     * @brief MySQLDump::setDropTable
+     * @param dropTable if true, the dump includes the statements to drop the tables
+     */
     void MySQLDump::setDropTable(bool dropTable)
     {
         this->dropTable = dropTable;
     }
 
+    /**
+     * @brief MySQLDump::setDropDatabase
+     * @param dropDatabase if true, the dump includes the statements to drop the database
+     */
     void MySQLDump::setDropDatabase(bool dropDatabase)
     {
         this->dropDatabase = dropDatabase;
     }
 
+    /**
+     * @brief MySQLDump::setCreateDatabase
+     * @param createDatabase if true, the dump includes the statements to create the database
+     */
     void MySQLDump::setCreateDatabase(bool createDatabase)
     {
         this->createDatabase = createDatabase;
     }
 
+    /**
+     * @brief MySQLDump::setCreateTable
+     * @param createTable if true, the dump includes the statements to create the tables
+     */
     void MySQLDump::setCreateTable(bool createTable)
     {
         this->createTable = createTable;
     }
 
+    /**
+     * @brief MySQLDump::setFormat
+     * @param format the format for the dump, changes the way the lines are inserted (INSERT INTO, INSERT IGNORE INTO, REPLACE, ...)
+     */
     void MySQLDump::setFormat(MySQLDumpFormat format)
     {
         this->format = format;
     }
 
+    /**
+     * @brief MySQLDump::setTables
+     * @param tableList the list of tables name to dump, if the table list is not set, all the database will be dumped
+     */
     void MySQLDump::setTables(QStringList tableList)
     {
         this->tables = tableList;
     }
 
+    /**
+     * Starts the dump process
+     * @brief MySQLDump::dump
+     */
     void MySQLDump::dump()
     {
-        qDebug() << "Start dump ...";
-
         QSqlDatabase database = DataBase::createFromConfig(this->configuration);
         if (!database.open()) {
             qDebug() << database.lastError().text();
@@ -83,7 +109,6 @@ namespace Util {
 
         QFile *file = new QFile(this->filename);
         if (file->exists()) {
-            qDebug() << "Remove existing file";
             file->remove();
         }
 
@@ -124,12 +149,17 @@ namespace Util {
             qDebug() << "Unable to open the file: "+this->filename;
         }
 
-        qDebug() << "End thread";
         database.close();
 
         emit dumpFinished(this->stop);
     }
 
+    /**
+     * @brief MySQLDump::dumpTable
+     * @param database the source database
+     * @param table the table to dump
+     * @param file the ouput file
+     */
     void MySQLDump::dumpTable(QSqlDatabase database, QString table, QFile *file)
     {
         this->currentTable = table;
@@ -214,31 +244,56 @@ namespace Util {
         stream << endl;
     }
 
+    /**
+     * Gets the number of rows exported for the current table
+     * @brief MySQLDump::getProgressCurrentTable
+     * @return the number of rows exported for the current table
+     */
     int MySQLDump::getProgressCurrentTable()
     {
         return this->progressCurrentTable;
     }
 
+    /**
+     * @brief MySQLDump::getProgress
+     * @return the number of tables exported
+     */
     int MySQLDump::getProgress()
     {
         return this->progress;
     }
 
+    /**
+     * @brief MySQLDump::getTotalLine
+     * @return the number of rows to dump for the current table
+     */
     int MySQLDump::getTotalLine()
     {
         return this->totalCurrentTable;
     }
 
+    /**
+     * @brief MySQLDump::getCurrentTable
+     * @return The table name for the table which are processing
+     */
     QString MySQLDump::getCurrentTable()
     {
         return this->currentTable;
     }
 
+    /**
+     * @brief MySQLDump::getTableCount
+     * @return The count of tables to export
+     */
     int MySQLDump::getTableCount()
     {
         return tableCount;
     }
 
+    /**
+     * Stops the dump process
+     * @brief MySQLDump::stopRequired
+     */
     void MySQLDump::stopRequired()
     {
         this->stop = true;

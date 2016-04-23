@@ -25,7 +25,6 @@
 
 int main(int argc, char *argv[])
 {
-	qInfo() << "Start the application";
     QApplication app(argc, argv);
 
     int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/Lato-Regular.ttf");

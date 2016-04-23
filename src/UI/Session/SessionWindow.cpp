@@ -44,13 +44,13 @@ namespace Session {
 
 SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 
-	 QVBoxLayout *vlayout = new QVBoxLayout;
+     QVBoxLayout *vlayout = new QVBoxLayout(this);
 	 this->setLayout(vlayout);
 
      QWidget *header = new QWidget(this);
 	 vlayout->addWidget(header);
 
-	 QHBoxLayout *hlayout = new QHBoxLayout;
+     QHBoxLayout *hlayout = new QHBoxLayout(header);
 	 header->setLayout(hlayout);
 
      this->sessionList = new QListView(this);
@@ -86,12 +86,12 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 hlayout->addWidget(this->editSession);
 
 	 // Footer part
-	 QWidget *buttonContainer = new QWidget;
+     QWidget *buttonContainer = new QWidget(this);
 	 QBoxLayout *buttonLayout = new QBoxLayout(QBoxLayout::LeftToRight);
 	 buttonContainer->setLayout(buttonLayout);
 
-	 QWidget *leftPartWidget = new QWidget;
-	 QHBoxLayout *leftPartLayout = new QHBoxLayout;
+     QWidget *leftPartWidget = new QWidget(this);
+     QHBoxLayout *leftPartLayout = new QHBoxLayout(leftPartWidget);
 	 leftPartWidget->setLayout(leftPartLayout);
 	 leftPartLayout->setAlignment(Qt::AlignLeft);
 
@@ -103,8 +103,8 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	 leftPartLayout->addWidget(deleteButton);
 	 buttonLayout->addWidget(leftPartWidget);
 
-	 QWidget *rightPartWidget = new QWidget;
-	 QHBoxLayout *rightPartLayout = new QHBoxLayout;
+     QWidget *rightPartWidget = new QWidget(this);
+     QHBoxLayout *rightPartLayout = new QHBoxLayout(rightPartWidget);
 	 rightPartLayout->setAlignment(Qt::AlignRight);
 	 rightPartWidget->setLayout(rightPartLayout);
 	 exitButton = new QPushButton(tr("Exit"));
@@ -250,14 +250,12 @@ void SessionWindow::handleSaveConnection()
 
 void SessionWindow::persistSessionStore()
 {
-	qInfo() << "Saving the session configuration";
 	QSettings settings("smartarello", "mysqlclient");
 
 	QJsonDocument doc;
 	doc.setArray(this->sessionStore);
 	QString strJson(doc.toJson(QJsonDocument::Compact));
 
-	qDebug() << strJson;
 	settings.setValue("sessions", strJson);
 }
 
