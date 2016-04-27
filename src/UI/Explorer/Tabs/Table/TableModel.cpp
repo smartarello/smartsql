@@ -41,6 +41,7 @@ void TableModel::setTable(QSqlDatabase database, QString table, QString filter){
     this->filter = filter;
     this->columns = QList<QString>();
     this->primaryKey = QStringList();
+    this->foreignKeys = QHash<QString, QStringList>();
 
 
     if (!this->database.isOpen() && !this->database.open()) {
@@ -66,6 +67,19 @@ void TableModel::setTable(QSqlDatabase database, QString table, QString filter){
 		} else {
 			qDebug() << "TableModel::setTable - " + queryIndex.lastError().text();
 		}
+
+        // Finds the foreign keys
+        QString queryString = QString("SELECT  COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = '%1'  AND TABLE_NAME = '%2' AND REFERENCED_TABLE_NAME IS NOT NULL").arg(this->database.databaseName()).arg(table);
+        QSqlQuery queryFK(this->database);
+        if (query.exec(queryString)) {
+            while (query.next()) {
+                QStringList fk;
+                fk << query.value(1).toString(); // Referenced table
+                fk << query.value(2).toString(); // Referenced column
+                this->foreignKeys.insert(query.value(0).toString(), fk);
+            }
+        }
+
 	} else {
 		qDebug() << "TableModel::setTable - " + query.lastError().text();
 	}
@@ -100,6 +114,11 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
 
 QList<QString> TableModel::getColumns(){
 	return this->columns;
+}
+
+QHash<QString,QStringList> TableModel::getForeignKeys()
+{
+    return this->foreignKeys;
 }
 
 void TableModel::sort(int column, Qt::SortOrder order){
@@ -272,9 +291,6 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent)
 		emit queryError("", query.lastError().text());
 		return false;
 	}
-
-    //this->database.close();
-
 
 	beginRemoveRows(parent, row, lastRow);
 

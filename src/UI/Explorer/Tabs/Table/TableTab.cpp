@@ -52,11 +52,10 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this->tableData, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
 
-	this->whereConditionText = new TableFilterTextEdit();
+    this->whereConditionText = new TableFilterTextEdit(this);
 
 	QWidget *topPart = new QWidget(this);
-	QVBoxLayout *topPartLayout = new QVBoxLayout();
-	topPart->setLayout(topPartLayout);
+    QVBoxLayout *topPartLayout = new QVBoxLayout(topPart);
 
 	this->tableInfoLabel = new QLabel();
 	topPartLayout->addWidget(this->tableInfoLabel);
@@ -64,8 +63,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->addWidget(topPart);
 
 	QWidget *bottomPart = new QWidget(this);
-	QVBoxLayout *bottomPartLayout = new QVBoxLayout();
-	bottomPart->setLayout(bottomPartLayout);
+    QVBoxLayout *bottomPartLayout = new QVBoxLayout(bottomPart);
 
 	QLabel *filterLabel = new QLabel(this);
 	filterLabel->setText(tr("Filter:"));
@@ -83,7 +81,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->setStretchFactor(0, 4);
 	this->setStretchFactor(1, 1);
 
-	TableModel *queryModel = new TableModel();
+    TableModel *queryModel = new TableModel(this);
 	this->tableData->setModel(queryModel);
 	this->tableData->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -227,8 +225,20 @@ void TableTab::customContextMenuRequested(QPoint point)
 			filterLikeAction->setEnabled(false);
 			filterEqualAction->setEnabled(false);
 		}
+
+        QHash<QString, QStringList> fks = model->getForeignKeys();
+        if (fks.contains(colTitle)) {
+            menu->addSeparator();
+            QStringList fk = fks.value(colTitle);
+            QAction *goToAction = new QAction(QString(tr("Go to `%1`")).arg(fk.at(0)), this);
+            connect(goToAction, SIGNAL(triggered(bool)), SLOT(handleGoToForeignKeyAction()));
+            //filterEqualAction->setIcon(QIcon(":/resources/icons/filter-icon.png"));
+            menu->addAction(goToAction);
+
+        }
 	}
 
+    menu->addSeparator();
 	QAction *refreshAction = new QAction(tr("Refresh"), this);
 	refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
 	menu->addAction(refreshAction);
@@ -248,23 +258,50 @@ void TableTab::customContextMenuRequested(QPoint point)
 	menu->popup(this->tableData->viewport()->mapToGlobal(point));
 }
 
-void TableTab::handleFilterColumnLikeAction()
+void TableTab::handleGoToForeignKeyAction()
 {
 	TableModel * model = ((TableModel *)this->tableData->model());
 	QList<QString> columns = model->getColumns();
+    if (columns.size() < this->contextMenuIndex.column()) {
+        return ;
+    }
+
 	QString colTitle = columns.at(this->contextMenuIndex.column());
 
-	bool ok;
-	QString text = QInputDialog::getText(this,
-			"",
-			QString(tr("`%1` LIKE \"%...%\"")).arg(colTitle),
-			QLineEdit::Normal,
-			"", &ok);
+    QVariant cellData = this->tableData->model()->data(this->contextMenuIndex);
+    if (!cellData.isValid() || cellData.isNull()) {
+        return ;
+    }
 
-	if (ok && !text.isEmpty()) {
-		this->whereConditionText->setText(QString(tr("`%1` LIKE \"%%2%\"")).arg(colTitle).arg(text));
+    QHash<QString, QStringList> fks = model->getForeignKeys();
+    if (!fks.contains(colTitle)) {
+        return ;
+    }
+
+    QStringList fk = fks.value(colTitle);
+    this->setTable(this->database, fk.value(0));
+    this->loadData();
+    this->whereConditionText->setText(QString(tr("`%1` LIKE \"%2\"")).arg(fk.value(1)).arg(cellData.toString()));
+    this->applyFilterClicked();
+}
+
+void TableTab::handleFilterColumnLikeAction()
+{
+    TableModel * model = ((TableModel *)this->tableData->model());
+    QList<QString> columns = model->getColumns();
+    QString colTitle = columns.at(this->contextMenuIndex.column());
+
+    bool ok;
+    QString text = QInputDialog::getText(this,
+                                         "",
+                                         QString(tr("`%1` LIKE \"%...%\"")).arg(colTitle),
+                                         QLineEdit::Normal,
+                                         "", &ok);
+
+    if (ok && !text.isEmpty()) {
+        this->whereConditionText->setText(QString(tr("`%1` LIKE \"%%2%\"")).arg(colTitle).arg(text));
         this->applyFilterClicked();
-	}
+    }
 }
 
 void TableTab::handleFilterColumnEqualAction()
@@ -331,9 +368,6 @@ void TableTab::queryError(QString query, QString error)
 }
 
 TableTab::~TableTab() {
-    delete this->tableData->model();
-    delete this->tableData;
-    delete this->whereConditionText;
 }
 
 } /* namespace Table */

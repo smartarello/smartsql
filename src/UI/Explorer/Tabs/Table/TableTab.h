@@ -49,6 +49,7 @@ public slots:
 	void handleDeleteAction();
 	void handleFilterColumnLikeAction();
 	void handleFilterColumnEqualAction();
+    void handleGoToForeignKeyAction();
     void refreshData();
 
 private:
