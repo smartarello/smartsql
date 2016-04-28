@@ -45,7 +45,7 @@ namespace Session {
 SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 
      QVBoxLayout *vlayout = new QVBoxLayout(this);
-	 this->setLayout(vlayout);
+     this->setLayout(vlayout);
 
      QWidget *header = new QWidget(this);
 	 vlayout->addWidget(header);

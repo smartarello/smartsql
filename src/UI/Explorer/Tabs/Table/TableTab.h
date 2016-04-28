@@ -23,6 +23,9 @@
 #include <QLabel>
 #include "TableFilterTextEdit.h"
 #include <QSqlDatabase>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+#include <QTimer>
 
 namespace UI {
 namespace Explorer {
@@ -50,6 +53,8 @@ public slots:
 	void handleFilterColumnLikeAction();
 	void handleFilterColumnEqualAction();
     void refreshData();
+    void hideNotification();
+    void dataUpdatedSuccessfully();
 
 private:
 	QTableView *tableData;
@@ -59,7 +64,10 @@ private:
     QString tableName;
     QSqlDatabase database;
     bool loaded;
-    QMap<QString,QString> savedFilter;
+    QMap<QString,QString> savedFilter;   
+
+    QWidget* notificationWidget;
+    QPropertyAnimation *notificationAnimation;
 };
 
 } /* namespace Table */

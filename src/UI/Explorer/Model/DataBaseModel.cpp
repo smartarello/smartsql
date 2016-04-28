@@ -342,8 +342,6 @@ void DataBaseModel::refresh(const QModelIndex & index)
 		QStandardItem *serverItem = rootItem->child(index.parent().row());
 		QStandardItem *dbItem = serverItem->child(index.row());
 
-		qInfo() << "Reload table list for: "+dbItem->text();
-
 		QJsonObject serverConf = serverItem->data().toJsonObject();
 
 		if (Util::DataBase::open(serverConf, dbItem->text())) {

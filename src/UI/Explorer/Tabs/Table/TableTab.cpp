@@ -52,19 +52,19 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->tableData->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this->tableData, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
 
-	this->whereConditionText = new TableFilterTextEdit();
+    this->whereConditionText = new TableFilterTextEdit(this);
 
 	QWidget *topPart = new QWidget(this);
-	QVBoxLayout *topPartLayout = new QVBoxLayout();
+    QVBoxLayout *topPartLayout = new QVBoxLayout(topPart);
 	topPart->setLayout(topPartLayout);
 
-	this->tableInfoLabel = new QLabel();
+    this->tableInfoLabel = new QLabel(this);
 	topPartLayout->addWidget(this->tableInfoLabel);
 	topPartLayout->addWidget(this->tableData);
 	this->addWidget(topPart);
 
 	QWidget *bottomPart = new QWidget(this);
-	QVBoxLayout *bottomPartLayout = new QVBoxLayout();
+    QVBoxLayout *bottomPartLayout = new QVBoxLayout(bottomPart);
 	bottomPart->setLayout(bottomPartLayout);
 
 	QLabel *filterLabel = new QLabel(this);
@@ -83,7 +83,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	this->setStretchFactor(0, 4);
 	this->setStretchFactor(1, 1);
 
-	TableModel *queryModel = new TableModel();
+    TableModel *queryModel = new TableModel(this);
 	this->tableData->setModel(queryModel);
 	this->tableData->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -94,6 +94,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
     connect(this->whereConditionText, SIGNAL(filterChanged(QString)), SLOT(applyFilterClicked()));
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
     connect(filterButton, SIGNAL(clicked(bool)), SLOT(applyFilterClicked()));
+    connect(queryModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), SLOT(dataUpdatedSuccessfully()));
 }
 
 void TableTab::refreshData()
@@ -318,6 +319,51 @@ void TableTab::handleDeleteAction()
 	model->removeRows(list.first().row(), list.count(), list.first().parent());
 }
 
+/**
+ * Called when a row has been updated with success
+ * Show a notification
+ *
+ * @brief TableTab::dataUpdatedSuccessfully
+ */
+void TableTab::dataUpdatedSuccessfully()
+{
+    notificationWidget = new QWidget(this->tableData);
+    notificationWidget->setStyleSheet("background-color:#ebf8a4; border: 1 solid #35DB00;");
+    QHBoxLayout *layout = new QHBoxLayout(notificationWidget);
+    layout->setSpacing(0);
+
+    // The success icon
+    QLabel *notificationIcon = new QLabel();
+    notificationIcon->setStyleSheet("border: none;");
+    QPixmap icon(":/resources/icons/check-icon.png");
+    notificationIcon->setPixmap(icon);
+
+    QLabel *notificationLabel = new QLabel(tr("Successfully updated"));
+    notificationLabel->setStyleSheet("border: none;");
+
+    layout->addWidget(notificationIcon);
+    layout->addWidget(notificationLabel);
+
+    QPoint center = this->rect().center();
+    notificationWidget->setGeometry(QRect(center.x() - 100, 30, 200, 50));
+    notificationWidget->show();
+
+
+    // Creates an animation to hide the notification
+    QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
+    eff->setOpacity(1);
+    notificationWidget->setGraphicsEffect(eff);
+
+    notificationAnimation = new QPropertyAnimation(eff,"opacity");
+    notificationAnimation->setDuration(4000);
+    notificationAnimation->setStartValue(1);
+    notificationAnimation->setEndValue(0);
+    notificationAnimation->setEasingCurve(QEasingCurve::OutBack);
+
+    // Starts an animation to hide the notification after 500ms
+    QTimer::singleShot(500, this, SLOT(hideNotification()));
+}
+
 void TableTab::queryError(QString query, QString error)
 {
 	QMessageBox *message = new QMessageBox(this);
@@ -330,10 +376,16 @@ void TableTab::queryError(QString query, QString error)
 	message->show();
 }
 
+/**
+ * Starts the animation which hides the notification
+ * @brief TableTab::hideNotification
+ */
+void TableTab::hideNotification()
+{
+    notificationAnimation->start(QPropertyAnimation::DeleteWhenStopped);
+}
+
 TableTab::~TableTab() {
-    delete this->tableData->model();
-    delete this->tableData;
-    delete this->whereConditionText;
 }
 
 } /* namespace Table */

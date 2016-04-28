@@ -46,11 +46,11 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 
 	QWidget *topPart = new QWidget(this);
 
-	QVBoxLayout *topLayout = new QVBoxLayout();
+    QVBoxLayout *topLayout = new QVBoxLayout(topPart);
 	topPart->setLayout(topLayout);
 
     // Query editor
-    this->queryTextEdit = new QueryTextEdit();
+    this->queryTextEdit = new QueryTextEdit(this);
     topLayout->addWidget(this->queryTextEdit);
 
     // Actions
@@ -59,7 +59,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	buttonContainer->setLayout(buttonLayout);
 	buttonLayout->setAlignment(Qt::AlignLeft);	
 
-	this->executeButton = new QPushButton();
+    this->executeButton = new QPushButton(this);
 	this->executeButton->setIcon(QIcon(":/resources/icons/play.png"));
 	this->executeButton->setIconSize(QSize(25, 25));
 	this->executeButton->setToolTip(tr("Execute query (F5)"));
@@ -67,7 +67,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	this->executeButton->setFixedHeight(30);
 	buttonLayout->addWidget(this->executeButton);
 
-	this->stopButton = new QPushButton();
+    this->stopButton = new QPushButton(this);
 	this->stopButton->setIcon(QIcon(":/resources/icons/stop.png"));
 	this->stopButton->setIconSize(QSize(25, 25));
 	this->stopButton->setToolTip(tr("Cancel running queries"));
@@ -92,7 +92,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	this->setSizes(sizes);
 
     // Events
-	connect(parent, SIGNAL (databaseChanged()), this->queryTextEdit, SLOT (databaseChanged()));
+    connect(this->parent(), SIGNAL (databaseChanged()), this->queryTextEdit, SLOT (databaseChanged()));
 	connect(this->queryTextEdit, SIGNAL (queryChanged()), this, SLOT (queryChanged()));
 	connect(this->executeButton, SIGNAL (clicked(bool)), this, SLOT (queryChanged()));
 	connect(this->stopButton, SIGNAL (clicked(bool)), this, SLOT (stopQueries()));

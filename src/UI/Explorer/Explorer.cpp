@@ -310,6 +310,8 @@ void Explorer::refreshDatabase()
 	this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(db.databaseName()));
 
     this->explorerTabs->setCurrentWidget(this->databaseTab);
+
+    emit databaseChanged();
 }
 
 void Explorer::addDatabase(QJsonObject sessionConfiguration)
