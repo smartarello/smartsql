@@ -30,6 +30,7 @@
 #include <QJsonObject>
 #include <QSqlRecord>
 #include "QueryModel.h"
+#include "ResultTableView.h"
 
 namespace UI {
 namespace Explorer {
@@ -146,8 +147,9 @@ void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
         double seconds = result.msec / 1000.0;
 
         if (result.isSelect) {
-            QTableView *tableData = new QTableView(this->queryTabs);
+            ResultTableView *tableData = new ResultTableView(this->queryTabs);
             tableData->verticalHeader()->hide();
+
             QueryModel *model = new QueryModel(result.data, this);
 
             tableData->setModel(model);
