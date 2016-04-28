@@ -226,9 +226,12 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
                 value = QVariant("(NULL)");
             } else if (value.type() == QVariant::DateTime) {
                 return value.toDateTime().toString("yyyy-MM-dd hh:mm:ss");
+            } else if (value.type() == QVariant::Date) {
+                return value.toDate().toString("yyyy-MM-dd");
+            } else {
+                return value;
             }
 
-            return value;
         } else if (value.isNull()) { // Qt::FontRole
             QFont font("DejaVue Sans Mono");
             font.setItalic(true);
