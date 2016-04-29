@@ -306,6 +306,20 @@ void Explorer::refreshDatabase()
     }
 
 	QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen() && !db.open()) {
+        qDebug() << "Unable to refresh database, database connection failed";
+
+        QMessageBox *message = new QMessageBox();
+        message->setWindowTitle(tr("Connection error"));
+        message->setText(tr("Unable to connect to the Data Base"));
+        message->setDetailedText(db.lastError().text());
+
+        message->setIcon(QMessageBox::Critical);
+        message->exec();
+
+        return;
+    }
+
 	this->databaseTab->refresh();
 	this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(db.databaseName()));
 
