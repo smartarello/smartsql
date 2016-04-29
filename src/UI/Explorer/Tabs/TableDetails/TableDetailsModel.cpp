@@ -89,6 +89,13 @@ TableDetailsModel::TableDetailsModel(QString createString, QObject *parent) : QA
                 this->primaryKey << primaryKeyPart;
             }
         }
+
+
+
+        QRegExp foreignKeyRx("^\\s*CONSTRAINT `(.+)` FOREIGN KEY \\(`(.+)`\\) REFERENCES `(.+)` \\(`(.+)`\\)", Qt::CaseInsensitive);
+        if (foreignKeyRx.indexIn(part) != -1) { // Primary key definition
+            this->fks << foreignKeyRx.cap(2);
+        }
     }
 
 }

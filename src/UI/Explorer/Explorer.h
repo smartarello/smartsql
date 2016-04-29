@@ -28,6 +28,7 @@
 #include "DataBaseTree.h"
 #include "Tabs/Database/DataBaseTab.h"
 #include "Tabs/Server/ServerTab.h"
+#include "Tabs/TableDetails/TableDetailsTab.h"
 
 namespace UI {
 namespace Explorer {
@@ -65,6 +66,7 @@ private:
 	Tabs::Database::DataBaseTab *databaseTab;
 	Tabs::Table::TableTab *tableTab;
     ServerTab *serverTab;
+    TableDetailsTab *tableDetailsTab;
 
 };
 

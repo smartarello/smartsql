@@ -17,18 +17,22 @@
 #ifndef TABLEDETAILSWINDOW_H
 #define TABLEDETAILSWINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QTableView>
 #include <QSqlDatabase>
+#include <QTextEdit>
 
-class TableDetailsWindow : public QMainWindow
+class TableDetailsTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TableDetailsWindow(QSqlDatabase database, QString tableName,  QWidget *parent = 0);
+    explicit TableDetailsTab(QWidget *parent = 0);
+    void setTable(QSqlDatabase database, QString tableName);
 
 private:
     QTableView *tableColumns;
+    QTableView *tableForeignKeys;
+    QTextEdit *createTableTextEdit;
 
 signals:
 

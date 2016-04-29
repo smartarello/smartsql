@@ -35,7 +35,8 @@
 #include "Model/TableFilterProxyModel.h"
 #include "Tabs/Query/QueryTab.h"
 #include "Tabs/TabView.h"
-#include "../../Util/DataBase.h"
+#include "Util/DataBase.h"
+#include "Tabs/TableDetails/TableDetailsTab.h"
 
 
 namespace UI {
@@ -115,6 +116,9 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	splitter->setStretchFactor(0, 1);
 	splitter->setStretchFactor(1, 3);
 	hboxlayout->addWidget(splitter);
+
+    this->tableDetailsTab = new TableDetailsTab(this);
+    this->tableDetailsTab->hide();
 
 	this->tableTab = new Tabs::Table::TableTab(this);
 	this->tableTab->hide();
@@ -199,6 +203,7 @@ void Explorer::dataBaseTreeDoubleClicked(QModelIndex index)
 void Explorer::dataBaseTreeItemChanged()
 {
 	int tableTabIndex = this->explorerTabs->indexOf(this->tableTab) ;
+    int tableDetailsTabIndex = this->explorerTabs->indexOf(this->tableDetailsTab) ;
     int dataBaseTabIndex = this->explorerTabs->indexOf(this->databaseTab) ;
     int serverTabIndex = this->explorerTabs->indexOf(this->serverTab) ;
     QModelIndex index = this->dataBaseTree->currentIndex();
@@ -207,6 +212,10 @@ void Explorer::dataBaseTreeItemChanged()
 		if (tableTabIndex != -1){
 			this->explorerTabs->removeTab(tableTabIndex);
 		}
+
+        if (tableDetailsTabIndex != -1){
+            this->explorerTabs->removeTab(tableDetailsTabIndex);
+        }
 
         if (dataBaseTabIndex != -1) {
             this->explorerTabs->removeTab(dataBaseTabIndex);
@@ -273,22 +282,34 @@ void Explorer::dataBaseTreeItemChanged()
 	if (!tableName.isNull()){
         // Set the current table
         this->tableTab->setTable(QSqlDatabase::database(), tableName);
+        this->tableDetailsTab->setTable(QSqlDatabase::database(), tableName);
 
         // If the table tab is not visible, do not load the data
         // We use lazy loading, the data will be loaded when the tab will be activated.
         int tableTabIndex = this->explorerTabs->indexOf(this->tableTab);
         if (tableTabIndex == -1){
 			this->tableTab->show();
-			this->explorerTabs->insertTab(1, this->tableTab, tr("Data"));
-            this->explorerTabs->setCurrentIndex(1);
+            this->tableDetailsTab->show();
+            this->explorerTabs->insertTab(1, this->tableDetailsTab, QString(tr("Table: %1")).arg(tableName));
+            this->explorerTabs->insertTab(2, this->tableTab, tr("Data"));
+            this->explorerTabs->setCurrentIndex(2);
 			this->explorerTabs->tabBar()->tabButton(1, QTabBar::RightSide)->hide();
+            this->explorerTabs->tabBar()->tabButton(2, QTabBar::RightSide)->hide();
             this->tableTab->loadData();
         } else if (tableTabIndex == this->explorerTabs->currentIndex()) {
             this->tableTab->loadData();
         }
-	}
-	else if (tableTabIndex != -1){
-		this->explorerTabs->removeTab(tableTabIndex);
+
+        this->explorerTabs->setTabText(1, QString(tr("Table: %1")).arg(tableName));
+    }
+    else {
+        if (tableTabIndex != -1){
+            this->explorerTabs->removeTab(tableTabIndex);
+        }
+
+        if (tableDetailsTabIndex != -1) {
+            this->explorerTabs->removeTab(tableDetailsTabIndex);
+        }
 	}
 
     this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
@@ -301,8 +322,13 @@ void Explorer::dataBaseTreeItemChanged()
 void Explorer::refreshDatabase()
 {
     int tableTabIndex = this->explorerTabs->indexOf(this->tableTab) ;
+    int tableDetailsTabIndex = this->explorerTabs->indexOf(this->tableDetailsTab) ;
     if (tableTabIndex != -1){
         this->explorerTabs->removeTab(tableTabIndex);
+    }
+
+    if (tableDetailsTabIndex != -1){
+        this->explorerTabs->removeTab(tableDetailsTabIndex);
     }
 
 	QSqlDatabase db = QSqlDatabase::database();
