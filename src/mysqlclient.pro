@@ -40,7 +40,8 @@ HEADERS += UI/MainWindow.h \
     Util/MySQLDump.h \
     UI/Explorer/Tabs/Query/ResultTableView.h \
     UI/Explorer/Tabs/TableDetails/TableDetailsTab.h \
-    UI/Explorer/Tabs/TableDetails/ForeignKeyModel.h
+    UI/Explorer/Tabs/TableDetails/ForeignKeyModel.h \
+    UI/Explorer/Tabs/TableDetails/TableIndexModel.h
 SOURCES += main.cpp \
 		Util/DataBase.cpp \
            UI/MainWindow.cpp \
@@ -71,7 +72,8 @@ SOURCES += main.cpp \
     Util/MySQLDump.cpp \
     UI/Explorer/Tabs/Query/ResultTableView.cpp \
     UI/Explorer/Tabs/TableDetails/TableDetailsTab.cpp \
-    UI/Explorer/Tabs/TableDetails/ForeignKeyModel.cpp
+    UI/Explorer/Tabs/TableDetails/ForeignKeyModel.cpp \
+    UI/Explorer/Tabs/TableDetails/TableIndexModel.cpp
 TRANSLATIONS += mysqlclient_en.ts
 
 win32:debug {

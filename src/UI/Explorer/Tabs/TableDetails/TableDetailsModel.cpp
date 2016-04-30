@@ -89,13 +89,6 @@ TableDetailsModel::TableDetailsModel(QString createString, QObject *parent) : QA
                 this->primaryKey << primaryKeyPart;
             }
         }
-
-
-
-        QRegExp foreignKeyRx("^\\s*CONSTRAINT `(.+)` FOREIGN KEY \\(`(.+)`\\) REFERENCES `(.+)` \\(`(.+)`\\)", Qt::CaseInsensitive);
-        if (foreignKeyRx.indexIn(part) != -1) { // Primary key definition
-            this->fks << foreignKeyRx.cap(2);
-        }
     }
 
 }
@@ -122,7 +115,6 @@ QVariant TableDetailsModel::headerData(int section, Qt::Orientation orientation,
         if (this->primaryKey.contains(col.name, Qt::CaseInsensitive)) {
             return QPixmap(":/resources/icons/key-icon.png").scaledToWidth(20);
         }
-
     }
 
     return QVariant();

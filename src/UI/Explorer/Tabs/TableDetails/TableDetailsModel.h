@@ -44,15 +44,6 @@ private:
         QVariant defaultValue;
     };
 
-    struct ForeignKeyDefinition
-    {
-        QString keyName;
-        QString column;
-        QString foreignTable;
-        QString foreignColumn;
-        QString onUpdate;
-        QString onDelete;
-    };
 
     QList<ColumnDefinition> columns;
     QStringList fks;

@@ -14,30 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef TABLEDETAILSWINDOW_H
-#define TABLEDETAILSWINDOW_H
+#ifndef TABLEINDEXMODEL_H
+#define TABLEINDEXMODEL_H
 
-#include <QWidget>
-#include <QTableView>
-#include <QSqlDatabase>
-#include <QTextEdit>
+#include <QAbstractTableModel>
 
-class TableDetailsTab : public QWidget
+class TableIndexModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit TableDetailsTab(QWidget *parent = 0);
-    void setTable(QSqlDatabase database, QString tableName);
+    explicit TableIndexModel(QString createString, QObject *parent = 0);
 
-private:
-    QTableView *tableColumns;
-    QTableView *tableForeignKeys;
-    QTableView *tableindexes;
-    QTextEdit *createTableTextEdit;
+    int rowCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
+    int columnCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
 
 signals:
 
 public slots:
+
+private:
+    struct IndexDefinition
+    {
+        QString keyName;
+        QStringList columns;
+        QString type;
+    };
+
+    QList<IndexDefinition> indexes;
+    QStringList headers;
 };
 
-#endif // TABLEDETAILSWINDOW_H
+#endif // TABLEINDEXMODEL_H

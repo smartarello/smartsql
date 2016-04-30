@@ -25,6 +25,7 @@
 #include "UI/Explorer/Tabs/SQLSyntaxHighlighter.h"
 #include "TableDetailsModel.h"
 #include "ForeignKeyModel.h"
+#include "TableIndexModel.h"
 
 TableDetailsTab::TableDetailsTab(QWidget *parent) : QWidget(parent)
 {
@@ -33,14 +34,14 @@ TableDetailsTab::TableDetailsTab(QWidget *parent) : QWidget(parent)
     QVBoxLayout *containerLayout = new QVBoxLayout(this);
 
     this->tableColumns = new QTableView(this);
-    this->tableColumns->resizeColumnsToContents();
-    this->tableColumns->horizontalHeader()->setStretchLastSection(true);
     this->tableColumns->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tabWidget->addTab(this->tableColumns, tr("Columns"));
 
+    this->tableindexes = new QTableView(this);
+    this->tableindexes->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    tabWidget->addTab(this->tableindexes, tr("Indexes"));
+
     this->tableForeignKeys = new QTableView(this);
-    this->tableForeignKeys->resizeColumnsToContents();
-    this->tableForeignKeys->horizontalHeader()->setStretchLastSection(true);
     this->tableForeignKeys->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tabWidget->addTab(this->tableForeignKeys, tr("Foreign keys"));
 
@@ -63,7 +64,10 @@ void TableDetailsTab::setTable(QSqlDatabase database, QString tableName)
         createString = query.value(1).toString();
         this->tableColumns->setModel(new TableDetailsModel(createString, this));
         this->tableForeignKeys->setModel(new ForeignKeyModel(createString, this));
+        this->tableindexes->setModel(new TableIndexModel(createString, this));
         this->tableForeignKeys->resizeColumnsToContents();
+        this->tableindexes->resizeColumnsToContents();
+        this->tableColumns->resizeColumnsToContents();
 
     } else {
         qDebug() << "TableDetailsWindow::TableDetailsWindow - " + query.lastError().text();
