@@ -180,17 +180,26 @@ void TableTab::loadData()
 
 void TableTab::customContextMenuRequested(QPoint point)
 {
+    QMenu *menu = new QMenu(this);
 	this->contextMenuIndex = this->tableData->indexAt(point);
 
 	if (!this->contextMenuIndex.isValid()){
+        QAction *refreshAction = new QAction(tr("Refresh"), this);
+        refreshAction->setShortcut(QKeySequence(Qt::Key_F5));
+        refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
+        menu->addAction(refreshAction);
+
+        connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked()));
+        menu->popup(this->tableData->viewport()->mapToGlobal(point));
 		return ;
 	}
 
 	TableModel * model = ((TableModel *)this->tableData->model());
 	QModelIndexList list = this->tableData->selectionModel()->selectedRows(0);
-	QMenu *menu = new QMenu(this);
+
 
 	QAction *copyAction = new QAction(tr("Copy"), this);
+    copyAction->setShortcut(QKeySequence("Ctrl+C"));
 	copyAction->setIcon(QIcon(":/resources/icons/copy-icon.png"));
 	menu->addAction(copyAction);
 
@@ -231,6 +240,7 @@ void TableTab::customContextMenuRequested(QPoint point)
 	}
 
 	QAction *refreshAction = new QAction(tr("Refresh"), this);
+    refreshAction->setShortcut(QKeySequence(Qt::Key_F5));
 	refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
 	menu->addAction(refreshAction);
 

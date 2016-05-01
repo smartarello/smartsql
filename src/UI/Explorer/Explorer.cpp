@@ -97,7 +97,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 
 	this->explorerTabs = new Tabs::TabView(splitter);
 
-	QShortcut * addTabShortCut = new QShortcut(QKeySequence("Ctrl+N"), this->explorerTabs);
+    QShortcut * addTabShortCut = new QShortcut(QKeySequence("Ctrl+T"), this->explorerTabs);
 	splitter->addWidget(this->explorerTabs);
 
 	QSortFilterProxyModel *filterModel = (QSortFilterProxyModel *)this->dataBaseTree->model();
