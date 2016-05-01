@@ -21,6 +21,8 @@
 #include <QSqlQuery>
 #include <QTextCursor>
 #include <QDebug>
+#include <QAction>
+#include <QMenu>
 #include <QAbstractItemView>
 #include <QScrollBar>
 #include <QSqlError>
@@ -51,11 +53,31 @@ QueryTextEdit::QueryTextEdit(QWidget *parent) : QTextEdit(parent) {
 	this->autoCompleteModel = new QStringListModel(this->tableList, this->autocomplete);
 	this->autocomplete->setModel(this->autoCompleteModel);
 
+
     QShortcut* refreshShortcut = new QShortcut(QKeySequence("Ctrl+Shift+F"), this);
     refreshShortcut->setContext(Qt::WidgetShortcut);
 
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(showContextMenu(const QPoint &)));
+
     connect(refreshShortcut, SIGNAL(activated()), SLOT(formatSql()));
     connect(this->autocomplete, SIGNAL(activated(QString)), SLOT(insertCompletion(QString)));
+}
+
+void QueryTextEdit::showContextMenu(const QPoint &pt)
+{
+    QMenu *menu = this->createStandardContextMenu();
+
+    menu->addSeparator();
+
+    QAction *formatAction = new QAction(QString(tr("Reformat SQL")), this);
+    formatAction->setShortcut(QKeySequence("Ctrl+Shift+F"));
+    menu->addAction(formatAction);
+
+    connect(formatAction, SIGNAL(triggered(bool)), SLOT(formatSql()));
+
+    menu->exec(this->mapToGlobal(pt));
+    delete menu;
 }
 
 /**

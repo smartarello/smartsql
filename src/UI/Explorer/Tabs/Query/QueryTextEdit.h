@@ -43,6 +43,7 @@ protected:
 
 private slots:
 	void insertCompletion(const QString &completion);
+    void showContextMenu(const QPoint &);
 
 public slots:
 		void databaseChanged();
