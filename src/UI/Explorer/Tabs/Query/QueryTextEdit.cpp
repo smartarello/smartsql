@@ -90,7 +90,7 @@ void QueryTextEdit::formatSql()
     sql = sql.replace("\n", " ");
 
     QStringList keywords ;
-    keywords << "SELECT";
+    keywords << "(SELECT";
     keywords << "INNER JOIN";
     keywords << "LEFT JOIN";
     keywords << "FROM";
