@@ -24,6 +24,8 @@
 #include <QAbstractItemView>
 #include <QScrollBar>
 #include <QSqlError>
+#include <QShortcut>
+#include <QKeySequence>
 
 
 namespace UI {
@@ -49,7 +51,45 @@ QueryTextEdit::QueryTextEdit(QWidget *parent) : QTextEdit(parent) {
 	this->autoCompleteModel = new QStringListModel(this->tableList, this->autocomplete);
 	this->autocomplete->setModel(this->autoCompleteModel);
 
-	QObject::connect(this->autocomplete, SIGNAL(activated(QString)), this, SLOT(insertCompletion(QString)));
+    QShortcut* refreshShortcut = new QShortcut(QKeySequence("Ctrl+Shift+F"), this);
+    refreshShortcut->setContext(Qt::WidgetShortcut);
+
+    connect(refreshShortcut, SIGNAL(activated()), SLOT(formatSql()));
+    connect(this->autocomplete, SIGNAL(activated(QString)), SLOT(insertCompletion(QString)));
+}
+
+/**
+ * Formats the SQL query
+ * @brief QueryTextEdit::formatSql
+ */
+void QueryTextEdit::formatSql()
+{
+    QString sql = this->toPlainText();
+    sql = sql.replace("\n", " ");
+
+    QStringList keywords ;
+    keywords << "SELECT";
+    keywords << "INNER JOIN";
+    keywords << "LEFT JOIN";
+    keywords << "FROM";
+    keywords << "WHERE";
+    keywords << "GROUP BY";
+    keywords << "ORDER BY";
+    keywords << "LIMIT";
+    keywords << "UNION";
+
+    foreach (QString keyword, keywords) {
+        sql = sql.replace(keyword, QString("<br>%1").arg(keyword), Qt::CaseInsensitive);
+    }
+
+    QStringList secondaryKeywords;
+    secondaryKeywords << " AND ";
+    secondaryKeywords << " OR ";
+    foreach (QString keyword, secondaryKeywords) {
+        sql = sql.replace(keyword, QString("<br>&nbsp;&nbsp;&nbsp;%1&nbsp;").arg(keyword), Qt::CaseInsensitive);
+    }
+
+    this->setHtml(sql);
 }
 
 void QueryTextEdit::databaseChanged()

@@ -46,6 +46,7 @@ private slots:
 
 public slots:
 		void databaseChanged();
+        void formatSql();
 
 private:
 	QString textUnderCursor() const;
