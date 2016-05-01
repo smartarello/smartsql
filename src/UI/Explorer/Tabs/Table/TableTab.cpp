@@ -189,7 +189,12 @@ void TableTab::customContextMenuRequested(QPoint point)
         refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
         menu->addAction(refreshAction);
 
+        QAction *insertAction = new QAction(tr("Insert row"), this);
+        menu->addAction(insertAction);
+
         connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked()));
+        connect(insertAction, SIGNAL(triggered(bool)), SLOT(handleInsertRow()));
+
         menu->popup(this->tableData->viewport()->mapToGlobal(point));
 		return ;
 	}
@@ -212,6 +217,9 @@ void TableTab::customContextMenuRequested(QPoint point)
 	QAction *setNullAction = new QAction(tr("Set NULL"), this);
 	setNullAction->setIcon(QIcon(":/resources/icons/empty-document-icon.png"));
 	menu->addAction(setNullAction);
+
+    QAction *insertAction = new QAction(tr("Insert row"), this);
+    menu->addAction(insertAction);
 
 	QAction *deleteAction = new QAction(tr("Delete selected row"), this);
 	deleteAction->setIcon(QIcon(":/resources/icons/delete-icon.png"));
@@ -249,6 +257,7 @@ void TableTab::customContextMenuRequested(QPoint point)
 	connect(pasteAction, SIGNAL(triggered(bool)), SLOT(handlePastAction()));
 	connect(deleteAction, SIGNAL(triggered(bool)), SLOT(handleDeleteAction()));
     connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked()));
+    connect(insertAction, SIGNAL(triggered(bool)), SLOT(handleInsertRow()));
 
 	if (list.size() > 1) {
 		setNullAction->setEnabled(false);
@@ -257,6 +266,12 @@ void TableTab::customContextMenuRequested(QPoint point)
 	}
 
 	menu->popup(this->tableData->viewport()->mapToGlobal(point));
+}
+
+void TableTab::handleInsertRow()
+{
+    InsertWindow *insertWindow = new InsertWindow(this->database, Util::TableDefinition(this->database, this->tableName), this);
+    insertWindow->show();
 }
 
 void TableTab::handleFilterColumnLikeAction()

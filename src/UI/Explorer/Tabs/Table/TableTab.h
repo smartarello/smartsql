@@ -26,6 +26,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QTimer>
+#include "InsertWindow.h"
 
 namespace UI {
 namespace Explorer {
@@ -52,6 +53,7 @@ public slots:
 	void handleDeleteAction();
 	void handleFilterColumnLikeAction();
 	void handleFilterColumnEqualAction();
+    void handleInsertRow();
     void refreshData();
     void hideNotification();
     void dataUpdatedSuccessfully();
