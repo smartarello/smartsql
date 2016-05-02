@@ -41,6 +41,7 @@ private:
     QSqlDatabase connection;
 
 signals:
+    void insertDone();
 
 public slots:
     void refreshInsertStatement();

@@ -31,5 +31,6 @@
         <file>resources/fonts/DejaVuSansMono.ttf</file>
         <file>resources/icons/key-icon.png</file>
         <file>resources/icons/check-icon.png</file>
+        <file>resources/icons/table-insert-icon.png</file>
     </qresource>
 </RCC>

@@ -42,6 +42,7 @@ InsertWindow::InsertWindow(QSqlDatabase connection, Util::TableDefinition table,
     QMainWindow(parent),
     table(table)
 {
+    this->setWindowTitle(tr("Insert row"));
     this->setAttribute(Qt::WA_DeleteOnClose);
     this->setMinimumWidth(600);
 
@@ -75,7 +76,16 @@ InsertWindow::InsertWindow(QSqlDatabase connection, Util::TableDefinition table,
     foreach(ColumnDefinition column, columns) {
 
         QLabel *label = new QLabel(column.name, this);
-        QLabel *type = new QLabel(column.type, this);
+        QString typeString = column.type.toUpper();
+        if (column.length > 0) {
+            typeString += QString("(%1)").arg(column.length) ;
+        }
+
+        if (column.unsignedCol) {
+            typeString += " unsigned";
+        }
+
+        QLabel *type = new QLabel(typeString, this);
 
         gridLayout->addWidget(label, row, 0);
         gridLayout->addWidget(type, row, 1);
@@ -83,22 +93,21 @@ InsertWindow::InsertWindow(QSqlDatabase connection, Util::TableDefinition table,
         QCheckBox *setNull = new QCheckBox(this);
         checkboxes << setNull;
         gridLayout->addWidget(setNull, row, 2);
-        if (column.allowNull) {
-            setNull->setChecked(true);
+        if (column.allowNull) {            
             connect(setNull, SIGNAL (stateChanged(int)), SLOT(refreshInsertStatement()));
         } else {
             setNull->setDisabled(true);
         }
 
         if (column.type.toLower() == "datetime") {
-            QDateTimeEdit *datetime = new QDateTimeEdit(this);
+            QDateTimeEdit *datetime = new QDateTimeEdit(QDateTime::currentDateTime(), this);
             datetime->setDisplayFormat("yyyy-MM-dd hh:mm:ss");
             gridLayout->addWidget(datetime, row, 3);
 
             connect(datetime, SIGNAL (dateTimeChanged(const QDateTime &)), SLOT(refreshInsertStatement()));
             values << datetime;
         } else if (column.type.toLower() == "date") {
-            QDateEdit *date = new QDateEdit(this);
+            QDateEdit *date = new QDateEdit(QDate::currentDate(), this);
             date->setDisplayFormat("yyyy-MM-dd");
             gridLayout->addWidget(date, row, 3);
 
@@ -119,6 +128,9 @@ InsertWindow::InsertWindow(QSqlDatabase connection, Util::TableDefinition table,
     insertStatement->setReadOnly(true);
     insertStatement->setMinimumHeight(200);
     new SQLSyntaxHighlighter(insertStatement->document());
+    QWidget *insertStatementContainer = new QWidget(this);
+    QHBoxLayout *insertStatementLayout = new QHBoxLayout(insertStatementContainer);
+    insertStatementLayout->addWidget(insertStatement);
 
     QWidget *buttonContainer = new QWidget(this);
     QHBoxLayout *buttonLayout = new QHBoxLayout(buttonContainer);
@@ -130,7 +142,7 @@ InsertWindow::InsertWindow(QSqlDatabase connection, Util::TableDefinition table,
     buttonLayout->addWidget(cancelButton);
 
     containerLayout->addWidget(fieldsContainer);
-    containerLayout->addWidget(insertStatement);
+    containerLayout->addWidget(insertStatementContainer);
     containerLayout->addWidget(buttonContainer);
 
     this->setCentralWidget(container);
@@ -150,24 +162,42 @@ void InsertWindow::refreshInsertStatement()
         columnNames << "`" + column.name + "`";
     }
 
-    insertString += "(" + columnNames.join(", ") + ")\nVALUES ";
+    insertString += " (" + columnNames.join(", ") + ")\nVALUES ";
 
     QStringList insertValues;
     for (int i = 0; i < values.size(); i++) {
         QCheckBox *checkbox = checkboxes.at(i);
         if (checkbox->isChecked()) {
             insertValues << "NULL";
+
+            ColumnDefinition column = table.columns().at(i);
+
+            if (column.type.toLower() == "datetime") {
+                QDateTimeEdit *datetime = (QDateTimeEdit *) values.at(i);
+                datetime->setDisabled(true);
+            } else if (column.type.toLower() == "date") {
+                QDateEdit *date = (QDateEdit *)values.at(i);
+                date->setDisabled(true);
+            } else {
+                QLineEdit *text = (QLineEdit *)values.at(i);
+                text->setDisabled(true);
+            }
+
+
         } else {
             ColumnDefinition column = table.columns().at(i);
             QString value;
             if (column.type.toLower() == "datetime") {
                 QDateTimeEdit *datetime = (QDateTimeEdit *) values.at(i);
-                value = datetime->text();
+                 datetime->setDisabled(false);
+                value = datetime->dateTime().toString("yyyy-MM-dd hh:mm:ss");
             } else if (column.type.toLower() == "date") {
                 QDateEdit *date = (QDateEdit *)values.at(i);
-                value = date->text();
+                date->setDisabled(false);
+                value = date->date().toString("yyyy-MM-dd");
             } else {
                 QLineEdit *text = (QLineEdit *)values.at(i);
+                text->setDisabled(false);
                 value = text->text();
             }
 
@@ -185,6 +215,7 @@ void InsertWindow::handleInsert()
 {
     QSqlQuery insertQuery(this->connection);
     if (insertQuery.exec(insertStatement->toPlainText())) {
+        emit insertDone();
         this->close();
     } else {
         QMessageBox::critical(this, tr("Error"), insertQuery.lastError().text());
