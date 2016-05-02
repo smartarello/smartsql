@@ -181,21 +181,19 @@ void QueryTextEdit::keyPressEvent(QKeyEvent *e)
 		this->autoCompleteModel->setStringList(this->tableList);
 	}
 
-	if (!isShortcut) {
-		this->autocomplete->popup()->hide();
-		return;
-	}
+    if (isShortcut || this->autocomplete->popup()->isVisible()) {
 
-	if (completionPrefix != this->autocomplete->completionPrefix()) {
-		this->autocomplete->setCompletionPrefix(completionPrefix);
-		this->autocomplete->popup()->setCurrentIndex(this->autocomplete->completionModel()->index(0, 0));
-	}
+        if (completionPrefix != this->autocomplete->completionPrefix()) {
+            this->autocomplete->setCompletionPrefix(completionPrefix);
+            this->autocomplete->popup()->setCurrentIndex(this->autocomplete->completionModel()->index(0, 0));
+        }
 
-	QRect cr = cursorRect();
-	cr.setWidth(this->autocomplete->popup()->sizeHintForColumn(0)
-			+ this->autocomplete->popup()->verticalScrollBar()->sizeHint().width());
+        QRect cr = cursorRect();
+        cr.setWidth(this->autocomplete->popup()->sizeHintForColumn(0)
+                    + this->autocomplete->popup()->verticalScrollBar()->sizeHint().width());
 
-	this->autocomplete->complete(cr);
+        this->autocomplete->complete(cr);
+    }
 }
 
 QString QueryTextEdit::textUnderCursor() const
