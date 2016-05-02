@@ -98,6 +98,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	this->explorerTabs = new Tabs::TabView(splitter);
 
     QShortcut * addTabShortCut = new QShortcut(QKeySequence("Ctrl+T"), this->explorerTabs);
+    QShortcut * closeTabShortCut = new QShortcut(QKeySequence("Ctrl+W"), this->explorerTabs);
 	splitter->addWidget(this->explorerTabs);
 
 	QSortFilterProxyModel *filterModel = (QSortFilterProxyModel *)this->dataBaseTree->model();
@@ -134,7 +135,8 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
     connect(this->dataBaseTree, SIGNAL (openTableInNewTab()), this, SLOT (handleOpenTableInTab()));
 	connect(this->dataBaseTree, SIGNAL (doubleClicked(QModelIndex)), this, SLOT (dataBaseTreeDoubleClicked(QModelIndex)));
 	connect(addTabShortCut, SIGNAL(activated()), this, SLOT(addQueryTab()));
-	connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
+    connect(closeTabShortCut, SIGNAL(activated()), this, SLOT(closeTab()));
+    connect(this->explorerTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeQueryTab(int)));
 	connect(this->explorerTabs->tabBar(), SIGNAL(newTabRequested()), this, SLOT(addQueryTab()));
     connect(this->explorerTabs->tabBar(), SIGNAL(currentChanged(int)), SLOT(handleCurrentTabChanged(int)));
     connect(this->dataBaseTree->getDataBaseModel(), SIGNAL(databaseChanged()), this, SLOT(refreshDatabase()));
@@ -183,6 +185,17 @@ void Explorer::closeQueryTab(int index)
 		this->explorerTabs->removeTab(index);
         delete w;
 	}
+}
+
+void Explorer::closeTab()
+{
+    int currentIndex = this->explorerTabs->currentIndex();
+
+    if (!this->explorerTabs->tabBar()->tabButton(currentIndex, QTabBar::RightSide)->isHidden()) {
+        QWidget *w = this->explorerTabs->widget(currentIndex);
+        this->explorerTabs->removeTab(currentIndex);
+        delete w;
+    }
 }
 
 void Explorer::dataBaseTreeDoubleClicked(QModelIndex index)
