@@ -18,13 +18,14 @@
 #define FOREIGNKEYMODEL_H
 
 #include <QAbstractTableModel>
+#include "Util/TableDefinition.h"
 
 class ForeignKeyModel: public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    ForeignKeyModel(QString createString, QObject *parent);
+    ForeignKeyModel(Util::TableDefinition table, QObject *parent);
     int rowCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
@@ -32,15 +33,6 @@ public:
 
 
 private:
-    struct ForeignKeyDefinition
-    {
-        QString keyName;
-        QString column;
-        QString foreignTable;
-        QString foreignColumn;
-        QString onUpdate;
-        QString onDelete;
-    };
 
     QList<ForeignKeyDefinition> fks;
     QStringList headers;

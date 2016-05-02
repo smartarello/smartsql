@@ -91,6 +91,10 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
     refreshShortcut->setContext(Qt::WidgetShortcut);
     connect(refreshShortcut, SIGNAL(activated()), SLOT(refreshData()));
 
+    QShortcut* deleteShortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this->tableData);
+    deleteShortcut->setContext(Qt::WidgetShortcut);
+    connect(deleteShortcut, SIGNAL(activated()), SLOT(handleDeleteAction()));
+
     connect(this->whereConditionText, SIGNAL(filterChanged(QString)), SLOT(applyFilterClicked()));
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
     connect(filterButton, SIGNAL(clicked(bool)), SLOT(applyFilterClicked()));
@@ -189,7 +193,13 @@ void TableTab::customContextMenuRequested(QPoint point)
         refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
         menu->addAction(refreshAction);
 
+        QAction *insertAction = new QAction(tr("Insert row"), this);
+        insertAction->setIcon(QIcon(":/resources/icons/table-insert-icon.png"));
+        menu->addAction(insertAction);
+
         connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked()));
+        connect(insertAction, SIGNAL(triggered(bool)), SLOT(handleInsertRow()));
+
         menu->popup(this->tableData->viewport()->mapToGlobal(point));
 		return ;
 	}
@@ -212,6 +222,10 @@ void TableTab::customContextMenuRequested(QPoint point)
 	QAction *setNullAction = new QAction(tr("Set NULL"), this);
 	setNullAction->setIcon(QIcon(":/resources/icons/empty-document-icon.png"));
 	menu->addAction(setNullAction);
+
+    QAction *insertAction = new QAction(tr("Insert row"), this);
+    insertAction->setIcon(QIcon(":/resources/icons/table-insert-icon.png"));
+    menu->addAction(insertAction);
 
 	QAction *deleteAction = new QAction(tr("Delete selected row"), this);
 	deleteAction->setIcon(QIcon(":/resources/icons/delete-icon.png"));
@@ -249,6 +263,7 @@ void TableTab::customContextMenuRequested(QPoint point)
 	connect(pasteAction, SIGNAL(triggered(bool)), SLOT(handlePastAction()));
 	connect(deleteAction, SIGNAL(triggered(bool)), SLOT(handleDeleteAction()));
     connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked()));
+    connect(insertAction, SIGNAL(triggered(bool)), SLOT(handleInsertRow()));
 
 	if (list.size() > 1) {
 		setNullAction->setEnabled(false);
@@ -257,6 +272,13 @@ void TableTab::customContextMenuRequested(QPoint point)
 	}
 
 	menu->popup(this->tableData->viewport()->mapToGlobal(point));
+}
+
+void TableTab::handleInsertRow()
+{
+    InsertWindow *insertWindow = new InsertWindow(this->database, Util::TableDefinition(this->database, this->tableName), this);
+    connect(insertWindow, SIGNAL(insertDone()), this, SLOT(refreshData()));
+    insertWindow->show();
 }
 
 void TableTab::handleFilterColumnLikeAction()
@@ -326,7 +348,10 @@ void TableTab::handleDeleteAction()
 		return ;
 	}
 
-	model->removeRows(list.first().row(), list.count(), list.first().parent());
+    if (QMessageBox::Yes == QMessageBox::question(this, tr("Confirm"), QString(tr("Delete %1 row(s) ?")).arg(list.count()),
+                           QMessageBox::Cancel, QMessageBox::Yes)) {
+        model->removeRows(list.first().row(), list.count(), list.first().parent());
+    }
 }
 
 /**

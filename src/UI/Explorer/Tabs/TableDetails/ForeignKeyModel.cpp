@@ -16,7 +16,7 @@
 **/
 #include "ForeignKeyModel.h"
 
-ForeignKeyModel::ForeignKeyModel(QString createString, QObject *parent) : QAbstractTableModel(parent)
+ForeignKeyModel::ForeignKeyModel(Util::TableDefinition table, QObject *parent) : QAbstractTableModel(parent)
 {
     // Column headers
     this->headers << tr("Key name");
@@ -26,36 +26,7 @@ ForeignKeyModel::ForeignKeyModel(QString createString, QObject *parent) : QAbstr
     this->headers << tr("On UPDATE");
     this->headers << tr("On DELETE");
 
-
-    QStringList createParts = createString.split("\n");
-    createParts.removeAt(0); // Removes the first line with CREATE TABLE
-    foreach(QString part, createParts) {
-        QRegExp foreignKeyRx("^\\s*CONSTRAINT `(.+)` FOREIGN KEY \\((.+)\\) REFERENCES `(.+)` \\((.+)\\)", Qt::CaseInsensitive);
-        if (foreignKeyRx.indexIn(part) != -1) { // Foreign key definition
-
-            ForeignKeyDefinition fk;
-            fk.keyName = foreignKeyRx.cap(1);
-            fk.column = foreignKeyRx.cap(2);
-            fk.foreignTable = foreignKeyRx.cap(3);
-            fk.foreignColumn = foreignKeyRx.cap(4);
-
-            QRegExp onDeleteActionRx("ON DELETE (RESTRICT|CASCADE|SET NULL|NO ACTION)", Qt::CaseInsensitive);
-            if (onDeleteActionRx.indexIn(part) != -1) {
-                fk.onDelete = onDeleteActionRx.cap(1);
-            } else {
-                fk.onDelete = "RESTRICT";
-            }
-
-            QRegExp onUpdateActionRx("ON UPDATE (RESTRICT|CASCADE|SET NULL|NO ACTION)", Qt::CaseInsensitive);
-            if (onUpdateActionRx.indexIn(part) != -1) {
-                fk.onUpdate = onUpdateActionRx.cap(1);
-            } else {
-                fk.onUpdate = "RESTRICT";
-            }
-
-            this->fks << fk;
-        }
-    }
+    this->fks = table.foreignKeys();
 }
 
 int ForeignKeyModel::rowCount(const QModelIndex & parent) const

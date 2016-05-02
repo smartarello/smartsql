@@ -14,31 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef TABLEINDEXMODEL_H
-#define TABLEINDEXMODEL_H
+#ifndef INSERTWINDOW_H
+#define INSERTWINDOW_H
 
-#include <QAbstractTableModel>
+#include <QMainWindow>
 #include "Util/TableDefinition.h"
+#include <QTextEdit>
+#include <QCheckBox>
+#include <QSqlDatabase>
 
-class TableIndexModel : public QAbstractTableModel
+namespace UI {
+namespace Explorer {
+namespace Tabs {
+namespace Table {
+class InsertWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit TableIndexModel(Util::TableDefinition table, QObject *parent = 0);
-
-    int rowCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
-    int columnCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
-    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
-
-signals:
-
-public slots:
+    explicit InsertWindow(QSqlDatabase connection, Util::TableDefinition table, QWidget *parent = 0);
 
 private:
+    QTextEdit *insertStatement;
+    Util::TableDefinition table;
+    QList<QWidget *> values;
+    QList<QCheckBox *> checkboxes;
+    QSqlDatabase connection;
 
-    QList<IndexDefinition> indexes;
-    QStringList headers;
+signals:
+    void insertDone();
+
+public slots:
+    void refreshInsertStatement();
+    void handleInsert();
 };
 
-#endif // TABLEINDEXMODEL_H
+} /* namespace Table */
+} /* namespace Tabs */
+} /* namespace Explorer */
+} /* namespace UI */
+
+#endif // INSERTWINDOW_H

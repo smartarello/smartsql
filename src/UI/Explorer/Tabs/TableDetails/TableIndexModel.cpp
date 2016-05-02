@@ -16,48 +16,14 @@
 **/
 #include "TableIndexModel.h"
 
-TableIndexModel::TableIndexModel(QString createString, QObject*parent) : QAbstractTableModel(parent)
+TableIndexModel::TableIndexModel(Util::TableDefinition table, QObject*parent) : QAbstractTableModel(parent)
 {
     // Column headers
     this->headers << tr("Key name");
     this->headers << tr("Columns");
     this->headers << tr("Type");
 
-    QStringList createParts = createString.split("\n");
-    createParts.removeAt(0); // Removes the first line with CREATE TABLE
-    foreach(QString part, createParts) {
-        QRegExp keyRx("^\\s*KEY `(.+)` \\((.+)\\)", Qt::CaseInsensitive);
-        if (keyRx.indexIn(part) != -1) {
-
-            IndexDefinition index;
-            index.keyName = keyRx.cap(1);
-            index.columns = keyRx.cap(2).replace("`", "").split(",");
-            index.type = "KEY";
-
-            this->indexes << index;
-        }
-
-        QRegExp uniquekeyRx("^\\s*UNIQUE KEY `(.+)` \\((.+)\\)", Qt::CaseInsensitive);
-        if (uniquekeyRx.indexIn(part) != -1) {
-
-            IndexDefinition index;
-            index.keyName = uniquekeyRx.cap(1);
-            index.columns = keyRx.cap(2).replace("`", "").split(",");
-            index.type = "UNIQUE";
-
-            this->indexes << index;
-        }
-
-        QRegExp primaryKeyRx("^\\s*PRIMARY KEY \\((.*)\\)", Qt::CaseInsensitive);
-        if (primaryKeyRx.indexIn(part) != -1) { // Primary key definition
-            IndexDefinition index;
-            index.keyName = "PRIMARY KEY";
-            index.columns = primaryKeyRx.cap(1).replace("`", "").split(",");
-            index.type = "PRIMARY KEY";
-
-            this->indexes << index;
-        }
-    }
+    this->indexes = table.indexes();
 }
 
 

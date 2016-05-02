@@ -19,13 +19,14 @@
 
 #include <QStandardItemModel>
 #include <QSqlDatabase>
+#include "Util/TableDefinition.h"
 class TableDetailsModel : public QAbstractTableModel
 {
 
     Q_OBJECT
 
 public:
-    TableDetailsModel(QString createString, QObject *parent = 0);
+    TableDetailsModel(Util::TableDefinition table, QObject *parent = 0);
     int rowCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex & parent) const Q_DECL_OVERRIDE;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
@@ -34,21 +35,8 @@ public:
 
 private:
 
-    struct ColumnDefinition
-    {
-        QString name;
-        QString type;
-        int length;
-        bool unsignedCol;
-        bool allowNull;
-        QVariant defaultValue;
-    };
-
-
-    QList<ColumnDefinition> columns;
-    QStringList fks;
     QStringList headers;
-    QStringList primaryKey;
+    Util::TableDefinition table;
 };
 
 #endif // TABLEDETAILSMODEL_H

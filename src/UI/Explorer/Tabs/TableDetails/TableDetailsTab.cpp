@@ -55,24 +55,15 @@ TableDetailsTab::TableDetailsTab(QWidget *parent) : QWidget(parent)
 
 void TableDetailsTab::setTable(QSqlDatabase database, QString tableName)
 {
-    QString createString = "";
+    Util::TableDefinition table(database, tableName);
 
-    database.open();
-    QSqlQuery query(database);
-    if (query.exec(QString("SHOW CREATE TABLE %1").arg(tableName)) && query.next()) {
+    this->tableColumns->setModel(new TableDetailsModel(table, this));
+    this->tableForeignKeys->setModel(new ForeignKeyModel(table, this));
+    this->tableindexes->setModel(new TableIndexModel(table, this));
+    this->tableForeignKeys->resizeColumnsToContents();
+    this->tableindexes->resizeColumnsToContents();
+    this->tableColumns->resizeColumnsToContents();
 
-        createString = query.value(1).toString();
-        this->tableColumns->setModel(new TableDetailsModel(createString, this));
-        this->tableForeignKeys->setModel(new ForeignKeyModel(createString, this));
-        this->tableindexes->setModel(new TableIndexModel(createString, this));
-        this->tableForeignKeys->resizeColumnsToContents();
-        this->tableindexes->resizeColumnsToContents();
-        this->tableColumns->resizeColumnsToContents();
-
-    } else {
-        qDebug() << "TableDetailsWindow::TableDetailsWindow - " + query.lastError().text();
-    }
-
-    createString = createString.replace("\n", "<br/>");
+    QString createString = table.createTable().replace("\n", "<br/>");
     createTableTextEdit->setText(createString);
 }
