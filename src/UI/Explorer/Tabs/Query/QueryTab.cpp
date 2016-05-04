@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QUuid>
 #include <QLocale>
+#include <QShortcut>
 #include <QJsonObject>
 #include <QSqlRecord>
 #include "QueryModel.h"
@@ -149,6 +150,10 @@ void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
         if (result.isSelect) {
             ResultTableView *tableData = new ResultTableView(this->queryTabs);
             tableData->verticalHeader()->hide();
+
+            QShortcut* refreshShortcut = new QShortcut(QKeySequence(Qt::Key_F5), tableData);
+            refreshShortcut->setContext(Qt::WidgetShortcut);
+            connect(refreshShortcut, SIGNAL(activated()), this, SLOT(queryChanged()));
 
             QueryModel *model = new QueryModel(result.data, this);
 
