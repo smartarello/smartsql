@@ -57,7 +57,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	QWidget *topPart = new QWidget(this);
     QVBoxLayout *topPartLayout = new QVBoxLayout(topPart);
 
-	this->tableInfoLabel = new QLabel();
+    this->tableInfoLabel = new QLabel(this);
 	topPartLayout->addWidget(this->tableInfoLabel);
 	topPartLayout->addWidget(this->tableData);
 	this->addWidget(topPart);
@@ -89,9 +89,14 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
     refreshShortcut->setContext(Qt::WidgetShortcut);
     connect(refreshShortcut, SIGNAL(activated()), SLOT(refreshData()));
 
+    QShortcut* deleteShortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this->tableData);
+    deleteShortcut->setContext(Qt::WidgetShortcut);
+    connect(deleteShortcut, SIGNAL(activated()), SLOT(handleDeleteAction()));
+
     connect(this->whereConditionText, SIGNAL(filterChanged(QString)), SLOT(applyFilterClicked()));
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
     connect(filterButton, SIGNAL(clicked(bool)), SLOT(applyFilterClicked()));
+    connect(queryModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), SLOT(dataUpdatedSuccessfully()));
 }
 
 void TableTab::refreshData()
@@ -177,17 +182,32 @@ void TableTab::loadData()
 
 void TableTab::customContextMenuRequested(QPoint point)
 {
+    QMenu *menu = new QMenu(this);
 	this->contextMenuIndex = this->tableData->indexAt(point);
 
 	if (!this->contextMenuIndex.isValid()){
+        QAction *refreshAction = new QAction(tr("Refresh"), this);
+        refreshAction->setShortcut(QKeySequence(Qt::Key_F5));
+        refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
+        menu->addAction(refreshAction);
+
+        QAction *insertAction = new QAction(tr("Insert row"), this);
+        insertAction->setIcon(QIcon(":/resources/icons/table-insert-icon.png"));
+        menu->addAction(insertAction);
+
+        connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked()));
+        connect(insertAction, SIGNAL(triggered(bool)), SLOT(handleInsertRow()));
+
+        menu->popup(this->tableData->viewport()->mapToGlobal(point));
 		return ;
 	}
 
 	TableModel * model = ((TableModel *)this->tableData->model());
 	QModelIndexList list = this->tableData->selectionModel()->selectedRows(0);
-	QMenu *menu = new QMenu(this);
+
 
 	QAction *copyAction = new QAction(tr("Copy"), this);
+    copyAction->setShortcut(QKeySequence("Ctrl+C"));
 	copyAction->setIcon(QIcon(":/resources/icons/copy-icon.png"));
 	menu->addAction(copyAction);
 
@@ -200,6 +220,10 @@ void TableTab::customContextMenuRequested(QPoint point)
 	QAction *setNullAction = new QAction(tr("Set NULL"), this);
 	setNullAction->setIcon(QIcon(":/resources/icons/empty-document-icon.png"));
 	menu->addAction(setNullAction);
+
+    QAction *insertAction = new QAction(tr("Insert row"), this);
+    insertAction->setIcon(QIcon(":/resources/icons/table-insert-icon.png"));
+    menu->addAction(insertAction);
 
 	QAction *deleteAction = new QAction(tr("Delete selected row"), this);
 	deleteAction->setIcon(QIcon(":/resources/icons/delete-icon.png"));
@@ -240,6 +264,7 @@ void TableTab::customContextMenuRequested(QPoint point)
 
     menu->addSeparator();
 	QAction *refreshAction = new QAction(tr("Refresh"), this);
+    refreshAction->setShortcut(QKeySequence(Qt::Key_F5));
 	refreshAction->setIcon(QIcon(":/resources/icons/refresh-icon.png"));
 	menu->addAction(refreshAction);
 
@@ -248,6 +273,7 @@ void TableTab::customContextMenuRequested(QPoint point)
 	connect(pasteAction, SIGNAL(triggered(bool)), SLOT(handlePastAction()));
 	connect(deleteAction, SIGNAL(triggered(bool)), SLOT(handleDeleteAction()));
     connect(refreshAction, SIGNAL(triggered(bool)), SLOT(applyFilterClicked()));
+    connect(insertAction, SIGNAL(triggered(bool)), SLOT(handleInsertRow()));
 
 	if (list.size() > 1) {
 		setNullAction->setEnabled(false);
@@ -256,6 +282,13 @@ void TableTab::customContextMenuRequested(QPoint point)
 	}
 
 	menu->popup(this->tableData->viewport()->mapToGlobal(point));
+}
+
+void TableTab::handleInsertRow()
+{
+    InsertWindow *insertWindow = new InsertWindow(this->database, Util::TableDefinition(this->database, this->tableName), this);
+    connect(insertWindow, SIGNAL(insertDone()), this, SLOT(refreshData()));
+    insertWindow->show();
 }
 
 void TableTab::handleGoToForeignKeyAction()
@@ -352,7 +385,55 @@ void TableTab::handleDeleteAction()
 		return ;
 	}
 
-	model->removeRows(list.first().row(), list.count(), list.first().parent());
+    if (QMessageBox::Yes == QMessageBox::question(this, tr("Confirm"), QString(tr("Delete %1 row(s) ?")).arg(list.count()),
+                           QMessageBox::Cancel, QMessageBox::Yes)) {
+        model->removeRows(list.first().row(), list.count(), list.first().parent());
+    }
+}
+
+/**
+ * Called when a row has been updated with success
+ * Show a notification
+ *
+ * @brief TableTab::dataUpdatedSuccessfully
+ */
+void TableTab::dataUpdatedSuccessfully()
+{
+    notificationWidget = new QWidget(this->tableData);
+    notificationWidget->setStyleSheet("background-color:#ebf8a4; border: 1 solid #35DB00;");
+    QHBoxLayout *layout = new QHBoxLayout(notificationWidget);
+    layout->setSpacing(0);
+
+    // The success icon
+    QLabel *notificationIcon = new QLabel();
+    notificationIcon->setStyleSheet("border: none;");
+    QPixmap icon(":/resources/icons/check-icon.png");
+    notificationIcon->setPixmap(icon);
+
+    QLabel *notificationLabel = new QLabel(tr("Successfully updated"));
+    notificationLabel->setStyleSheet("border: none;");
+
+    layout->addWidget(notificationIcon);
+    layout->addWidget(notificationLabel);
+
+    QPoint center = this->rect().center();
+    notificationWidget->setGeometry(QRect(center.x() - 100, 30, 200, 50));
+    notificationWidget->show();
+
+
+    // Creates an animation to hide the notification
+    QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
+    eff->setOpacity(1);
+    notificationWidget->setGraphicsEffect(eff);
+
+    notificationAnimation = new QPropertyAnimation(eff,"opacity");
+    notificationAnimation->setDuration(4000);
+    notificationAnimation->setStartValue(1);
+    notificationAnimation->setEndValue(0);
+    notificationAnimation->setEasingCurve(QEasingCurve::OutBack);
+
+    // Starts an animation to hide the notification after 500ms
+    QTimer::singleShot(500, this, SLOT(hideNotification()));
 }
 
 void TableTab::queryError(QString query, QString error)
@@ -365,6 +446,15 @@ void TableTab::queryError(QString query, QString error)
 	}
 
 	message->show();
+}
+
+/**
+ * Starts the animation which hides the notification
+ * @brief TableTab::hideNotification
+ */
+void TableTab::hideNotification()
+{
+    notificationAnimation->start(QPropertyAnimation::DeleteWhenStopped);
 }
 
 TableTab::~TableTab() {

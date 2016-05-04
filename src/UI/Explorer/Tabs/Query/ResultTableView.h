@@ -14,25 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#ifndef TABLEDETAILSWINDOW_H
-#define TABLEDETAILSWINDOW_H
+#ifndef RESULTTABLEVIEW_H
+#define RESULTTABLEVIEW_H
 
-#include <QMainWindow>
 #include <QTableView>
-#include <QSqlDatabase>
 
-class TableDetailsWindow : public QMainWindow
+namespace UI {
+namespace Explorer {
+namespace Tabs {
+namespace Query {
+class ResultTableView : public QTableView
 {
     Q_OBJECT
 public:
-    explicit TableDetailsWindow(QSqlDatabase database, QString tableName,  QWidget *parent = 0);
+    explicit ResultTableView(QWidget *parent = 0);
 
 private:
-    QTableView *tableColumns;
+    QModelIndex contextMenuIndex;
 
 signals:
 
 public slots:
-};
 
-#endif // TABLEDETAILSWINDOW_H
+    void contextMenuRequested(QPoint point);
+    void handleCopyAction();
+};
+} /* namespace Query */
+} /* namespace Tabs */
+} /* namespace Explorer */
+} /* namespace UI */
+#endif // RESULTTABLEVIEW_H

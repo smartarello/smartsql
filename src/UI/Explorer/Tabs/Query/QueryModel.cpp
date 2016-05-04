@@ -22,6 +22,7 @@
 #include <QSqlError>
 #include <QVariant>
 #include <QFont>
+#include <QDateTime>
 
 namespace UI {
 namespace Explorer {
@@ -43,7 +44,14 @@ QVariant QueryModel::data(const QModelIndex &index, int role) const
                 return QVariant("(NULL)");
         }
         else if (role == Qt::DisplayRole) {
-            return value;
+
+            if (value.type() == QVariant::DateTime) {
+                return value.toDateTime().toString("yyyy-MM-dd hh:mm:ss");
+            } else if (value.type() == QVariant::Date) {
+                return value.toDate().toString("yyyy-MM-dd");
+            } else {
+                return value;
+            }
         }
         else if (role == Qt::FontRole && value.isNull()) {
 

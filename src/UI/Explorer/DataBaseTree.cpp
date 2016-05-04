@@ -28,7 +28,6 @@
 #include "Explorer.h"
 #include <UI/Explorer/Model/TableFilterProxyModel.h>
 #include "ServerAction/NewDatabaseWindow.h"
-#include "TableAction/TableDetailsWindow.h"
 #include "Util/DataBase.h"
 
 namespace UI {
@@ -160,9 +159,7 @@ void DataBaseTree::customContextMenuRequested(QPoint point)
         connect(openInTabAction, SIGNAL(triggered(bool)), SLOT(handleOpenTableInTab()));
         menu->addAction(openInTabAction);
 
-        QAction *showDetailsAction = new QAction(tr("Details..."), this);
-        connect(showDetailsAction, SIGNAL(triggered(bool)), SLOT(handleShowDetailsTable()));
-        menu->addAction(showDetailsAction);
+
 
         menu->addSeparator();
 
@@ -199,21 +196,6 @@ void DataBaseTree::handleCreateDatabase()
     connect(newDatabaseWindow, SIGNAL(createDatabase(QString, QString)), SLOT(createDatabase(QString, QString)));
     newDatabaseWindow->show();
 }
-
-void DataBaseTree::handleShowDetailsTable()
-{
-    QModelIndex index = ((Model::TableFilterProxyModel *)this->model())->mapToSource(this->currentIndex());
-    QStandardItem *serverItem = this->dataBaseModel->invisibleRootItem()->child(index.parent().parent().row(), 0);
-    QStandardItem *dbItem = serverItem->child(index.parent().row());
-    QStandardItem *tableItem = dbItem->child(index.row());
-
-    QSqlDatabase currentDb = QSqlDatabase::database();
-    QSqlDatabase db = QSqlDatabase::cloneDatabase(currentDb, QUuid::createUuid().toString());
-    db.setDatabaseName(dbItem->text());
-    TableDetailsWindow *tableDetails = new TableDetailsWindow(db, tableItem->text(), this);
-    tableDetails->show();
-}
-
 
 /**
  * Called when the user has specified the database name et the collation

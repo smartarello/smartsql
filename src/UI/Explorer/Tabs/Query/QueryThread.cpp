@@ -101,6 +101,10 @@ void QueryThread::run()
 
 	} else {
         qWarning() << database.lastError();
+        QueryExecutionResult result;
+        result.error = database.lastError().text();
+        results << result;
+        emit queryResultReady(results);
 	}
 
 }

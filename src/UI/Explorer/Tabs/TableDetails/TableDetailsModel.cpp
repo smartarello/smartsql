@@ -18,7 +18,9 @@
 #include <QDebug>
 #include <QPixmap>
 
-TableDetailsModel::TableDetailsModel(QString createString, QObject *parent) : QAbstractTableModel(parent)
+TableDetailsModel::TableDetailsModel(Util::TableDefinition table, QObject *parent) :
+    QAbstractTableModel(parent),
+    table(table)
 {
     // Column headers
     this->headers << tr("Name");
@@ -27,76 +29,12 @@ TableDetailsModel::TableDetailsModel(QString createString, QObject *parent) : QA
     this->headers << tr("Unsigned");
     this->headers << tr("Allow NULL");
     this->headers << tr("Default");
-
-
-    QStringList createParts = createString.split("\n");
-    createParts.removeAt(0); // Removes the first line with CREATE TABLE
-    foreach(QString part, createParts) {
-
-        // e.g `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-        QRegExp line("^\\s*`(\\S+)` (\\w+)\\(?(\\d*)\\)?", Qt::CaseInsensitive);
-        if (line.indexIn(part) != -1) { // Column definition
-            ColumnDefinition column;
-            column.name = line.cap(1);
-            column.type = line.cap(2);
-            column.length = -1;
-
-            if (line.captureCount() == 3) {
-                QString length = line.cap(3);
-                if (!length.isEmpty()) {
-                    column.length = line.cap(3).toInt();
-                }
-            }
-
-            QRegExp unsignedRx("unsigned", Qt::CaseInsensitive);
-            if (unsignedRx.indexIn(part) != -1) {
-                column.unsignedCol = true;
-            } else {
-                column.unsignedCol = false;
-            }
-
-            QRegExp notNullRx("not null", Qt::CaseInsensitive);
-            if (notNullRx.indexIn(part) != -1) {
-                column.allowNull = false;
-            } else {
-                column.allowNull = true;
-            }
-
-            QRegExp defaultValueRx("default '(\\w)'", Qt::CaseInsensitive);
-            if (defaultValueRx.indexIn(part) != -1) {
-                column.defaultValue = defaultValueRx.cap(1);
-            } else {
-                column.defaultValue = "";
-            }
-
-            defaultValueRx = QRegExp("default null", Qt::CaseInsensitive);
-            if (defaultValueRx.indexIn(part) != -1) {
-                column.defaultValue = QVariant();
-            }
-
-
-
-            this->columns << column;
-        }
-
-        QRegExp primaryKeyRx("^\\s*PRIMARY KEY \\((.*)\\)", Qt::CaseInsensitive);
-        if (primaryKeyRx.indexIn(part) != -1) { // Primary key definition
-            QString primaryKeyString = primaryKeyRx.cap(1);
-            QStringList primaryKeyParts = primaryKeyString.split(",");
-            foreach (QString primaryKeyPart, primaryKeyParts) {
-                primaryKeyPart = primaryKeyPart.replace("`", "");
-                primaryKeyPart = primaryKeyPart.trimmed();
-                this->primaryKey << primaryKeyPart;
-            }
-        }
-    }
-
 }
 
 
 int TableDetailsModel::rowCount(const QModelIndex & parent) const
 {
-    return this->columns.size() ;
+    return this->table.columns().size() ;
 }
 
 int TableDetailsModel::columnCount(const QModelIndex & parent) const
@@ -110,12 +48,11 @@ QVariant TableDetailsModel::headerData(int section, Qt::Orientation orientation,
 
         return QVariant(this->headers.at(section));
 
-    } else if (orientation == Qt::Vertical && section < this->columns.size() && role == Qt::DecorationRole) {
-        ColumnDefinition col = this->columns.at(section);
-        if (this->primaryKey.contains(col.name, Qt::CaseInsensitive)) {
+    } else if (orientation == Qt::Vertical && section < this->table.columns().size() && role == Qt::DecorationRole) {
+        ColumnDefinition col = this->table.columns().at(section);
+        if (this->table.primaryKey().contains(col.name, Qt::CaseInsensitive)) {
             return QPixmap(":/resources/icons/key-icon.png").scaledToWidth(20);
         }
-
     }
 
     return QVariant();
@@ -123,8 +60,8 @@ QVariant TableDetailsModel::headerData(int section, Qt::Orientation orientation,
 
 QVariant TableDetailsModel::data(const QModelIndex &index, int role) const
 {
-    if (index.row() < this->columns.size()) {
-        ColumnDefinition col = this->columns.at(index.row());
+    if (index.row() < this->table.columns().size()) {
+        ColumnDefinition col = this->table.columns().at(index.row());
 
         if (role == Qt::DisplayRole) {
             switch (index.column()) {

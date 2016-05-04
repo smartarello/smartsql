@@ -27,9 +27,11 @@
 #include <QMessageBox>
 #include <QUuid>
 #include <QLocale>
+#include <QShortcut>
 #include <QJsonObject>
 #include <QSqlRecord>
 #include "QueryModel.h"
+#include "ResultTableView.h"
 
 namespace UI {
 namespace Explorer {
@@ -46,11 +48,11 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 
 	QWidget *topPart = new QWidget(this);
 
-	QVBoxLayout *topLayout = new QVBoxLayout();
+    QVBoxLayout *topLayout = new QVBoxLayout(topPart);
 	topPart->setLayout(topLayout);
 
     // Query editor
-    this->queryTextEdit = new QueryTextEdit();
+    this->queryTextEdit = new QueryTextEdit(this);
     topLayout->addWidget(this->queryTextEdit);
 
     // Actions
@@ -59,7 +61,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	buttonContainer->setLayout(buttonLayout);
 	buttonLayout->setAlignment(Qt::AlignLeft);	
 
-	this->executeButton = new QPushButton();
+    this->executeButton = new QPushButton(this);
 	this->executeButton->setIcon(QIcon(":/resources/icons/play.png"));
 	this->executeButton->setIconSize(QSize(25, 25));
 	this->executeButton->setToolTip(tr("Execute query (F5)"));
@@ -67,7 +69,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	this->executeButton->setFixedHeight(30);
 	buttonLayout->addWidget(this->executeButton);
 
-	this->stopButton = new QPushButton();
+    this->stopButton = new QPushButton(this);
 	this->stopButton->setIcon(QIcon(":/resources/icons/stop.png"));
 	this->stopButton->setIconSize(QSize(25, 25));
 	this->stopButton->setToolTip(tr("Cancel running queries"));
@@ -92,7 +94,7 @@ QueryTab::QueryTab(QWidget *parent) : QSplitter(parent) {
 	this->setSizes(sizes);
 
     // Events
-	connect(parent, SIGNAL (databaseChanged()), this->queryTextEdit, SLOT (databaseChanged()));
+    connect(this->parent(), SIGNAL (databaseChanged()), this->queryTextEdit, SLOT (databaseChanged()));
 	connect(this->queryTextEdit, SIGNAL (queryChanged()), this, SLOT (queryChanged()));
 	connect(this->executeButton, SIGNAL (clicked(bool)), this, SLOT (queryChanged()));
 	connect(this->stopButton, SIGNAL (clicked(bool)), this, SLOT (stopQueries()));
@@ -146,8 +148,13 @@ void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
         double seconds = result.msec / 1000.0;
 
         if (result.isSelect) {
-            QTableView *tableData = new QTableView(this->queryTabs);
+            ResultTableView *tableData = new ResultTableView(this->queryTabs);
             tableData->verticalHeader()->hide();
+
+            QShortcut* refreshShortcut = new QShortcut(QKeySequence(Qt::Key_F5), tableData);
+            refreshShortcut->setContext(Qt::WidgetShortcut);
+            connect(refreshShortcut, SIGNAL(activated()), this, SLOT(queryChanged()));
+
             QueryModel *model = new QueryModel(result.data, this);
 
             tableData->setModel(model);

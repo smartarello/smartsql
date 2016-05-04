@@ -22,6 +22,8 @@
 #include <QDebug>
 #include <QFont>
 #include <QSize>
+#include <QDateTime>
+#include <QDate>
 
 namespace UI {
 namespace Explorer {
@@ -175,6 +177,11 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
     	QSqlRecord record = this->results.at(index.row());
 
+        // The value is not changed
+        if (value == record.value(index.column())) {
+            return false;
+        }
+
     	QString columnName = record.fieldName(index.column());
 
         QString updateQuery = QString("UPDATE %1 SET %2=:new_%3 WHERE ").arg(this->table).arg(columnName).arg(columnName);
@@ -236,9 +243,14 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole || role == Qt::EditRole) {
             if (value.isNull() && role == Qt::DisplayRole) {
                 value = QVariant("(NULL)");
+            } else if (value.type() == QVariant::DateTime) {
+                return value.toDateTime().toString("yyyy-MM-dd hh:mm:ss");
+            } else if (value.type() == QVariant::Date) {
+                return value.toDate().toString("yyyy-MM-dd");
+            } else {
+                return value;
             }
 
-            return value;
         } else if (value.isNull()) { // Qt::FontRole
             QFont font("DejaVue Sans Mono");
             font.setItalic(true);

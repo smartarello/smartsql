@@ -28,6 +28,7 @@
 #include "DataBaseTree.h"
 #include "Tabs/Database/DataBaseTab.h"
 #include "Tabs/Server/ServerTab.h"
+#include "Tabs/TableDetails/TableDetailsTab.h"
 
 namespace UI {
 namespace Explorer {
@@ -56,6 +57,7 @@ public slots:
     void handleShowTable(QString tableName);
     void handleShowDatabase(QString databaseName);
     void handleCurrentTabChanged(int index);
+    void closeTab();
 
 private:
 	DataBaseTree *dataBaseTree;
@@ -65,6 +67,7 @@ private:
 	Tabs::Database::DataBaseTab *databaseTab;
 	Tabs::Table::TableTab *tableTab;
     ServerTab *serverTab;
+    TableDetailsTab *tableDetailsTab;
 
 };
 

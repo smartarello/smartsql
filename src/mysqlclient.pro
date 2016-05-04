@@ -33,12 +33,17 @@ HEADERS += UI/MainWindow.h \
            UI/Explorer/Tabs/TabBar.h \
            UI/Explorer/Tabs/Table/TableTab.h \
     UI/Explorer/ServerAction/NewDatabaseWindow.h \
-    UI/Explorer/TableAction/TableDetailsWindow.h \
-    UI/Explorer/TableAction/TableDetailsModel.h \
+    UI/Explorer/Tabs/TableDetails/TableDetailsModel.h \
     UI/Explorer/Tabs/Server/ServerTab.h \
     UI/Explorer/Tabs/Database/DatabaseModel.h \
     UI/Explorer/Export/ExportWindow.h \
-    Util/MySQLDump.h
+    Util/MySQLDump.h \
+    UI/Explorer/Tabs/Query/ResultTableView.h \
+    UI/Explorer/Tabs/TableDetails/TableDetailsTab.h \
+    UI/Explorer/Tabs/TableDetails/ForeignKeyModel.h \
+    UI/Explorer/Tabs/TableDetails/TableIndexModel.h \
+    Util/TableDefinition.h \
+    UI/Explorer/Tabs/Table/InsertWindow.h
 SOURCES += main.cpp \
 		Util/DataBase.cpp \
            UI/MainWindow.cpp \
@@ -62,12 +67,17 @@ SOURCES += main.cpp \
            UI/Explorer/Tabs/Table/TableModel.cpp \
            UI/Explorer/Tabs/Table/TableTab.cpp \
     UI/Explorer/ServerAction/NewDatabaseWindow.cpp \
-    UI/Explorer/TableAction/TableDetailsWindow.cpp \
-    UI/Explorer/TableAction/TableDetailsModel.cpp \
+    UI/Explorer/Tabs/TableDetails/TableDetailsModel.cpp \
     UI/Explorer/Tabs/Server/ServerTab.cpp \
     UI/Explorer/Tabs/Database/DatabaseModel.cpp \
     UI/Explorer/Export/ExportWindow.cpp \
-    Util/MySQLDump.cpp
+    Util/MySQLDump.cpp \
+    UI/Explorer/Tabs/Query/ResultTableView.cpp \
+    UI/Explorer/Tabs/TableDetails/TableDetailsTab.cpp \
+    UI/Explorer/Tabs/TableDetails/ForeignKeyModel.cpp \
+    UI/Explorer/Tabs/TableDetails/TableIndexModel.cpp \
+    Util/TableDefinition.cpp \
+    UI/Explorer/Tabs/Table/InsertWindow.cpp
 TRANSLATIONS += mysqlclient_en.ts
 
 win32:debug {

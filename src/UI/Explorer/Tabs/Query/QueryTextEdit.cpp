@@ -21,9 +21,13 @@
 #include <QSqlQuery>
 #include <QTextCursor>
 #include <QDebug>
+#include <QAction>
+#include <QMenu>
 #include <QAbstractItemView>
 #include <QScrollBar>
 #include <QSqlError>
+#include <QShortcut>
+#include <QKeySequence>
 
 
 namespace UI {
@@ -49,7 +53,65 @@ QueryTextEdit::QueryTextEdit(QWidget *parent) : QTextEdit(parent) {
 	this->autoCompleteModel = new QStringListModel(this->tableList, this->autocomplete);
 	this->autocomplete->setModel(this->autoCompleteModel);
 
-	QObject::connect(this->autocomplete, SIGNAL(activated(QString)), this, SLOT(insertCompletion(QString)));
+
+    QShortcut* refreshShortcut = new QShortcut(QKeySequence("Ctrl+Shift+F"), this);
+    refreshShortcut->setContext(Qt::WidgetShortcut);
+
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(showContextMenu(const QPoint &)));
+
+    connect(refreshShortcut, SIGNAL(activated()), SLOT(formatSql()));
+    connect(this->autocomplete, SIGNAL(activated(QString)), SLOT(insertCompletion(QString)));
+}
+
+void QueryTextEdit::showContextMenu(const QPoint &pt)
+{
+    QMenu *menu = this->createStandardContextMenu();
+
+    menu->addSeparator();
+
+    QAction *formatAction = new QAction(QString(tr("Reformat SQL")), this);
+    formatAction->setShortcut(QKeySequence("Ctrl+Shift+F"));
+    menu->addAction(formatAction);
+
+    connect(formatAction, SIGNAL(triggered(bool)), SLOT(formatSql()));
+
+    menu->exec(this->mapToGlobal(pt));
+    delete menu;
+}
+
+/**
+ * Formats the SQL query
+ * @brief QueryTextEdit::formatSql
+ */
+void QueryTextEdit::formatSql()
+{
+    QString sql = this->toPlainText();
+    sql = sql.replace("\n", " ");
+
+    QStringList keywords ;
+    keywords << "(SELECT";
+    keywords << "INNER JOIN";
+    keywords << "LEFT JOIN";
+    keywords << "FROM";
+    keywords << "WHERE";
+    keywords << "GROUP BY";
+    keywords << "ORDER BY";
+    keywords << "LIMIT";
+    keywords << "UNION";
+
+    foreach (QString keyword, keywords) {
+        sql = sql.replace(keyword, QString("<br>%1").arg(keyword), Qt::CaseInsensitive);
+    }
+
+    QStringList secondaryKeywords;
+    secondaryKeywords << " AND ";
+    secondaryKeywords << " OR ";
+    foreach (QString keyword, secondaryKeywords) {
+        sql = sql.replace(keyword, QString("<br>&nbsp;&nbsp;&nbsp;%1&nbsp;").arg(keyword), Qt::CaseInsensitive);
+    }
+
+    this->setHtml(sql);
 }
 
 void QueryTextEdit::databaseChanged()
@@ -119,21 +181,19 @@ void QueryTextEdit::keyPressEvent(QKeyEvent *e)
 		this->autoCompleteModel->setStringList(this->tableList);
 	}
 
-	if (!isShortcut) {
-		this->autocomplete->popup()->hide();
-		return;
-	}
+    if (isShortcut || this->autocomplete->popup()->isVisible()) {
 
-	if (completionPrefix != this->autocomplete->completionPrefix()) {
-		this->autocomplete->setCompletionPrefix(completionPrefix);
-		this->autocomplete->popup()->setCurrentIndex(this->autocomplete->completionModel()->index(0, 0));
-	}
+        if (completionPrefix != this->autocomplete->completionPrefix()) {
+            this->autocomplete->setCompletionPrefix(completionPrefix);
+            this->autocomplete->popup()->setCurrentIndex(this->autocomplete->completionModel()->index(0, 0));
+        }
 
-	QRect cr = cursorRect();
-	cr.setWidth(this->autocomplete->popup()->sizeHintForColumn(0)
-			+ this->autocomplete->popup()->verticalScrollBar()->sizeHint().width());
+        QRect cr = cursorRect();
+        cr.setWidth(this->autocomplete->popup()->sizeHintForColumn(0)
+                    + this->autocomplete->popup()->verticalScrollBar()->sizeHint().width());
 
-	this->autocomplete->complete(cr);
+        this->autocomplete->complete(cr);
+    }
 }
 
 QString QueryTextEdit::textUnderCursor() const

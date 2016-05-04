@@ -14,53 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
+#ifndef INSERTWINDOW_H
+#define INSERTWINDOW_H
 
-#ifndef UI_EXPLORER_TABS_QUERY_QUERYTEXTEDIT_H_
-#define UI_EXPLORER_TABS_QUERY_QUERYTEXTEDIT_H_
-
-#include <qtextedit.h>
-#include <QCompleter>
-#include <QStringListModel>
+#include <QMainWindow>
+#include "Util/TableDefinition.h"
+#include <QTextEdit>
+#include <QCheckBox>
+#include <QSqlDatabase>
 
 namespace UI {
 namespace Explorer {
 namespace Tabs {
-namespace Query {
-
-class QueryTextEdit: public QTextEdit {
-
-	Q_OBJECT
-
+namespace Table {
+class InsertWindow : public QMainWindow
+{
+    Q_OBJECT
 public:
-	QueryTextEdit(QWidget *parent = 0);
-	virtual ~QueryTextEdit();
-
-signals:
-	void queryChanged();
-
-protected:
-	void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
-
-private slots:
-	void insertCompletion(const QString &completion);
-    void showContextMenu(const QPoint &);
-
-public slots:
-		void databaseChanged();
-        void formatSql();
+    explicit InsertWindow(QSqlDatabase connection, Util::TableDefinition table, QWidget *parent = 0);
 
 private:
-	QString textUnderCursor() const;
-	QStringList getTableList();
-	QCompleter *autocomplete;
-	QStringList tableList;
-	QStringListModel *autoCompleteModel;
-	void loadTableFields();
+    QTextEdit *insertStatement;
+    Util::TableDefinition table;
+    QList<QWidget *> values;
+    QList<QCheckBox *> checkboxes;
+    QSqlDatabase connection;
+
+signals:
+    void insertDone();
+
+public slots:
+    void refreshInsertStatement();
+    void handleInsert();
 };
 
-} /* namespace Query */
+} /* namespace Table */
 } /* namespace Tabs */
 } /* namespace Explorer */
 } /* namespace UI */
 
-#endif /* UI_EXPLORER_TABS_QUERY_QUERYTEXTEDIT_H_ */
+#endif // INSERTWINDOW_H

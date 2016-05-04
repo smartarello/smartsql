@@ -48,7 +48,6 @@ public slots:
 	void queryError(QString error);
     void handleCreateDatabase();
     void createDatabase(QString databaseName, QString collation);
-    void handleShowDetailsTable();
     void handleOpenTableInTab();
     void handleExportTableAsSql();
     void exportWindowDestroyed();

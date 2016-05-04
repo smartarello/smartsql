@@ -30,7 +30,7 @@ TabBar::TabBar(QWidget * parent) : QTabBar(parent) {
 	this->plusButton->setIconSize(QSize(18, 18));
 	this->plusButton->setMaximumSize(40, 25) ;
 	this->plusButton->setMinimumSize(40, 25) ;
-	this->plusButton->setToolTip(tr("Open a blank query tab (Ctrl+N)"));
+    this->plusButton->setToolTip(tr("Open a blank query tab (Ctrl+T)"));
 
 	this->plusButton->setParent(this);
 	this->movePlusButton();

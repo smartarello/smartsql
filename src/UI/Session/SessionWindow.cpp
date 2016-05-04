@@ -45,7 +45,7 @@ namespace Session {
 SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 
      QVBoxLayout *vlayout = new QVBoxLayout(this);
-	 this->setLayout(vlayout);
+     this->setLayout(vlayout);
 
      QWidget *header = new QWidget(this);
 	 vlayout->addWidget(header);
@@ -124,9 +124,13 @@ SessionWindow::SessionWindow(QWidget *parent) : QWidget(parent){
 	       this, SLOT(handleSelectionChanged(QItemSelection)));
 
 	 connect(this->sessionList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT( handleOpenConnection() ) );
+     connect(this->sessionList, SIGNAL(activated(QModelIndex)), this, SLOT( handleOpenConnection() ) );
 
 	 QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this->sessionList);
 	 connect(shortcut, SIGNAL(activated()), this, SLOT(handleDelete()));
+
+     QShortcut* openShortcut = new QShortcut(QKeySequence(Qt::Key_Enter), this->sessionList);
+     connect(openShortcut, SIGNAL(activated()), this, SLOT(handleOpenConnection()));
 
 	 if ( this->sessionStore.count() == 0){
 		 	this->handleNewConnection();
