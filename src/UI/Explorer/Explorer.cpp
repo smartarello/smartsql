@@ -140,6 +140,7 @@ Explorer::Explorer(QWidget *parent, QJsonObject sessionConf) : QWidget(parent) {
 	connect(this->explorerTabs->tabBar(), SIGNAL(newTabRequested()), this, SLOT(addQueryTab()));
     connect(this->explorerTabs->tabBar(), SIGNAL(currentChanged(int)), SLOT(handleCurrentTabChanged(int)));
     connect(this->dataBaseTree->getDataBaseModel(), SIGNAL(databaseChanged()), this, SLOT(refreshDatabase()));
+    connect(this->tableTab, SIGNAL(openForeignKeyInTab(QSqlDatabase,QString,QString)), SLOT(handleOpenForeignKeyInTab(QSqlDatabase,QString,QString)));
 
 
     connect(this->dataBaseTree->selectionModel(),
@@ -168,7 +169,20 @@ void Explorer::handleOpenTableInTab()
         tableTab->loadData();
         int tabIndex = this->explorerTabs->addTab(tableTab, dbItem->text()+"."+tableItem->text());
         this->explorerTabs->setCurrentIndex(tabIndex);
+
+        connect(tableTab, SIGNAL(openForeignKeyInTab(QSqlDatabase,QString,QString)), SLOT(handleOpenForeignKeyInTab(QSqlDatabase,QString,QString)));
     }
+}
+
+void Explorer::handleOpenForeignKeyInTab(QSqlDatabase connection, QString table, QString whereCondition)
+{
+    Tabs::Table::TableTab *tableTab = new Tabs::Table::TableTab(this);
+    tableTab->setTable(connection, table);
+    tableTab->setFilter(whereCondition);
+    tableTab->loadData();
+    int tabIndex = this->explorerTabs->addTab(tableTab, connection.databaseName()+"."+table);
+    this->explorerTabs->setCurrentIndex(tabIndex);
+    connect(tableTab, SIGNAL(openForeignKeyInTab(QSqlDatabase,QString,QString)), SLOT(handleOpenForeignKeyInTab(QSqlDatabase,QString,QString)));
 }
 
 void Explorer::addQueryTab(){

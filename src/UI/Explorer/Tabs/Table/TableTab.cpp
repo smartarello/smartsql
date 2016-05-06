@@ -83,7 +83,6 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 
     TableModel *queryModel = new TableModel(this);
 	this->tableData->setModel(queryModel);
-	this->tableData->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     QShortcut* refreshShortcut = new QShortcut(QKeySequence(Qt::Key_F5), this->tableData);
     refreshShortcut->setContext(Qt::WidgetShortcut);
@@ -97,6 +96,7 @@ TableTab::TableTab(QWidget *parent) : QSplitter(parent) {
 	connect(queryModel, SIGNAL(queryError(QString, QString)), this, SLOT(queryError(QString, QString)));
     connect(filterButton, SIGNAL(clicked(bool)), SLOT(applyFilterClicked()));
     connect(queryModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), SLOT(dataUpdatedSuccessfully()));
+
 }
 
 void TableTab::refreshData()
@@ -254,7 +254,7 @@ void TableTab::customContextMenuRequested(QPoint point)
         if (fks.contains(colTitle)) {
             menu->addSeparator();
             QStringList fk = fks.value(colTitle);
-            QAction *goToAction = new QAction(QString(tr("Go to `%1`")).arg(fk.at(0)), this);
+            QAction *goToAction = new QAction(QString(tr("Go to `%1` table")).arg(fk.at(0)), this);
             connect(goToAction, SIGNAL(triggered(bool)), SLOT(handleGoToForeignKeyAction()));
             //filterEqualAction->setIcon(QIcon(":/resources/icons/filter-icon.png"));
             menu->addAction(goToAction);
@@ -312,10 +312,7 @@ void TableTab::handleGoToForeignKeyAction()
     }
 
     QStringList fk = fks.value(colTitle);
-    this->setTable(this->database, fk.value(0));
-    this->loadData();
-    this->whereConditionText->setText(QString(tr("`%1` LIKE \"%2\"")).arg(fk.value(1)).arg(cellData.toString()));
-    this->applyFilterClicked();
+    emit openForeignKeyInTab(this->database, fk.value(0), QString(tr("`%1` LIKE \"%2\"")).arg(fk.value(1)).arg(cellData.toString()));
 }
 
 void TableTab::handleFilterColumnLikeAction()
@@ -446,6 +443,11 @@ void TableTab::queryError(QString query, QString error)
 	}
 
 	message->show();
+}
+
+void TableTab::setFilter(QString whereCondition)
+{
+    this->whereConditionText->setText(whereCondition);
 }
 
 /**

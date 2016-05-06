@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QFont>
 #include <QSize>
+#include <QColor>
 #include <QDateTime>
 #include <QDate>
 
@@ -255,6 +256,15 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
             QFont font("DejaVue Sans Mono");
             font.setItalic(true);
             return QVariant(font);
+        }
+    }
+
+    if(role == Qt::ForegroundRole && index.isValid() && index.row() < this->results.size())
+    {
+        QSqlRecord record = this->results.at(index.row());
+        QString column = record.fieldName(index.column());
+        if (this->foreignKeys.contains(column)) {
+            return QVariant::fromValue(QColor(Qt::blue));
         }
     }
 

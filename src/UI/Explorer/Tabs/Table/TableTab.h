@@ -42,6 +42,7 @@ public:
 	virtual ~TableTab();
     void setTable(QSqlDatabase database, QString tableName);
     void loadData();
+    void setFilter(QString whereCondition);
 
 public slots:
 	void queryError(QString query, QString error);
@@ -58,6 +59,9 @@ public slots:
     void hideNotification();
     void dataUpdatedSuccessfully();
     void handleGoToForeignKeyAction();
+
+signals:
+    void openForeignKeyInTab(QSqlDatabase connection, QString table, QString whereCondition);
 
 private:
 	QTableView *tableData;

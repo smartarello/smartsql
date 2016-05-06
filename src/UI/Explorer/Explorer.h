@@ -57,6 +57,7 @@ public slots:
     void handleShowTable(QString tableName);
     void handleShowDatabase(QString databaseName);
     void handleCurrentTabChanged(int index);
+    void handleOpenForeignKeyInTab(QSqlDatabase connection, QString table, QString whereCondition);
     void closeTab();
 
 private:
