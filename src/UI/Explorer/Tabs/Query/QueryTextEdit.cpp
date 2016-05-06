@@ -87,31 +87,58 @@ void QueryTextEdit::showContextMenu(const QPoint &pt)
 void QueryTextEdit::formatSql()
 {
     QString sql = this->toPlainText();
-    sql = sql.replace("\n", " ");
 
     QStringList keywords ;
-    keywords << "(SELECT";
-    keywords << "INNER JOIN";
-    keywords << "LEFT JOIN";
-    keywords << "FROM";
-    keywords << "WHERE";
-    keywords << "GROUP BY";
-    keywords << "ORDER BY";
-    keywords << "LIMIT";
-    keywords << "UNION";
-
-    foreach (QString keyword, keywords) {
-        sql = sql.replace(keyword, QString("<br>%1").arg(keyword), Qt::CaseInsensitive);
-    }
+    keywords << "SELECT";
+    keywords << "INNER JOIN ";
+    keywords << "LEFT JOIN ";
+    keywords << "FROM ";
+    keywords << "WHERE ";
+    keywords << "GROUP BY ";
+    keywords << "ORDER BY ";
+    keywords << "LIMIT ";
+    keywords << "UNION ";
 
     QStringList secondaryKeywords;
     secondaryKeywords << " AND ";
     secondaryKeywords << " OR ";
-    foreach (QString keyword, secondaryKeywords) {
-        sql = sql.replace(keyword, QString("<br>&nbsp;&nbsp;&nbsp;%1&nbsp;").arg(keyword), Qt::CaseInsensitive);
+
+    QStringList lines = sql.split("\n");
+
+    QString formatedSql = "";
+    QString commentPart = "";
+
+    QRegExp commentRegExp("-- ");
+
+    foreach(QString line, lines) {
+
+        int commentIdx = line.indexOf(commentRegExp);
+        if (commentIdx != -1) {
+            commentPart = line.mid(commentIdx);
+            line = line.left(commentIdx);
+
+        } else {
+            commentPart = "";
+        }
+
+        foreach (QString keyword, keywords) {
+            line = line.replace(QRegExp(keyword, Qt::CaseInsensitive), QString("\n%1").arg(keyword));
+        }
+
+        foreach (QString keyword, secondaryKeywords) {
+            line = line.replace(keyword, QString("\n   %1 ").arg(keyword), Qt::CaseInsensitive);
+        }
+
+        formatedSql += "\n" + line + commentPart;
     }
 
-    this->setHtml(sql);
+
+    QRegExp regExp("(\n)+");
+    formatedSql = formatedSql.replace(regExp, "\n");
+
+    formatedSql = formatedSql.trimmed();
+
+    this->setText(formatedSql);
 }
 
 void QueryTextEdit::databaseChanged()
