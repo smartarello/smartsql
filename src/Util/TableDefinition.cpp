@@ -109,7 +109,7 @@ TableDefinition::TableDefinition(QSqlDatabase connection, QString tableName):
 
                     IndexDefinition index;
                     index.keyName = uniquekeyRx.cap(1);
-                    index.columns = keyRx.cap(2).replace("`", "").split(",");
+                    index.columns = uniquekeyRx.cap(2).replace("`", "").split(",");
                     index.type = "UNIQUE";
 
                     this->idx << index;

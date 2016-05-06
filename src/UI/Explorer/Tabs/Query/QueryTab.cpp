@@ -128,8 +128,6 @@ void QueryTab::queryChanged()
 
 void QueryTab::handleQueryResultReady(QList<QueryExecutionResult> results)
 {
-    delete  this->queryWorker;
-
 	this->executeButton->setEnabled(true);
     this->stopButton->setEnabled(false);
 

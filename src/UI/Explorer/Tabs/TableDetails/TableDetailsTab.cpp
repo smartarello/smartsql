@@ -39,6 +39,7 @@ TableDetailsTab::TableDetailsTab(QWidget *parent) : QWidget(parent)
 
     this->tableindexes = new QTableView(this);
     this->tableindexes->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
     tabWidget->addTab(this->tableindexes, tr("Indexes"));
 
     this->tableForeignKeys = new QTableView(this);
@@ -47,7 +48,7 @@ TableDetailsTab::TableDetailsTab(QWidget *parent) : QWidget(parent)
 
     createTableTextEdit = new QTextEdit(this);
     createTableTextEdit->setReadOnly(true);
-    UI::Explorer::Tabs::SQLSyntaxHighlighter *highlighter  = new UI::Explorer::Tabs::SQLSyntaxHighlighter(createTableTextEdit->document());
+    new UI::Explorer::Tabs::SQLSyntaxHighlighter(createTableTextEdit->document());
     tabWidget->addTab(createTableTextEdit, tr("Create table"));
 
     containerLayout->addWidget(tabWidget);
@@ -60,9 +61,25 @@ void TableDetailsTab::setTable(QSqlDatabase database, QString tableName)
     this->tableColumns->setModel(new TableDetailsModel(table, this));
     this->tableForeignKeys->setModel(new ForeignKeyModel(table, this));
     this->tableindexes->setModel(new TableIndexModel(table, this));
-    this->tableForeignKeys->resizeColumnsToContents();
-    this->tableindexes->resizeColumnsToContents();
-    this->tableColumns->resizeColumnsToContents();
+
+    this->tableindexes->setColumnWidth(0, 200);
+    this->tableindexes->setColumnWidth(1, 400);
+    this->tableindexes->setColumnWidth(2, 150);
+
+
+    this->tableForeignKeys->setColumnWidth(0, 200);
+    this->tableForeignKeys->setColumnWidth(1, 250);
+    this->tableForeignKeys->setColumnWidth(2, 150);
+    this->tableForeignKeys->setColumnWidth(3, 250);
+    this->tableForeignKeys->setColumnWidth(4, 100);
+    this->tableForeignKeys->setColumnWidth(5, 100);
+
+    this->tableColumns->setColumnWidth(0, 250);
+    this->tableColumns->setColumnWidth(1, 150);
+    this->tableColumns->setColumnWidth(2, 100);
+    this->tableColumns->setColumnWidth(3, 150);
+    this->tableColumns->setColumnWidth(4, 150);
+    this->tableColumns->setColumnWidth(5, 150);
 
     QString createString = table.createTable().replace("\n", "<br/>");
     createTableTextEdit->setText(createString);

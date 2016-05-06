@@ -256,7 +256,7 @@ void TableTab::customContextMenuRequested(QPoint point)
             QStringList fk = fks.value(colTitle);
             QAction *goToAction = new QAction(QString(tr("Go to `%1` table")).arg(fk.at(0)), this);
             connect(goToAction, SIGNAL(triggered(bool)), SLOT(handleGoToForeignKeyAction()));
-            //filterEqualAction->setIcon(QIcon(":/resources/icons/filter-icon.png"));
+            goToAction->setIcon(QIcon(":/resources/icons/database-link-icon.png"));
             menu->addAction(goToAction);
 
         }
