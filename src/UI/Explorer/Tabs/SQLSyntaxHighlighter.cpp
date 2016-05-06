@@ -669,7 +669,8 @@ SQLSyntaxHighlighter::SQLSyntaxHighlighter(QTextDocument *parent) : QSyntaxHighl
     commentFormat.setFontFamily("DejaVu Sans Mono");
 
     commentRule.format = commentFormat;
-    commentRule.pattern = QRegExp("-- .*");
+    commentRule.pattern = QRegExp("-- .*|#.*|/\\*.*\\*/");
+
 
     highlightingRules.append(commentRule);
 }
