@@ -233,8 +233,14 @@ void Explorer::dataBaseTreeItemChanged()
     int tableDetailsTabIndex = this->explorerTabs->indexOf(this->tableDetailsTab) ;
     int dataBaseTabIndex = this->explorerTabs->indexOf(this->databaseTab) ;
     int serverTabIndex = this->explorerTabs->indexOf(this->serverTab) ;
-    QModelIndex index = this->dataBaseTree->currentIndex();
-	if (!index.parent().isValid()){
+    QModelIndex currentIndex = this->dataBaseTree->currentIndex();
+
+
+    QSortFilterProxyModel *model = (QSortFilterProxyModel *)this->dataBaseTree->model();
+    QModelIndex index = model->mapToSource(currentIndex);
+    QStandardItem *root = this->dataBaseTree->getDataBaseModel()->invisibleRootItem();
+
+    if (!currentIndex.parent().isValid()){
 		// click on the server host
 		if (tableTabIndex != -1){
 			this->explorerTabs->removeTab(tableTabIndex);
@@ -254,6 +260,12 @@ void Explorer::dataBaseTreeItemChanged()
         }
 
         this->explorerTabs->setCurrentIndex(0);
+
+        QStandardItem *server = root->child(index.row());
+        QJsonObject sessionConf = server->data().toJsonObject();
+        Util::DataBase::open(sessionConf);
+        this->serverTab->reload();
+
 		return ;
     } else if (serverTabIndex != -1) {
         this->explorerTabs->removeTab(serverTabIndex);
@@ -261,11 +273,6 @@ void Explorer::dataBaseTreeItemChanged()
         this->explorerTabs->insertTab(0, this->databaseTab, "");
         this->explorerTabs->tabBar()->tabButton(0, QTabBar::RightSide)->hide();
     }
-
-	QSortFilterProxyModel *model = (QSortFilterProxyModel *)this->dataBaseTree->model();
-    index = model->mapToSource(index);
-	QStandardItem *root = this->dataBaseTree->getDataBaseModel()->invisibleRootItem();
-
 
 	QString dataBaseName;
 	QString tableName;
@@ -337,7 +344,7 @@ void Explorer::dataBaseTreeItemChanged()
         if (tableDetailsTabIndex != -1) {
             this->explorerTabs->removeTab(tableDetailsTabIndex);
         }
-	}
+    }
 
     this->explorerTabs->setTabText(0, QString(tr("Database: %1")).arg(dataBaseName));
     if (dataBaseName != previousDatabase) {

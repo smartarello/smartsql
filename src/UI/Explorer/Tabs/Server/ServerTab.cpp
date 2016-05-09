@@ -31,6 +31,11 @@ ServerTab::ServerTab(QWidget *parent) : QTableView(parent)
     connect(this, SIGNAL(doubleClicked(QModelIndex)), SLOT(handleDoubleClicked(QModelIndex)));
 }
 
+void ServerTab::reload()
+{
+    ((QSqlQueryModel * )this->model())->setQuery("SHOW DATABASES");
+}
+
 void ServerTab::handleDoubleClicked(QModelIndex index)
 {
     QVariant databaseName = this->model()->data(index);

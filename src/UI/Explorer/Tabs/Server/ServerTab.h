@@ -28,6 +28,7 @@ class ServerTab : public QTableView
 public:
     ServerTab(QWidget *parent = 0);
     virtual ~ServerTab();
+    void reload();
 
 public slots:
     void handleDoubleClicked(QModelIndex index);
