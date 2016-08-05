@@ -17,7 +17,7 @@ $ sudo apt-get install smartsql
   * Install Qt sources
 * g++ 4.8 or later
 * Debian/Ubuntu (apt-get)
-  * `sudo apt-get install build-essential libgl1-mesa-dev libmysqlclient-dev libssl-dev libfontconfig1-dev libfreetype6-dev`
+  * `sudo apt-get install build-essential libgl1-mesa-dev libmysqlclient-dev libssl-dev libfontconfig1-dev libfreetype6-dev libxrender-dev`
 
 ### Build the MySQL plugin
 ```
