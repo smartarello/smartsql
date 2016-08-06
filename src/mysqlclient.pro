@@ -9,6 +9,7 @@ TARGET = SmartSQL
 INCLUDEPATH += .
 DESTDIR = ../dist
 RESOURCES     = mysqlclient.qrc
+QMAKE_CXXFLAGS += -std=c++0x
 
 # Input
 HEADERS += UI/MainWindow.h \

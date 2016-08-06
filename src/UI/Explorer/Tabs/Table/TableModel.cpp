@@ -130,7 +130,7 @@ void TableModel::sort(int column, Qt::SortOrder order){
 	}
 
     QString sortOrder = QString("DESC");
-	if (order == Qt::AscendingOrder){
+    if (order == Qt::DescendingOrder){
         sortOrder = QString("ASC");
 	}
 
