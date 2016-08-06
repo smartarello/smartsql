@@ -13,7 +13,7 @@ $ sudo apt-get install smartsql
 ## Compiling SmartSQL on Unix
 ### Prerequisites
 
-* [Qt 5.6](http://www.qt.io/download/)
+* [Qt 5.5](http://www.qt.io/download/)
   * Install Qt sources
 * g++ 4.8 or later
 * Debian/Ubuntu (apt-get)
